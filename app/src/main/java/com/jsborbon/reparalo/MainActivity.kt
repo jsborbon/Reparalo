@@ -10,38 +10,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.jsborbon.reparalo.ui.theme.ReparaloTheme
 
-class MainActivity : ComponentActivity() {
+
+class MainActivity() : ComponentActivity() {
+    private lateinit var navHostController: NavHostController
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
             ReparaloTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                navHostController = rememberNavController()
+                auth = FirebaseAuth.getInstance()
+
+                NavigationWrapper(navHostController, auth)
+
             }
         }
     }
+
+
+
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ReparaloTheme {
-        Greeting("Android")
-    }
-}

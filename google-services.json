@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1068752748408",
+    "project_id": "reparalo-2440b",
+    "storage_bucket": "reparalo-2440b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068752748408:android:606058097468710c1ed28d",
+        "android_client_info": {
+          "package_name": "com.jsborbon.reparalo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6eAqXzjOmNb1yjvzB6x2-GvRfExmlTMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
