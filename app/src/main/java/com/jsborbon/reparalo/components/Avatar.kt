@@ -1,5 +1,4 @@
-
-package com.jsborbon.relato.components
+package com.jsborbon.reparalo.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
-import com.jsborbon.relato.R
 
 @Composable
 fun Avatar(

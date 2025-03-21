@@ -9,7 +9,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,8 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.jsborbon.relato.models.Communication
+import com.jsborbon.reparalo.models.Communication
 import java.util.UUID
 
 
@@ -178,13 +179,13 @@ fun HeaderSection() {
                 fontWeight = FontWeight.Bold
             )
         }
-        Image(
-            painter = painterResource(id = R.drawable.baseline_markunread_mailbox_24),
+        Icon(
+            imageVector = Icons.Default.MailOutline,
             contentDescription = null,
             modifier = Modifier
                 .size(70.dp)
                 .padding(10.dp),
-            contentScale = ContentScale.Fit
+            tint = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -198,7 +199,7 @@ fun CommunicationRow(communication: Communication) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_person),
+            imageVector = Icons.Default.AccountCircle,
             contentDescription = null,
             modifier = Modifier.size(32.dp)
         )

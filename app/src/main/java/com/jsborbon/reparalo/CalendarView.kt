@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jsborbon.relato.models.CalendarEvent
+import com.jsborbon.reparalo.models.CalendarEvent
 import java.text.SimpleDateFormat
 import java.util.*
 

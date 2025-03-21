@@ -1,5 +1,6 @@
-package com.jsborbon.relato.components
+package com.jsborbon.reparalo.components
 
+import android.graphics.Paint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -53,7 +54,7 @@ fun Marquee(text: String) {
 }
 
 fun getTextWidth(text: String): Float {
-    val paint = android.graphics.Paint()
+    val paint = Paint()
     paint.textSize = 20f
     return paint.measureText(text)
 }

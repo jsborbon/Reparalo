@@ -1,9 +1,12 @@
-package com.jsborbon.relato.components
+package com.jsborbon.reparalo.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -13,7 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.jsborbon.relato.R
+import com.jsborbon.reparalo.R
 
 @Composable
 fun PopoverMenu() {
@@ -24,11 +27,10 @@ fun PopoverMenu() {
             .padding(10.dp)
             .clickable { menuExpanded = !menuExpanded }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.companyicon),
-            contentDescription = "Company Icon",
-            modifier = Modifier.size(70.dp),
-            contentScale = ContentScale.Fit
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Account",
+            tint = Color.Black
         )
     }
 

@@ -26,7 +26,7 @@ fun NavigationWrapper (navHostController: NavHostController, auth: FirebaseAuth)
     NavHost(navController = navHostController, startDestination = startDestination) {
 
         composable(Routes.Login) {
-            com.jsborbon.relato.LoginView(auth = auth, navController = navHostController) { user ->
+            com.jsborbon.reparalo.LoginView(auth = auth, navController = navHostController) { user ->
                 if (user != null) {
                     Log.d("Auth", "Login Successful: ${user.email}")
                     navHostController.navigate(Routes.Home) {
@@ -36,7 +36,7 @@ fun NavigationWrapper (navHostController: NavHostController, auth: FirebaseAuth)
             }
         }
         composable(Routes.SignUp) {
-            com.jsborbon.relato.SignUpView(auth = auth, navController = navHostController) { user ->
+            SignUpView(auth = auth, navController = navHostController) { user ->
                 if (user != null) {
                     Log.d("Auth", "Registration Successful: ${user.email}")
                     navHostController.navigate(Routes.Home) {
@@ -45,12 +45,12 @@ fun NavigationWrapper (navHostController: NavHostController, auth: FirebaseAuth)
                 }
             }
         }
-        composable(Routes.Home) { com.jsborbon.relato.HomeView(navHostController) }
-        composable(Routes.Calendar) { com.jsborbon.relato.CalendarView(navHostController) }
-        composable(Routes.Communications) { com.jsborbon.relato.CommunicationsView(navHostController) }
-        composable(Routes.Configuration) { com.jsborbon.relato.ConfigurationView(navHostController) }
-        composable(Routes.Management) { com.jsborbon.relato.ManagementView(navHostController) }
-        composable(Routes.Insights) { com.jsborbon.relato.InsightsView(navHostController) }
+        composable(Routes.Home) { com.jsborbon.reparalo.HomeView(navHostController) }
+        composable(Routes.Calendar) { com.jsborbon.reparalo.CalendarView(navHostController) }
+        composable(Routes.Communications) { com.jsborbon.reparalo.CommunicationsView(navHostController) }
+        composable(Routes.Configuration) { com.jsborbon.reparalo.ConfigurationView(navHostController) }
+        composable(Routes.Management) { ManagementView(navHostController) }
+        composable(Routes.Insights) { com.jsborbon.reparalo.InsightsView(navHostController) }
 
 
     }

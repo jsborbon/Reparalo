@@ -1,4 +1,4 @@
-package com.jsborbon.relato.models
+package com.jsborbon.reparalo.models
 import java.util.UUID
 
 data class Review(
