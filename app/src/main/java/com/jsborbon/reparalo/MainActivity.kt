@@ -7,10 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.jsborbon.reparalo.navigation.NavigationWrapper
 import com.jsborbon.reparalo.ui.theme.ReparaloTheme
 
-
-class MainActivity() : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
     private lateinit var auth: FirebaseAuth
 
@@ -25,13 +25,7 @@ class MainActivity() : ComponentActivity() {
                 auth = FirebaseAuth.getInstance()
 
                 NavigationWrapper(navHostController, auth)
-
             }
         }
     }
-
-
-
 }
-
-
