@@ -43,6 +43,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.coil.compose)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

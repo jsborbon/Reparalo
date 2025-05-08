@@ -9,21 +9,21 @@ object ValidationUtils {
     }
 
     fun isStrongPassword(password: String): Boolean {
-        // Al menos 6 caracteres, un número, una letra mayúscula
-        val regex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{6,}")
+        // At least 6 characters, one number, one uppercase letter
+        val regex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{6,}$")
         return regex.matches(password)
     }
 
     fun isValidPhone(phone: String): Boolean {
-        // Validar mínimo 7 dígitos y solo números
-        return phone.matches(Regex("^\\d{7,}\$"))
+        // Minimum 7 digits, only numbers
+        return phone.matches(Regex("^\\d{7,}$"))
     }
 
-    fun passwordsMatch(pass1: String, pass2: String): Boolean {
-        return pass1 == pass2
+    fun passwordsMatch(password1: String, password2: String): Boolean {
+        return password1 == password2
     }
 
-    fun isNotEmpty(vararg fields: String): Boolean {
+    fun areNotEmpty(vararg fields: String): Boolean {
         return fields.all { it.isNotBlank() }
     }
 }

@@ -24,6 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".components.video.FullScreenVideoActivity"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar.FullScreen"/>
     </application>
 
 </manifest>

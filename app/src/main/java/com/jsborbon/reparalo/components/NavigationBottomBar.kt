@@ -29,98 +29,63 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.navigation.navigateAndPopUpTo
+import com.jsborbon.reparalo.screens.dashboard.DashboardScreen
+import com.jsborbon.reparalo.screens.forum.ForumScreen
+import com.jsborbon.reparalo.screens.material.MaterialsListScreen
+import com.jsborbon.reparalo.screens.profile.UserProfileScreen
+import com.jsborbon.reparalo.screens.settings.SettingsScreen
+import com.jsborbon.reparalo.screens.tutorial.TutorialsScreen
 
 @Composable
 fun NavigationBottomBar(
     selectedIndex: Int,
-    navController: NavController,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        NavigationBar(
-            modifier = Modifier.padding(vertical = 4.dp),
-        ) {
+        NavigationBar(modifier = Modifier.padding(vertical = 4.dp)) {
             BottomBarIcon(
                 selected = selectedIndex == 0,
-                onClick = {
-                    if (selectedIndex != 0) {
-                        navController.navigate(Routes.DASHBOARD) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.DASHBOARD, Routes.DASHBOARD) },
                 icon = Icons.Default.Home,
-                contentDescription = "Inicio",
+                contentDescription = "Inicio"
             )
             BottomBarIcon(
                 selected = selectedIndex == 1,
-                onClick = {
-                    if (selectedIndex != 1) {
-                        navController.navigate(Routes.TUTORIALS) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.TUTORIALS, Routes.DASHBOARD) },
                 icon = Icons.Default.DateRange,
-                contentDescription = "Calendario",
+                contentDescription = "Tutoriales"
             )
             BottomBarIcon(
                 selected = selectedIndex == 2,
-                onClick = {
-                    if (selectedIndex != 2) {
-                        navController.navigate(Routes.MATERIALS_LIST) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.MATERIALS_LIST, Routes.DASHBOARD) },
                 icon = Icons.Default.Build,
-                contentDescription = "Reparaciones",
+                contentDescription = "Materiales"
             )
             BottomBarIcon(
                 selected = selectedIndex == 3,
-                onClick = {
-                    if (selectedIndex != 3) {
-                        navController.navigate(Routes.FORUM) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.FORUM, Routes.DASHBOARD) },
                 icon = Icons.Default.MailOutline,
-                contentDescription = "Mensajes",
-                badgeCount = 3,
+                contentDescription = "Foro",
+                badgeCount = 3
             )
             BottomBarIcon(
                 selected = selectedIndex == 4,
-                onClick = {
-                    if (selectedIndex != 4) {
-                        navController.navigate(Routes.SETTINGS) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.SETTINGS, Routes.DASHBOARD) },
                 icon = Icons.Default.Settings,
-                contentDescription = "Ajustes",
+                contentDescription = "Configuración"
             )
             BottomBarIcon(
                 selected = selectedIndex == 5,
-                onClick = {
-                    if (selectedIndex != 5) {
-                        navController.navigate(Routes.USER_PROFILE) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                onClick = { navController.navigateAndPopUpTo(Routes.USER_PROFILE, Routes.DASHBOARD) },
                 icon = Icons.Default.Person,
-                contentDescription = "Perfil",
+                contentDescription = "Perfil"
             )
         }
     }
@@ -132,13 +97,13 @@ fun BottomBarIcon(
     onClick: () -> Unit,
     icon: ImageVector,
     contentDescription: String,
-    badgeCount: Int = 0,
+    badgeCount: Int = 0
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable { onClick() }
     ) {
         Box {
             Icon(
@@ -148,10 +113,8 @@ fun BottomBarIcon(
                 tint = if (selected) {
                     MaterialTheme.colorScheme.secondary
                 } else {
-                    MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.6f,
-                    )
-                },
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                }
             )
             if (badgeCount > 0) {
                 Box(
@@ -161,31 +124,64 @@ fun BottomBarIcon(
                         .size(14.dp)
                         .background(
                             color = MaterialTheme.colorScheme.error,
-                            shape = MaterialTheme.shapes.extraSmall,
+                            shape = MaterialTheme.shapes.extraSmall
                         ),
-                    contentAlignment = Alignment.Center,
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = badgeCount.toString(),
                         color = Color.White,
                         style = MaterialTheme.typography.labelSmall,
-                        fontSize = 10.sp,
+                        fontSize = 10.sp
                     )
                 }
             }
         }
-
         Text(
             text = contentDescription,
             style = MaterialTheme.typography.labelSmall,
             color = if (selected) {
                 MaterialTheme.colorScheme.secondary
             } else {
-                MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = 0.6f,
-                )
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             },
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = 4.dp)
         )
+    }
+}
+
+@Composable
+fun BottomNavHost(
+    navController: NavHostController,
+    onTabChange: (Int) -> Unit
+) {
+    androidx.navigation.compose.NavHost(
+        navController = navController,
+        startDestination = Routes.DASHBOARD
+    ) {
+        composable(Routes.DASHBOARD) {
+            onTabChange(0)
+            DashboardScreen(navController = navController)
+        }
+        composable(Routes.TUTORIALS) {
+            onTabChange(1)
+            TutorialsScreen(navController = navController)
+        }
+        composable(Routes.MATERIALS_LIST) {
+            onTabChange(2)
+            MaterialsListScreen(navController = navController)
+        }
+        composable(Routes.FORUM) {
+            onTabChange(3)
+            ForumScreen(navController = navController)
+        }
+        composable(Routes.SETTINGS) {
+            onTabChange(4)
+            SettingsScreen(navController = navController)
+        }
+        composable(Routes.USER_PROFILE) {
+            onTabChange(5)
+            UserProfileScreen(navController = navController)
+        }
     }
 }

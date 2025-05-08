@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.Reparalo" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Material3.DayNight.NoActionBar.FullScreen" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

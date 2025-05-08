@@ -24,7 +24,10 @@ class MainActivity : ComponentActivity() {
                 navHostController = rememberNavController()
                 auth = FirebaseAuth.getInstance()
 
-                NavigationWrapper(navHostController, auth)
+                NavigationWrapper(
+                    navController = navHostController,
+                    auth = auth
+                )
             }
         }
     }
