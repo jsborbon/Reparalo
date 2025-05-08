@@ -43,5 +43,6 @@ I want you to know that contributions are welcome. If you wish to contribute, pl
 
 ---
 📌 **Developed by:** Javier Santiago Borbón Borbón
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jsborbon/Reparalo)
 
