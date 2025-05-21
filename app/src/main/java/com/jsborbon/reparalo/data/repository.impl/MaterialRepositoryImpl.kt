@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class MaterialRepositoryImpl @Inject constructor(
-    private val api: MaterialApiService
+    private val api: MaterialApiService,
 ) : MaterialRepository {
 
     override suspend fun getMaterials(): Flow<ApiResponse<List<Material>>> = flow {
@@ -22,13 +22,22 @@ class MaterialRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMaterialById(id: String): Flow<ApiResponse<Material>> = flow {
+    override suspend fun getMaterialById(id: String): ApiResponse<Material> {
+        return try {
+            val material = api.getMaterialById(id)
+            ApiResponse.Success(material)
+        } catch (e: Exception) {
+            ApiResponse.Failure(e.message ?: "Error al obtener el material")
+        }
+    }
+
+    override suspend fun updateMaterial(material: Material): Flow<ApiResponse<Material>> = flow {
         emit(ApiResponse.Loading)
         try {
-            val material = api.getMaterialById(id)
-            emit(ApiResponse.Success(material))
+            val updated = api.updateMaterial(material.id, material)
+            emit(ApiResponse.Success(updated))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error al obtener el material"))
+            emit(ApiResponse.Failure(e.message ?: "Error al actualizar el material"))
         }
     }
 }

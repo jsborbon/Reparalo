@@ -35,12 +35,12 @@ fun ProfileHeader(
     isTechnician: Boolean,
     isVerified: Boolean,
     userRating: Float,
-    completedServices: Int
+    completedServices: Int,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier.size(120.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             if (userPhoto.isNotEmpty()) {
                 AsyncImage(
@@ -49,7 +49,7 @@ fun ProfileHeader(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             } else {
                 Icon(
@@ -60,7 +60,7 @@ fun ProfileHeader(
                         .size(60.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(12.dp)
+                        .padding(12.dp),
                 )
             }
 
@@ -71,13 +71,13 @@ fun ProfileHeader(
                         .size(36.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Verificado",
                         tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
@@ -88,19 +88,19 @@ fun ProfileHeader(
         Text(
             text = userName,
             fontWeight = FontWeight.Bold,
-            fontSize = 22.sp
+            fontSize = 22.sp,
         )
 
         Text(
             text = if (isTechnician) "Técnico" else "Cliente",
             color = MaterialTheme.colorScheme.secondary,
-            fontSize = 16.sp
+            fontSize = 16.sp,
         )
 
         if (isTechnician) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
             ) {
                 Text(text = userRating.toString(), fontWeight = FontWeight.Bold)
                 Icon(
@@ -109,12 +109,12 @@ fun ProfileHeader(
                     tint = Color(0xFFFFC107),
                     modifier = Modifier
                         .size(20.dp)
-                        .padding(start = 4.dp, end = 2.dp)
+                        .padding(start = 4.dp, end = 2.dp),
                 )
                 Text(
                     text = "($completedServices servicios)",
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

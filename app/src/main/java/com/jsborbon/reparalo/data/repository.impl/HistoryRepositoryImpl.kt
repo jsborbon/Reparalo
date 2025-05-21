@@ -6,7 +6,7 @@ import com.jsborbon.reparalo.models.ServiceHistoryItem
 import javax.inject.Inject
 
 class HistoryRepositoryImpl @Inject constructor(
-    private val apiService: HistoryApiService
+    private val apiService: HistoryApiService,
 ) : HistoryRepository {
 
     override suspend fun getServiceHistory(userId: String): List<ServiceHistoryItem> {

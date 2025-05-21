@@ -3,7 +3,10 @@ package com.jsborbon.reparalo.components.video
 import android.content.Intent
 import android.net.Uri
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -23,7 +26,7 @@ import com.jsborbon.reparalo.ui.theme.RepairYellow
 @Composable
 fun VideoPlayer(
     videoUrl: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -47,11 +50,11 @@ fun VideoPlayer(
                     useController = true
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
+                        ViewGroup.LayoutParams.MATCH_PARENT,
                     )
                 }
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
 
         IconButton(
@@ -59,17 +62,17 @@ fun VideoPlayer(
                 context.startActivity(
                     Intent(context, FullScreenVideoActivity::class.java).apply {
                         putExtra("video_url", videoUrl)
-                    }
+                    },
                 )
             },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Icon(
                 painterResource(id = com.jsborbon.reparalo.R.drawable.baseline_fullscreen),
                 contentDescription = "Pantalla completa",
-                tint = RepairYellow
+                tint = RepairYellow,
             )
         }
     }

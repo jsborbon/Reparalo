@@ -6,7 +6,7 @@ import com.jsborbon.reparalo.models.Tutorial
 import javax.inject.Inject
 
 class FavoritesRepositoryImpl @Inject constructor(
-    private val apiService: FavoritesApiService
+    private val apiService: FavoritesApiService,
 ) : FavoritesRepository {
 
     override suspend fun getFavoriteTutorials(userId: String): List<Tutorial> {

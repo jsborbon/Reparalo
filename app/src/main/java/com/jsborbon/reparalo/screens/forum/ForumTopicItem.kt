@@ -33,17 +33,17 @@ import com.jsborbon.reparalo.utils.formatDate
 @Composable
 fun ForumTopicItem(
     topic: ForumTopic,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
-            .clickable(enabled = onClick != null) { onClick?.invoke() }
+            .clickable(enabled = onClick != null) { onClick?.invoke() },
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -51,7 +51,7 @@ fun ForumTopicItem(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -61,7 +61,7 @@ fun ForumTopicItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -69,14 +69,14 @@ fun ForumTopicItem(
             Text(
                 text = "Publicado por ${topic.author} el ${formatDate(topic.date.time)}",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray
+                color = Color.Gray,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 ForumStat(painter = painterResource(R.drawable.baseline_visibility), value = topic.views.toString())
                 ForumStat(icon = Icons.Default.ThumbUp, value = topic.likes.toString())
@@ -93,7 +93,7 @@ private fun ForumStat(icon: ImageVector, value: String) {
         Text(
             text = value,
             modifier = Modifier.padding(start = 4.dp),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }
@@ -105,7 +105,7 @@ private fun ForumStat(painter: Painter, value: String) {
         Text(
             text = value,
             modifier = Modifier.padding(start = 4.dp),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

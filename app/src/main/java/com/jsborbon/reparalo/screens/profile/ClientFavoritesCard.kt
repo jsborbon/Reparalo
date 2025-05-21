@@ -1,6 +1,5 @@
 package com.jsborbon.reparalo.screens.profile
 
-import InfoRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -11,22 +10,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.components.InfoCard
+import com.jsborbon.reparalo.components.InfoRow
 
 @Composable
 fun ClientFavoritesCard(
     favoriteCount: Int,
-    onViewFavoritesClick: () -> Unit
+    onViewFavoritesClick: () -> Unit,
 ) {
     InfoCard(title = "Mis Favoritos") {
         InfoRow(
             icon = painterResource(id = R.drawable.baseline_favorite),
-            text = "$favoriteCount tutoriales guardados"
+            text = "$favoriteCount tutoriales guardados",
         )
         Button(
             onClick = onViewFavoritesClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
+                .padding(top = 8.dp),
         ) {
             Text("Ver mis favoritos")
         }

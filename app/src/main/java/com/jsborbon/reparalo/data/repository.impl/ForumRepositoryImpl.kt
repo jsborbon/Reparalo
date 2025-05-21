@@ -18,7 +18,7 @@ class ForumRepositoryImpl @Inject constructor(
             val topics = api.getTopics()
             emit(ApiResponse.Success(topics))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error al obtener temas"))
+            emit(ApiResponse.Failure(e.message ?: "Error while fetching forum topics"))
         }
     }
 
@@ -28,7 +28,32 @@ class ForumRepositoryImpl @Inject constructor(
             api.createTopic(topic)
             emit(ApiResponse.Success(true))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error al crear tema"))
+            emit(ApiResponse.Failure(e.message ?: "Error while creating topic"))
+        }
+    }
+
+    override suspend fun getTopicById(topicId: String): Flow<ApiResponse<ForumTopic>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val topic = api.getTopicById(topicId)
+            emit(ApiResponse.Success(topic))
+        } catch (e: Exception) {
+            emit(ApiResponse.Failure(e.message ?: "Error while fetching topic"))
+        }
+    }
+
+    override suspend fun updateTopic(
+        id: String,
+        title: String,
+        description: String,
+        category: String
+    ): Flow<ApiResponse<Boolean>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            api.updateTopic(id, title, description, category)
+            emit(ApiResponse.Success(true))
+        } catch (e: Exception) {
+            emit(ApiResponse.Failure(e.message ?: "Error while updating topic"))
         }
     }
 }

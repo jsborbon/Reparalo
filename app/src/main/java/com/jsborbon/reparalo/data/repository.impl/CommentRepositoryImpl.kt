@@ -10,11 +10,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-/**
- * Implementation of [CommentRepository] that handles comment-related operations via the API.
- */
 class CommentRepositoryImpl @Inject constructor(
-    private val apiService: CommentApiService
+    private val apiService: CommentApiService,
 ) : CommentRepository {
 
     private val TAG = "CommentRepositoryImpl"

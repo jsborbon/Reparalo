@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TechnicianViewModel @Inject constructor(
-    private val repository: TechnicianRepository
+    private val repository: TechnicianRepository,
 ) : ViewModel() {
 
     private val _technician = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)

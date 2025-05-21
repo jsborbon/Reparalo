@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val repository: HistoryRepositoryImpl
+    private val repository: HistoryRepositoryImpl,
 ) : ViewModel() {
 
     private val _historyItems = MutableStateFlow<ApiResponse<List<ServiceHistoryItem>>>(ApiResponse.Loading)

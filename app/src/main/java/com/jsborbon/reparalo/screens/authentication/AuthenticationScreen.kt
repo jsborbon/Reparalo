@@ -27,7 +27,7 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun AuthenticationScreen(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     var isLogin by remember { mutableStateOf(true) }
 
@@ -36,19 +36,19 @@ fun AuthenticationScreen(
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
             text = "Reparalo",
             fontSize = 36.sp,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = "Tu asistente de reparaciones",
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -57,12 +57,12 @@ fun AuthenticationScreen(
             Tab(
                 selected = isLogin,
                 onClick = { isLogin = true },
-                text = { Text("Iniciar Sesión") }
+                text = { Text("Iniciar Sesión") },
             )
             Tab(
                 selected = !isLogin,
                 onClick = { isLogin = false },
-                text = { Text("Registrarse") }
+                text = { Text("Registrarse") },
             )
         }
 

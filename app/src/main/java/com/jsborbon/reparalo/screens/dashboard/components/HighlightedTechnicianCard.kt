@@ -34,7 +34,7 @@ fun HighlightedTechnicianCard(navController: NavController) {
             text = "Profesionales Destacados",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         )
 
         Card(
@@ -43,25 +43,25 @@ fun HighlightedTechnicianCard(navController: NavController) {
                 .padding(vertical = 8.dp)
                 .clickable { navController.navigate(Routes.PROFESSIONAL_CONNECTION) },
             shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         ) {
             Row(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(RoundedCornerShape(25.dp))
                         .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "JR",
                         color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
 
@@ -70,11 +70,11 @@ fun HighlightedTechnicianCard(navController: NavController) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Juan Rodríguez",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = "Electricista • 4.9 ★",
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     )
                 }
 
@@ -82,7 +82,7 @@ fun HighlightedTechnicianCard(navController: NavController) {
                     onClick = {
                         navController.navigate(Routes.PROFESSIONAL_CONNECTION)
                     },
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
                 ) {
                     Text(text = "Contactar")
                 }

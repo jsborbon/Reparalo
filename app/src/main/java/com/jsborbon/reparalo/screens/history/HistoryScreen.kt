@@ -26,8 +26,8 @@ import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 
 @Composable
 fun ServiceHistoryScreen(
-    navController: NavController,
-    viewModel: HistoryViewModel = viewModel()
+    navController: NavController, //TODO
+    viewModel: HistoryViewModel = viewModel(),
 ) {
     val state by viewModel.historyItems.collectAsState()
 
@@ -39,19 +39,19 @@ fun ServiceHistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Text(
             text = "Historial de servicios",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         when (state) {
             is ApiResponse.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -60,13 +60,13 @@ fun ServiceHistoryScreen(
             is ApiResponse.Success -> {
                 val historyItems = (state as ApiResponse.Success<List<ServiceHistoryItem>>).data
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(historyItems) { item ->
                         ServiceHistoryCard(
                             title = item.title,
                             description = item.description,
-                            date = item.date
+                            date = item.date,
                         )
                     }
                 }
@@ -76,7 +76,7 @@ fun ServiceHistoryScreen(
                 val errorMessage = (state as ApiResponse.Failure).errorMessage
                 Text(
                     text = "Error al cargar el historial: $errorMessage",
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }

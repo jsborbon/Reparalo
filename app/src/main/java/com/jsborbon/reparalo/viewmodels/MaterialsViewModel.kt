@@ -14,14 +14,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MaterialsViewModel @Inject constructor(
-    private val repository: MaterialRepositoryImpl
+    private val repository: MaterialRepositoryImpl,
 ) : ViewModel() {
 
     private val _materials = MutableStateFlow<ApiResponse<List<Material>>>(ApiResponse.Loading)
     val materials: StateFlow<ApiResponse<List<Material>>> = _materials
 
-    private val _selectedMaterial = MutableStateFlow<ApiResponse<Material>>(ApiResponse.Loading)
-    val selectedMaterial: StateFlow<ApiResponse<Material>> = _selectedMaterial
+    private val _materialDetail = MutableStateFlow<ApiResponse<Material>?>(null)
+    val materialDetail: StateFlow<ApiResponse<Material>?> = _materialDetail
 
     init {
         loadMaterials()
@@ -37,8 +37,16 @@ class MaterialsViewModel @Inject constructor(
 
     fun loadMaterialById(id: String) {
         viewModelScope.launch {
-            repository.getMaterialById(id).collectLatest { response ->
-                _selectedMaterial.value = response
+            _materialDetail.value = ApiResponse.Loading
+            _materialDetail.value = repository.getMaterialById(id)
+        }
+    }
+
+    fun updateMaterial(updated: Material) {
+        viewModelScope.launch {
+            _materialDetail.value = ApiResponse.Loading
+            repository.updateMaterial(updated).collectLatest { response ->
+                _materialDetail.value = response
             }
         }
     }

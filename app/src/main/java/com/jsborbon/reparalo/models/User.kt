@@ -9,5 +9,5 @@ data class User(
     val availability: String = "",
     val registrationDate: String = "",
     val specialty: String? = null,
-    val rating: Float = 0f
+    val rating: Float = 0f,
 )

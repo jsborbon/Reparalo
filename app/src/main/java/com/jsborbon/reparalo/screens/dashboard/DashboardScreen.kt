@@ -12,6 +12,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -38,9 +51,9 @@ fun DashboardScreen(navController: NavController) {
                         Icon(Icons.Default.Person, contentDescription = "Perfil")
                     }
                     PopoverMenu(navController = navController)
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         DashboardContent(innerPadding = innerPadding, navController = navController)
     }
@@ -59,14 +72,14 @@ fun DashboardContent(innerPadding: PaddingValues, navController: NavController) 
         AnimatedVisibility(
             visible = visibleState.value,
             enter = slideInHorizontally { it } + fadeIn(),
-            exit = slideOutHorizontally { -it } + fadeOut()
+            exit = slideOutHorizontally { -it } + fadeOut(),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             ) {
                 WelcomeSection()
                 CategorySection(navController)

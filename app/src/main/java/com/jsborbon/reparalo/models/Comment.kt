@@ -8,5 +8,5 @@ data class Comment(
     val userId: String = "",
     val content: String = "",
     val date: Date = Date(),
-    val rating: Int = 0
+    val rating: Int = 0,
 )

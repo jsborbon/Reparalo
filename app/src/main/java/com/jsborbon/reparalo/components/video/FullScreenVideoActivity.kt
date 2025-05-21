@@ -40,7 +40,7 @@ class FullScreenVideoActivity : ComponentActivity() {
             useController = true
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
         }
 

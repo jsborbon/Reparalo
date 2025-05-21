@@ -1,6 +1,32 @@
 package com.jsborbon.reparalo.screens.authentication
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -8,12 +34,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.UserType
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.utils.ValidationUtils.areNotEmpty
-import com.jsborbon.reparalo.utils.ValidationUtils.isStrongPassword
-import com.jsborbon.reparalo.utils.ValidationUtils.isValidEmail
-import com.jsborbon.reparalo.utils.ValidationUtils.isValidPhone
-import com.jsborbon.reparalo.utils.ValidationUtils.passwordsMatch
+import com.jsborbon.reparalo.utils.ValidationUtils
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @Composable
@@ -23,7 +46,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var userType by remember { mutableStateOf("cliente") }
+    var userType by remember { mutableStateOf(UserType.CLIENT) }
     var passwordVisible by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -53,7 +76,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { name = it },
             label = { Text("Nombre") },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,7 +86,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { email = it },
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -73,7 +96,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { phone = it },
             label = { Text("Teléfono") },
             leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -81,10 +104,10 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Tipo de usuario:")
             Spacer(modifier = Modifier.width(12.dp))
-            RadioButton(selected = userType == "cliente", onClick = { userType = "cliente" })
+            RadioButton(selected = userType == UserType.CLIENT, onClick = { userType = UserType.CLIENT })
             Text("Cliente")
             Spacer(modifier = Modifier.width(12.dp))
-            RadioButton(selected = userType == "tecnico", onClick = { userType = "tecnico" })
+            RadioButton(selected = userType == UserType.TECHNICIAN, onClick = { userType = UserType.TECHNICIAN })
             Text("Técnico")
         }
 
@@ -101,7 +124,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                     Text(if (passwordVisible) "🙈" else "👁️")
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -112,7 +135,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             label = { Text("Confirmar Contraseña") },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (error != null) {
@@ -125,32 +148,32 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
         Button(
             onClick = {
                 error = null
-                if (!areNotEmpty(name, email, phone, password, confirmPassword)) {
+                if (!ValidationUtils.areNotEmpty(name, email, phone, password, confirmPassword)) {
                     error = "Completa todos los campos"
                     return@Button
                 }
-                if (!isValidEmail(email)) {
+                if (!ValidationUtils.isValidEmail(email)) {
                     error = "Email no válido"
                     return@Button
                 }
-                if (!isStrongPassword(password)) {
+                if (!ValidationUtils.isStrongPassword(password)) {
                     error = "Contraseña débil"
                     return@Button
                 }
-                if (!passwordsMatch(password, confirmPassword)) {
+                if (!ValidationUtils.passwordsMatch(password, confirmPassword)) {
                     error = "Las contraseñas no coinciden"
                     return@Button
                 }
-                if (!isValidPhone(phone)) {
+                if (!ValidationUtils.isValidPhone(phone)) {
                     error = "Teléfono inválido"
                     return@Button
                 }
-                viewModel.signUp(email, password, name, phone, userType)
+                viewModel.signUp(email, password, name, phone, userType.name)
             },
             enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))

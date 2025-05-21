@@ -24,7 +24,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Material
 import com.jsborbon.reparalo.models.Tutorial
-import com.jsborbon.reparalo.utils.formatDate
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 import java.util.Date
 
@@ -48,11 +47,11 @@ import java.util.Date
 fun TutorialEditScreen(
     navController: NavController,
     tutorialId: String,
-    viewModel: TutorialsViewModel = viewModel()
+    viewModel: TutorialsViewModel = viewModel(),
 ) {
     val updateState by viewModel.updateState.collectAsState()
     val tutorialsState by viewModel.tutorials.collectAsState()
-    val snackbarHostState = rememberSnackbarHostState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -60,7 +59,7 @@ fun TutorialEditScreen(
     var difficulty by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
-    var materials by remember { mutableStateOf<List<String>>(emptyList()) }
+    var materials by remember { mutableStateOf<List<Material>>(emptyList()) }
     var newMaterial by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
     var videoUrl by remember { mutableStateOf("") }
@@ -82,7 +81,6 @@ fun TutorialEditScreen(
                 duration = it.estimatedDuration
                 author = it.author
                 materials = it.materials
-                imageUrl = it.imageUrl
                 videoUrl = it.videoUrl
             }
         }
@@ -94,7 +92,7 @@ fun TutorialEditScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -102,71 +100,73 @@ fun TutorialEditScreen(
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Título") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = difficulty,
                 onValueChange = { difficulty = it },
                 label = { Text("Nivel de dificultad") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = duration,
                 onValueChange = { duration = it },
                 label = { Text("Duración estimada") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = author,
                 onValueChange = { author = it },
                 label = { Text("Autor") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = imageUrl,
                 onValueChange = { imageUrl = it },
                 label = { Text("URL de imagen") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = videoUrl,
                 onValueChange = { videoUrl = it },
                 label = { Text("URL de video") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Text("Materiales", style = MaterialTheme.typography.titleMedium)
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 items(materials) { item ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = item, modifier = Modifier.weight(1f))
-                        IconButton(onClick = { materials = materials - item }) {
+                        Text(text = item.name, modifier = Modifier.weight(1f))
+                        IconButton(onClick = {
+                            materials = materials.filterNot { it.id == item.id }
+                        }) {
                             Icon(Icons.Default.Delete, contentDescription = "Eliminar material")
                         }
                     }
@@ -177,16 +177,23 @@ fun TutorialEditScreen(
                 value = newMaterial,
                 onValueChange = { newMaterial = it },
                 label = { Text("Nuevo material") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Button(
                 onClick = {
                     if (newMaterial.isNotBlank()) {
-                        materials = materials + newMaterial.trim()
+                        val newItem = Material(
+                            id = System.currentTimeMillis().toString(),
+                            name = newMaterial.trim(),
+                            quantity = 1,
+                            description = "",
+                            price = 0f,
+                        )
+                        materials = materials + newItem
                         newMaterial = ""
                     }
                 },
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
             ) {
                 Text("Añadir material")
             }
@@ -202,15 +209,14 @@ fun TutorialEditScreen(
                         estimatedDuration = duration,
                         author = author,
                         materials = materials,
-                        imageUrl = imageUrl,
                         videoUrl = videoUrl,
-                        publicationDate = formatDate(Date()),
-                        averageRating = 0f
+                        publicationDate = Date(),
+                        averageRating = 0f,
                     )
                     viewModel.updateTutorial(tutorialId, updatedTutorial)
                 },
                 enabled = updateState !is ApiResponse.Loading,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
             ) {
                 Text("Guardar cambios")
             }

@@ -1,4 +1,3 @@
-// TutorialApiService.kt
 package com.jsborbon.reparalo.data.api.service
 
 import com.jsborbon.reparalo.models.Tutorial
@@ -28,4 +27,14 @@ interface TutorialApiService {
 
     @DELETE("tutoriales/{id}")
     suspend fun delete(@Path("id") id: String): Response<Unit>
+
+    @GET("tutoriales/{id}/favorite")
+    suspend fun isFavorite(@Path("id") tutorialId: String): Response<Boolean>
+
+    @POST("tutoriales/{id}/favorite")
+    suspend fun addFavorite(@Path("id") tutorialId: String): Response<Unit>
+
+    @DELETE("tutoriales/{id}/favorite")
+    suspend fun removeFavorite(@Path("id") tutorialId: String): Response<Unit>
+
 }

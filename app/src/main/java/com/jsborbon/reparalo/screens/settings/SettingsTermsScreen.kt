@@ -1,19 +1,38 @@
 package com.jsborbon.reparalo.screens.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.viewmodels.TermsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTermsScreen(navController: NavController) {
+fun SettingsTermsScreen(
+    navController: NavController,
+    termsViewModel: TermsViewModel = hiltViewModel()
+) {
+    val termsState by termsViewModel.terms.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -22,58 +41,70 @@ fun SettingsTermsScreen(navController: NavController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-            Text(
-                text = "Última actualización: 06/05/2025",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+            when (termsState) {
+                is ApiResponse.Loading -> {
+                    Text("Cargando términos y condiciones...", style = MaterialTheme.typography.bodyMedium)
+                }
+                is ApiResponse.Failure -> {
+                    Text(
+                        text = "Error: ${(termsState as ApiResponse.Failure).errorMessage}",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                is ApiResponse.Success -> {
+                    val terms = (termsState as ApiResponse.Success).data
+                    Text(
+                        text = "Última actualización: ${terms.lastUpdated}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+                    terms.sections.forEach { section ->
+                        SectionTitle(title = section.title)
+                        SectionText(text = section.content)
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
 
-            Text(
-                text = "1. Uso de la aplicación",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Esta aplicación tiene como propósito brindar asistencia en reparaciones domésticas mediante tutoriales, materiales recomendados y contacto con profesionales técnicos."
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "2. Privacidad y datos",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Tu información será tratada con confidencialidad y conforme a la legislación vigente. No compartimos tus datos sin consentimiento explícito."
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "3. Responsabilidad del contenido",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Los tutoriales son de carácter informativo. El usuario es responsable de aplicar correctamente las indicaciones y tomar medidas de seguridad adecuadas."
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Al continuar usando la app, aceptas estos términos.",
-                style = MaterialTheme.typography.bodyMedium
-            )
+                    Text(
+                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos términos" +
+                            " y condiciones.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
         }
     }
+}
+
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = 4.dp)
+    )
+}
+
+@Composable
+fun SectionText(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
 }

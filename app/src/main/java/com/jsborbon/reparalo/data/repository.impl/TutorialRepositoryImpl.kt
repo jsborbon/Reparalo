@@ -10,11 +10,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-/**
- * Implementation of [TutorialRepository] that manages tutorial-related operations via the API.
- */
 class TutorialRepositoryImpl @Inject constructor(
-    private val apiService: TutorialApiService
+    private val apiService: TutorialApiService,
 ) : TutorialRepository {
 
     private val TAG = "TutorialRepositoryImpl"
@@ -100,6 +97,47 @@ class TutorialRepositoryImpl @Inject constructor(
         }
     }.catch { e ->
         Log.e(TAG, "deleteTutorial exception: ${e.message}", e)
+        emit(ApiResponse.failure("Exception: ${e.localizedMessage}"))
+    }
+
+    override fun isFavorite(tutorialId: String): Flow<ApiResponse<Boolean>> = flow {
+        emit(ApiResponse.Loading)
+        val response = apiService.isFavorite(tutorialId)
+        if (response.isSuccessful) {
+            response.body()?.let {
+                emit(ApiResponse.success(it))
+            } ?: emit(ApiResponse.failure("Empty response body"))
+        } else {
+            emit(ApiResponse.failure("Error ${response.code()}: ${response.message()}"))
+        }
+    }.catch { e ->
+        Log.e(TAG, "isFavorite exception: ${e.message}", e)
+        emit(ApiResponse.failure("Exception: ${e.localizedMessage}"))
+    }
+
+    override fun addFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
+        emit(ApiResponse.Loading)
+        val response = apiService.addFavorite(tutorialId)
+        if (response.isSuccessful) {
+            emit(ApiResponse.success(Unit))
+        } else {
+            emit(ApiResponse.failure("Error ${response.code()}: ${response.message()}"))
+        }
+    }.catch { e ->
+        Log.e(TAG, "addFavorite exception: ${e.message}", e)
+        emit(ApiResponse.failure("Exception: ${e.localizedMessage}"))
+    }
+
+    override fun removeFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
+        emit(ApiResponse.Loading)
+        val response = apiService.removeFavorite(tutorialId)
+        if (response.isSuccessful) {
+            emit(ApiResponse.success(Unit))
+        } else {
+            emit(ApiResponse.failure("Error ${response.code()}: ${response.message()}"))
+        }
+    }.catch { e ->
+        Log.e(TAG, "removeFavorite exception: ${e.message}", e)
         emit(ApiResponse.failure("Exception: ${e.localizedMessage}"))
     }
 }

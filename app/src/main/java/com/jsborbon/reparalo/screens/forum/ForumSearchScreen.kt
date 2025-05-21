@@ -40,7 +40,7 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumSearchScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel()
+    viewModel: ForumViewModel = viewModel(),
 ) {
     var query by remember { mutableStateOf("") }
     val topicsState by viewModel.topics.collectAsState()
@@ -53,15 +53,15 @@ fun ForumSearchScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
         ) {
             OutlinedTextField(
                 value = query,
@@ -73,7 +73,7 @@ fun ForumSearchScreen(
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
-                singleLine = true
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -83,7 +83,7 @@ fun ForumSearchScreen(
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -93,7 +93,7 @@ fun ForumSearchScreen(
                     Text(
                         text = "Error: ${state.errorMessage}",
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
 
@@ -105,7 +105,7 @@ fun ForumSearchScreen(
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 80.dp),
                     ) {
                         items(filteredTopics, key = { it.id }) { topic ->
                             ForumTopicItem(topic = topic)

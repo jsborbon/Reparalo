@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val apiService: UserApiService
+    private val apiService: UserApiService,
 ) : UserRepository {
 
     private val TAG = "UserRepositoryImpl"

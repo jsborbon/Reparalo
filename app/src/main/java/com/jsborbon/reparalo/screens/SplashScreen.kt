@@ -71,19 +71,19 @@ fun SplashScreen(navController: NavController) {
     val logoAlpha by animateFloatAsState(
         targetValue = if (startAnimation.value) 1f else 0f,
         animationSpec = tween(1000, easing = LinearOutSlowInEasing),
-        label = "logoAlpha"
+        label = "logoAlpha",
     )
 
     val elevation by animateDpAsState(
         targetValue = if (startAnimation.value) 12.dp else 0.dp,
         animationSpec = tween(1200, easing = FastOutSlowInEasing),
-        label = "elevation"
+        label = "elevation",
     )
 
     val scale by animateFloatAsState(
         targetValue = if (startAnimation.value) 1f else 0.8f,
         animationSpec = tween(1000, easing = FastOutSlowInEasing),
-        label = "scale"
+        label = "scale",
     )
 
     val infiniteTransition = rememberInfiniteTransition(label = "transition")
@@ -92,8 +92,9 @@ fun SplashScreen(navController: NavController) {
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(5000, easing = LinearOutSlowInEasing),
-            repeatMode = RepeatMode.Restart        ),
-        label = "rotation"
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "rotation",
     )
 
     val pulseSize by infiniteTransition.animateFloat(
@@ -101,8 +102,9 @@ fun SplashScreen(navController: NavController) {
         targetValue = 1.1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Restart        ),
-        label = "pulse"
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "pulse",
     )
 
     LaunchedEffect(Unit) {
@@ -117,32 +119,32 @@ fun SplashScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(brush = Brush.verticalGradient(colors = listOf(PrimaryDark, PrimaryLight))),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 color = Color.White.copy(alpha = 0.05f),
                 radius = size.width * 0.4f,
-                center = Offset(size.width * 0.8f, size.height * 0.2f)
+                center = Offset(size.width * 0.8f, size.height * 0.2f),
             )
             drawCircle(
                 color = Color.White.copy(alpha = 0.05f),
                 radius = size.width * 0.3f,
-                center = Offset(size.width * 0.2f, size.height * 0.8f)
+                center = Offset(size.width * 0.2f, size.height * 0.8f),
             )
             drawLine(
                 color = Secondary.copy(alpha = 0.2f),
                 start = Offset(0f, size.height * 0.3f),
                 end = Offset(size.width, size.height * 0.7f),
                 strokeWidth = 5f,
-                cap = StrokeCap.Round
+                cap = StrokeCap.Round,
             )
             drawLine(
                 color = Accent.copy(alpha = 0.2f),
                 start = Offset(0f, size.height * 0.7f),
                 end = Offset(size.width, size.height * 0.3f),
                 strokeWidth = 5f,
-                cap = StrokeCap.Round
+                cap = StrokeCap.Round,
             )
         }
 
@@ -153,12 +155,12 @@ fun SplashScreen(navController: NavController) {
                 .scale(scale)
                 .shadow(elevation, RoundedCornerShape(24.dp), spotColor = Secondary),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            shape = RoundedCornerShape(24.dp)
+            shape = RoundedCornerShape(24.dp),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(32.dp)
+                modifier = Modifier.padding(32.dp),
             ) {
                 Box(
                     modifier = Modifier
@@ -166,7 +168,7 @@ fun SplashScreen(navController: NavController) {
                         .clip(CircleShape)
                         .background(Brush.radialGradient(listOf(Secondary, PrimaryLight)))
                         .scale(pulseSize),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_reparalo_logo),
@@ -174,7 +176,7 @@ fun SplashScreen(navController: NavController) {
                         tint = Color.White,
                         modifier = Modifier
                             .size(48.dp)
-                            .rotate(rotationAngle)
+                            .rotate(rotationAngle),
                     )
                 }
 
@@ -182,14 +184,14 @@ fun SplashScreen(navController: NavController) {
 
                 AnimatedVisibility(
                     visible = startAnimation.value,
-                    enter = fadeIn(tween(1000)) + slideInVertically(initialOffsetY = { -50 })
+                    enter = fadeIn(tween(1000)) + slideInVertically(initialOffsetY = { -50 }),
                 ) {
                     Text(
                         text = "Reparalo",
                         color = PrimaryDark,
                         fontSize = 48.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
 
@@ -197,14 +199,14 @@ fun SplashScreen(navController: NavController) {
 
                 AnimatedVisibility(
                     visible = startAnimation.value,
-                    enter = fadeIn(tween(1200)) + slideInVertically(initialOffsetY = { 50 })
+                    enter = fadeIn(tween(1200)) + slideInVertically(initialOffsetY = { 50 }),
                 ) {
                     Text(
                         text = "Repara en Casa",
                         color = Color.DarkGray,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
 
@@ -214,13 +216,13 @@ fun SplashScreen(navController: NavController) {
                     CircularProgressIndicator(
                         color = Secondary,
                         modifier = Modifier.size(24.dp),
-                        strokeWidth = 3.dp
+                        strokeWidth = 3.dp,
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = "Cargando...",
                         color = Color.Gray,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
                     )
                 }
             }

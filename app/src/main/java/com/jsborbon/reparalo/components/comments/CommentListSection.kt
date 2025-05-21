@@ -20,12 +20,11 @@ import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.viewmodels.TutorialDetailViewModel
 
-
 @Composable
 fun CommentListSection(
     commentsState: ApiResponse<List<Comment>>,
     viewModel: TutorialDetailViewModel,
-    tutorialId: String
+    tutorialId: String,
 ) {
     when (commentsState) {
         is ApiResponse.Loading -> {
@@ -38,7 +37,11 @@ fun CommentListSection(
             Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Error al cargar comentarios")
-                    Text(commentsState.errorMessage, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                    Text(
+                        commentsState.errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.loadComments(tutorialId) }) {
                         Text("Reintentar")

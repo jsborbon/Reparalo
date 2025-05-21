@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val repository: FavoritesRepositoryImpl
+    private val repository: FavoritesRepositoryImpl,
 ) : ViewModel() {
 
     private val _favoriteTutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)

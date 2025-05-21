@@ -21,13 +21,10 @@ val Teal40 = Color(0xFF00ACC1)
 
 // Status colors
 val Success = Color(0xFF4CAF50)
-val Warning = Color(0xFFFFC107)
 val Error = Color(0xFFF44336)
-val Info = Color(0xFF2196F3)
 
 // Background and surface colors
 val BackgroundLight = Color(0xFFF5F5F5)
 val BackgroundDark = Color(0xFF121212)
 val SurfaceLight = Color(0xFFFFFFFF)
 val SurfaceDark = Color(0xFF1E1E1E)
-

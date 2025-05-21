@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
                 NavigationWrapper(
                     navController = navHostController,
-                    auth = auth
+                    auth = auth,
                 )
             }
         }

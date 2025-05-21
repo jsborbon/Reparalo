@@ -26,7 +26,7 @@ fun CategorySection(navController: NavController) {
             icon = Icons.Default.Star,
             backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             modifier = Modifier.weight(1f),
-            onClick = { navController.navigate(Routes.TUTORIALS) }
+            onClick = { navController.navigate(Routes.TUTORIALS) },
         )
         Spacer(modifier = Modifier.width(16.dp))
         CategoryCard(
@@ -34,7 +34,7 @@ fun CategorySection(navController: NavController) {
             icon = Icons.Default.Build,
             backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             modifier = Modifier.weight(1f),
-            onClick = { navController.navigate(Routes.MATERIALS_LIST) }
+            onClick = { navController.navigate(Routes.MATERIALS_LIST) },
         )
     }
 
@@ -46,7 +46,7 @@ fun CategorySection(navController: NavController) {
             icon = Icons.Default.Person,
             backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
             modifier = Modifier.weight(1f),
-            onClick = { navController.navigate(Routes.PROFESSIONAL_CONNECTION) }
+            onClick = { navController.navigate(Routes.PROFESSIONAL_CONNECTION) },
         )
         Spacer(modifier = Modifier.width(16.dp))
         CategoryCard(
@@ -54,7 +54,7 @@ fun CategorySection(navController: NavController) {
             icon = Icons.Default.Info,
             backgroundColor = Color(0xFFE1F5FE),
             modifier = Modifier.weight(1f),
-            onClick = { navController.navigate(Routes.FORUM) }
+            onClick = { navController.navigate(Routes.FORUM) },
         )
     }
 

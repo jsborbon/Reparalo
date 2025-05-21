@@ -2,6 +2,8 @@ package com.jsborbon.reparalo.navigation
 
 import androidx.navigation.NavController
 
+//TODO: To check this file, it seems to be a copy of the NavigationWrapper.kt file
+
 fun NavController.navigateToSplash() {
     if (currentDestination?.route != Routes.SPLASH) {
         navigate(Routes.SPLASH)
@@ -27,9 +29,22 @@ fun NavController.navigateToTutorials() {
 }
 
 fun NavController.navigateToTutorialDetail(tutorialId: String) {
-    val route = "${Routes.TUTORIAL_DETAIL}/$tutorialId"
+    val route = Routes.tutorialDetailWithId(tutorialId)
     if (currentDestination?.route != route) {
         navigate(route)
+    }
+}
+
+fun NavController.navigateToTutorialEdit(tutorialId: String) {
+    val route = Routes.tutorialEditWithId(tutorialId)
+    if (currentDestination?.route != route) {
+        navigate(route)
+    }
+}
+
+fun NavController.navigateToTutorialCreate() {
+    if (currentDestination?.route != Routes.TUTORIAL_CREATE) {
+        navigate(Routes.TUTORIAL_CREATE)
     }
 }
 
@@ -46,9 +61,7 @@ fun NavController.navigateToProfessionalConnection() {
 }
 
 fun NavController.navigateToForum() {
-    if (currentDestination?.route != Routes.FORUM) {
-        navigate(Routes.FORUM)
-    }
+    safeNavigate(Routes.FORUM)
 }
 
 fun NavController.navigateToForumSearch() {
@@ -64,7 +77,27 @@ fun NavController.navigateToForumCreate() {
 }
 
 fun NavController.navigateToForumTopicDetail(topicId: String) {
-    val route = "${Routes.FORUM_TOPIC_DETAIL}/$topicId"
+    val route = Routes.forumTopicDetailWithId(topicId)
+    if (currentDestination?.route != route) {
+        navigate(route)
+    }
+}
+
+fun NavController.navigateToForumEdit(topicId: String) {
+    val route = Routes.forumEditWithId(topicId)
+    if (currentDestination?.route != route) {
+        navigate(route)
+    }
+}
+
+fun NavController.navigateToTechnicianSearch() {
+    if (currentDestination?.route != Routes.TECHNICIAN_SEARCH) {
+        navigate(Routes.TECHNICIAN_SEARCH)
+    }
+}
+
+fun NavController.navigateToTechnicianProfile(technicianId: String) {
+    val route = Routes.technicianProfileWithId(technicianId)
     if (currentDestination?.route != route) {
         navigate(route)
     }
@@ -85,19 +118,6 @@ fun NavController.navigateToNotifications() {
 fun NavController.navigateToSettings() {
     if (currentDestination?.route != Routes.SETTINGS) {
         navigate(Routes.SETTINGS)
-    }
-}
-
-fun NavController.navigateToTechnicianSearch() {
-    if (currentDestination?.route != Routes.TECHNICIAN_SEARCH) {
-        navigate(Routes.TECHNICIAN_SEARCH)
-    }
-}
-
-fun NavController.navigateToTechnicianProfile(technicianId: String) {
-    val route = "${Routes.TECHNICIAN_PROFILE}/$technicianId"
-    if (currentDestination?.route != route) {
-        navigate(route)
     }
 }
 
@@ -125,11 +145,16 @@ fun NavController.navigateToServiceHistory() {
     }
 }
 
+fun NavController.navigateToSettingsPassword() {
+    if (currentDestination?.route != Routes.SETTINGS_PASSWORD) {
+        navigate(Routes.SETTINGS_PASSWORD)
+    }
+}
 
 fun NavController.navigateAndPopUpTo(
     route: String,
     popUpToRoute: String,
-    inclusive: Boolean = false
+    inclusive: Boolean = false,
 ) {
     navigate(route) {
         popUpTo(popUpToRoute) { this.inclusive = inclusive }
@@ -137,23 +162,10 @@ fun NavController.navigateAndPopUpTo(
     }
 }
 
-fun NavController.navigateToTutorialEdit(tutorialId: String) {
-    val route = "${Routes.TUTORIAL_EDIT}/$tutorialId"
+fun NavController.safeNavigate(route: String) {
     if (currentDestination?.route != route) {
         navigate(route)
     }
-}
-
-fun NavController.navigateToTutorialCreate() {
-    if (currentDestination?.route != Routes.TUTORIAL_CREATE) {
-        navigate(Routes.TUTORIAL_CREATE)
-    }
-}
-
-fun NavController.navigateToForum() = safeNavigate(Routes.FORUM)
-
-fun NavController.safeNavigate(route: String) {
-    if (currentDestination?.route != route) navigate(route)
 }
 
 fun NavController.goBack() {

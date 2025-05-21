@@ -22,7 +22,7 @@ import javax.inject.Inject
 class TutorialDetailViewModel @Inject constructor(
     private val tutorialRepository: TutorialRepositoryImpl,
     private val commentRepository: CommentRepositoryImpl,
-    private val userRepository: UserRepositoryImpl
+    private val userRepository: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val _tutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Loading)
@@ -71,7 +71,7 @@ class TutorialDetailViewModel @Inject constructor(
             userId = userId,
             content = text,
             date = Date(),
-            rating = rating
+            rating = rating,
         )
 
         viewModelScope.launch {

@@ -36,14 +36,13 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.text.take
 
-
 @Composable
 fun CommentCard(comment: Comment, viewModel: TutorialDetailViewModel) {
     AnimatedVisibility(visible = true, enter = slideInVertically { it / 2 } + fadeIn()) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 val name = viewModel.userNames.collectAsState().value[comment.userId]
@@ -53,9 +52,13 @@ fun CommentCard(comment: Comment, viewModel: TutorialDetailViewModel) {
                             .size(36.dp)
                             .clip(RoundedCornerShape(18.dp))
                             .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = (name ?: "U").take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = (name ?: "U").take(1).uppercase(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(name ?: "Usuario anónimo", fontWeight = FontWeight.Bold)
@@ -65,13 +68,18 @@ fun CommentCard(comment: Comment, viewModel: TutorialDetailViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     repeat(comment.rating) {
-                        Icon(Icons.Default.Star, contentDescription = null, tint = RepairYellow, modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = null,
+                            tint = RepairYellow,
+                            modifier = Modifier.size(16.dp),
+                        )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(comment.date),
                         color = Color.Gray,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
             }

@@ -23,27 +23,27 @@ import androidx.compose.ui.unit.sp
 fun CategoryChip(
     icon: ImageVector,
     text: String,
-    color: Color
+    color: Color,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .background(color.copy(alpha = 0.1f))
-            .padding(12.dp)
+            .padding(12.dp),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = text,
             tint = color,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
             color = color,
             fontSize = 12.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }

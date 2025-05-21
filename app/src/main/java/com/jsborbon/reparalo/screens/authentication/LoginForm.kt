@@ -64,14 +64,14 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -87,7 +87,7 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
                     Text(if (passwordVisible) "🙈" else "👁️")
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (error != null) {
@@ -117,7 +117,7 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
             enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))

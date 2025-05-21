@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.CategoryChip
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +139,12 @@ fun MaterialsListScreen(navController: NavController) {
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(filteredMaterials, key = { it.id }) { material ->
-                            MaterialItem(material = material)
+                            MaterialItem(
+                                material = material,
+                                onClick = {
+                                    navController.navigate("${Routes.MATERIAL_DETAIL}/${material.id}")
+                                }
+                            )
                         }
                     }
                 }

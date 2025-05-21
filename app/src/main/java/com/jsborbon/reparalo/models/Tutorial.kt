@@ -13,5 +13,5 @@ data class Tutorial(
     val videoUrl: String,
     val author: String,
     val publicationDate: Date,
-    val averageRating: Double,
+    val averageRating: Float,
 )

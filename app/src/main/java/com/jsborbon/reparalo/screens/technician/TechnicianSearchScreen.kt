@@ -1,9 +1,17 @@
 package com.jsborbon.reparalo.screens.technician
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -27,10 +35,17 @@ import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 @Composable
 fun TechnicianSearchScreen(
     navController: NavController,
-    viewModel: TechnicianListViewModel = hiltViewModel()
+    viewModel: TechnicianListViewModel = hiltViewModel(),
 ) {
     val techniciansState by viewModel.technicians.collectAsState()
+    val selectedSpecialty by viewModel.selectedSpecialty.collectAsState()
     val query = remember { mutableStateOf("") }
+
+    val specialties = listOf(
+        "Electricidad", "Plomería", "Carpintería",
+        "Electrónica", "Jardinería", "Automotriz",
+        "Pintura", "Albañilería"
+    )
 
     LaunchedEffect(Unit) {
         viewModel.loadAllTechnicians()
@@ -61,6 +76,27 @@ fun TechnicianSearchScreen(
                     .padding(vertical = 16.dp)
             )
 
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                items(specialties) { specialty ->
+                    val isSelected = specialty == selectedSpecialty
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            if (isSelected) {
+                                viewModel.loadAllTechnicians()
+                            } else {
+                                viewModel.loadTechniciansBySpecialty(specialty)
+                            }
+                        },
+                        label = { Text(specialty) }
+                    )
+                }
+            }
+
             when (val state = techniciansState) {
                 is ApiResponse.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -76,14 +112,12 @@ fun TechnicianSearchScreen(
                 }
 
                 is ApiResponse.Success -> {
-                    val technicians = state.data
-                    val filtered = filterTechnicians(technicians, query.value)
-
+                    val filtered = filterTechnicians(state.data, query.value)
                     if (filtered.isEmpty()) {
                         Text("No se encontraron técnicos.")
                     } else {
                         LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
-                            items(filtered) { technician ->
+                            items(filtered, key = { it.uid }) { technician ->
                                 TechnicianCard(
                                     technician = technician,
                                     padding = PaddingValues(vertical = 8.dp)
@@ -92,7 +126,6 @@ fun TechnicianSearchScreen(
                         }
                     }
                 }
-
             }
         }
     }

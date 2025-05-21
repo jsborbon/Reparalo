@@ -11,13 +11,9 @@ import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import javax.inject.Inject
 
-/**
- * Implementation of [AuthRepository] responsible for user authentication
- * and basic Firestore user data operations.
- */
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
 ) : AuthRepository {
 
     private val TAG = "AuthRepositoryImpl"
@@ -32,7 +28,12 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signUp(email: String, password: String, name: String, phone: String, userType: UserType): FirebaseUser?{
+    override suspend fun signUp(
+        email: String,
+        password: String,
+        name: String,
+        phone: String,
+        userType: UserType): FirebaseUser? {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
@@ -45,7 +46,7 @@ class AuthRepositoryImpl @Inject constructor(
                     email = email,
                     phone = phone,
                     userType = userType,
-                    registrationDate = registrationDate
+                    registrationDate = registrationDate,
                 )
                 firestore.collection("users").document(user.uid).set(profile).await()
             }
@@ -67,15 +68,16 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendPasswordReset(email: String): Boolean {
+    override suspend fun updatePassword(newPassword: String): Boolean {
         return try {
-            auth.sendPasswordResetEmail(email).await()
+            auth.currentUser?.updatePassword(newPassword)?.await()
             true
         } catch (e: Exception) {
-            Log.e(TAG, "sendPasswordReset failed", e)
+            Log.e(TAG, "updatePassword failed", e)
             false
         }
     }
+
 
     override fun signOut() {
         auth.signOut()

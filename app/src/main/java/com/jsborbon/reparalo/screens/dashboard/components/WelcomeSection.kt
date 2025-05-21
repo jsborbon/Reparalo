@@ -16,12 +16,12 @@ fun WelcomeSection() {
         text = "Bienvenido a Reparalo",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
+        color = MaterialTheme.colorScheme.primary,
     )
     Text(
         text = "¿Qué deseas hacer hoy?",
         fontSize = 16.sp,
-        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
     )
     Spacer(modifier = Modifier.height(24.dp))
 }

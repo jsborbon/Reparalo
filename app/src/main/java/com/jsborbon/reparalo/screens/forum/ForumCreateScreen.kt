@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,7 +37,7 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumCreateScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel()
+    viewModel: ForumViewModel = viewModel(),
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -50,25 +50,25 @@ fun ForumCreateScreen(
                 title = { Text("Nuevo Tema") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Título") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -78,7 +78,7 @@ fun ForumCreateScreen(
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -89,7 +89,7 @@ fun ForumCreateScreen(
                 label = { Text("Descripción") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
+                    .height(160.dp),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -101,7 +101,7 @@ fun ForumCreateScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = createState !is ApiResponse.Loading
+                enabled = createState !is ApiResponse.Loading,
             ) {
                 Text("Publicar tema")
             }
@@ -119,7 +119,7 @@ fun ForumCreateScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = (createState as ApiResponse.Failure).errorMessage,
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
 

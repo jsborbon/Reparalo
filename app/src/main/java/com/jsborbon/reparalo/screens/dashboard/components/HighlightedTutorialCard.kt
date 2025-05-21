@@ -34,7 +34,7 @@ fun HighlightedTutorialCard(navController: NavController) {
         text = "Tutoriales Destacados",
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(vertical = 8.dp),
     )
     Card(
         modifier = Modifier
@@ -42,18 +42,23 @@ fun HighlightedTutorialCard(navController: NavController) {
             .padding(vertical = 8.dp)
             .clickable { navController.navigate(Routes.TUTORIALS) },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Cómo reparar una fuga en el lavamanos", fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Aprende a solucionar problemas comunes de plomería en tu hogar",
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(16.dp))
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFFC107),
+                    modifier = Modifier.size(16.dp),
+                )
                 Text("4.8", fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                 Spacer(modifier = Modifier.width(16.dp))
                 Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(16.dp))

@@ -1,6 +1,11 @@
 package com.jsborbon.reparalo.components.comments
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -24,20 +29,20 @@ import com.jsborbon.reparalo.ui.theme.RepairYellow
 fun CommentFormSection(
     commentText: MutableState<String>,
     rating: MutableState<Int>,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Comentarios",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Deja tu comentario", fontWeight = FontWeight.Bold)
@@ -48,7 +53,7 @@ fun CommentFormSection(
                     onValueChange = { commentText.value = it },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Escribe tu comentario aquí") },
-                    minLines = 3
+                    minLines = 3,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -59,7 +64,7 @@ fun CommentFormSection(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "Calificación ${i + 1}",
-                                tint = if (i < rating.value) RepairYellow else Color.Gray.copy(alpha = 0.5f)
+                                tint = if (i < rating.value) RepairYellow else Color.Gray.copy(alpha = 0.5f),
                             )
                         }
                     }
@@ -67,7 +72,7 @@ fun CommentFormSection(
 
                 Button(
                     onClick = onSubmit,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.End),
                 ) {
                     Text("Enviar comentario")
                 }

@@ -15,16 +15,17 @@ import com.jsborbon.reparalo.screens.forum.ForumScreen
 import com.jsborbon.reparalo.screens.forum.ForumSearchScreen
 import com.jsborbon.reparalo.screens.forum.ForumTopicDetailScreen
 import com.jsborbon.reparalo.screens.history.ServiceHistoryScreen
-import com.jsborbon.reparalo.screens.material.MaterialListScreen
+import com.jsborbon.reparalo.screens.material.MaterialDetailScreen
+import com.jsborbon.reparalo.screens.material.MaterialEditScreen
+import com.jsborbon.reparalo.screens.material.MaterialsListScreen
 import com.jsborbon.reparalo.screens.notifications.NotificationScreen
+import com.jsborbon.reparalo.screens.profile.ChangePasswordScreen
 import com.jsborbon.reparalo.screens.profile.FavoritesScreen
-import com.jsborbon.reparalo.screens.profile.ProfileScreen
-import com.jsborbon.reparalo.screens.profile.ProfessionalConnectionScreen
 import com.jsborbon.reparalo.screens.profile.UserProfileScreen
 import com.jsborbon.reparalo.screens.settings.SettingsHelpScreen
 import com.jsborbon.reparalo.screens.settings.SettingsScreen
-import com.jsborbon.reparalo.screens.settings.SettingsSecurityScreen
 import com.jsborbon.reparalo.screens.settings.SettingsTermsScreen
+import com.jsborbon.reparalo.screens.technician.ProfessionalConnectionScreen
 import com.jsborbon.reparalo.screens.technician.TechnicianProfileScreen
 import com.jsborbon.reparalo.screens.technician.TechnicianSearchScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialCreateScreen
@@ -34,11 +35,11 @@ import com.jsborbon.reparalo.screens.tutorial.TutorialEditScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String
+    startDestination: String,
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
         composable(Routes.SPLASH) {
             SplashScreen(navController = navController)
@@ -50,10 +51,6 @@ fun AppNavGraph(
 
         composable(Routes.DASHBOARD) {
             MainScreen(navController = navController)
-        }
-
-        composable(Routes.USER_PROFILE) {
-            ProfileScreen(navController = navController)
         }
 
         composable(Routes.TECHNICIAN_SEARCH) {
@@ -83,7 +80,7 @@ fun AppNavGraph(
         }
 
         composable("${Routes.FORUM_EDIT}/{topicId}") { backStackEntry ->
-            val topicId = backStackEntry.arguments?.getString("topicId").orEmpty()
+            val topicId = backStackEntry.arguments?.getString("topicId") ?: return@composable
             ForumEditScreen(navController = navController, topicId = topicId)
         }
 
@@ -93,7 +90,7 @@ fun AppNavGraph(
 
         composable(
             route = "${Routes.USER_PROFILE}?edit={edit}",
-            arguments = listOf(navArgument("edit") { defaultValue = false })
+            arguments = listOf(navArgument("edit") { defaultValue = false }),
         ) { backStackEntry ->
             val isEdit = backStackEntry.arguments?.getBoolean("edit") ?: false
             UserProfileScreen(navController = navController, isEditMode = isEdit)
@@ -110,7 +107,7 @@ fun AppNavGraph(
 
         composable(
             route = "${Routes.TUTORIAL_EDIT}/{tutorialId}",
-            arguments = listOf(navArgument("tutorialId") { type = NavType.StringType })
+            arguments = listOf(navArgument("tutorialId") { type = NavType.StringType }),
         ) { backStackEntry ->
             val tutorialId = backStackEntry.arguments?.getString("tutorialId").orEmpty()
             TutorialEditScreen(navController = navController, tutorialId = tutorialId)
@@ -121,7 +118,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.MATERIALS_LIST) {
-            MaterialListScreen(navController = navController)
+            MaterialsListScreen(navController = navController)
         }
 
         composable(Routes.PROFESSIONAL_CONNECTION) {
@@ -140,12 +137,22 @@ fun AppNavGraph(
             SettingsHelpScreen(navController = navController)
         }
 
-        composable(Routes.SETTINGS_SECURITY) {
-            SettingsSecurityScreen(navController = navController)
-        }
-
         composable(Routes.SETTINGS_TERMS) {
             SettingsTermsScreen(navController = navController)
+        }
+
+        composable(Routes.SETTINGS_PASSWORD) {
+            ChangePasswordScreen(navController = navController)
+        }
+
+        composable("${Routes.MATERIAL_DETAIL}/{materialId}") { backStackEntry ->
+            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
+            MaterialDetailScreen(navController = navController, materialId = materialId)
+        }
+
+        composable("${Routes.MATERIAL_EDIT}/{materialId}") { backStackEntry ->
+            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
+            MaterialEditScreen(navController = navController, materialId = materialId)
         }
     }
 }

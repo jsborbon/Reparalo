@@ -1,19 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
+
+    <!-- Rules for cloud backup (Google Drive) -->
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+
+        <!-- Include only essential user preferences -->
+        <include domain="sharedpref" path="user_prefs.xml" />
+
+        <!-- Exclude temporary or session-based configurations -->
+        <exclude domain="sharedpref" path="session_state.xml" />
+        <exclude domain="sharedpref" path="debug_settings.xml" />
+
     </cloud-backup>
-    <!--
+
+    <!-- Rules for device-to-device transfer (Nearby / cable) -->
     <device-transfer>
-        <include .../>
-        <exclude .../>
+
+        <!-- Include persistent user-generated files -->
+        <include domain="file" path="." />
+        <include domain="sharedpref" path="user_prefs.xml" />
+
+        <!-- Exclude ephemeral or unnecessary data -->
+        <exclude domain="sharedpref" path="session_state.xml" />
+        <exclude domain="file" path="temp/" />
+        <exclude domain="file" path="logs/" />
+
     </device-transfer>
-    -->
+
 </data-extraction-rules>

@@ -43,49 +43,49 @@ import com.jsborbon.reparalo.screens.tutorial.TutorialsScreen
 @Composable
 fun NavigationBottomBar(
     selectedIndex: Int,
-    navController: NavController
+    navController: NavController,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         NavigationBar(modifier = Modifier.padding(vertical = 4.dp)) {
             BottomBarIcon(
                 selected = selectedIndex == 0,
                 onClick = { navController.navigateAndPopUpTo(Routes.DASHBOARD, Routes.DASHBOARD) },
                 icon = Icons.Default.Home,
-                contentDescription = "Inicio"
+                contentDescription = "Inicio",
             )
             BottomBarIcon(
                 selected = selectedIndex == 1,
                 onClick = { navController.navigateAndPopUpTo(Routes.TUTORIALS, Routes.DASHBOARD) },
                 icon = Icons.Default.DateRange,
-                contentDescription = "Tutoriales"
+                contentDescription = "Tutoriales",
             )
             BottomBarIcon(
                 selected = selectedIndex == 2,
                 onClick = { navController.navigateAndPopUpTo(Routes.MATERIALS_LIST, Routes.DASHBOARD) },
                 icon = Icons.Default.Build,
-                contentDescription = "Materiales"
+                contentDescription = "Materiales",
             )
             BottomBarIcon(
                 selected = selectedIndex == 3,
                 onClick = { navController.navigateAndPopUpTo(Routes.FORUM, Routes.DASHBOARD) },
                 icon = Icons.Default.MailOutline,
                 contentDescription = "Foro",
-                badgeCount = 3
+                badgeCount = 3,
             )
             BottomBarIcon(
                 selected = selectedIndex == 4,
                 onClick = { navController.navigateAndPopUpTo(Routes.SETTINGS, Routes.DASHBOARD) },
                 icon = Icons.Default.Settings,
-                contentDescription = "Configuración"
+                contentDescription = "Configuración",
             )
             BottomBarIcon(
                 selected = selectedIndex == 5,
                 onClick = { navController.navigateAndPopUpTo(Routes.USER_PROFILE, Routes.DASHBOARD) },
                 icon = Icons.Default.Person,
-                contentDescription = "Perfil"
+                contentDescription = "Perfil",
             )
         }
     }
@@ -97,13 +97,13 @@ fun BottomBarIcon(
     onClick: () -> Unit,
     icon: ImageVector,
     contentDescription: String,
-    badgeCount: Int = 0
+    badgeCount: Int = 0,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 8.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         Box {
             Icon(
@@ -114,7 +114,7 @@ fun BottomBarIcon(
                     MaterialTheme.colorScheme.secondary
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                }
+                },
             )
             if (badgeCount > 0) {
                 Box(
@@ -124,15 +124,15 @@ fun BottomBarIcon(
                         .size(14.dp)
                         .background(
                             color = MaterialTheme.colorScheme.error,
-                            shape = MaterialTheme.shapes.extraSmall
+                            shape = MaterialTheme.shapes.extraSmall,
                         ),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = badgeCount.toString(),
                         color = Color.White,
                         style = MaterialTheme.typography.labelSmall,
-                        fontSize = 10.sp
+                        fontSize = 10.sp,
                     )
                 }
             }
@@ -145,7 +145,7 @@ fun BottomBarIcon(
             } else {
                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             },
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 4.dp),
         )
     }
 }
@@ -153,11 +153,11 @@ fun BottomBarIcon(
 @Composable
 fun BottomNavHost(
     navController: NavHostController,
-    onTabChange: (Int) -> Unit
+    onTabChange: (Int) -> Unit,
 ) {
     androidx.navigation.compose.NavHost(
         navController = navController,
-        startDestination = Routes.DASHBOARD
+        startDestination = Routes.DASHBOARD,
     ) {
         composable(Routes.DASHBOARD) {
             onTabChange(0)

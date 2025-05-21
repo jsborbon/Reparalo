@@ -1,6 +1,5 @@
 package com.jsborbon.reparalo.screens.technician
 
-import InfoRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -17,12 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.components.InfoCard
+import com.jsborbon.reparalo.components.InfoRow
 
 @Composable
 fun TechnicianDetailsCard(
     specialties: List<String>,
     availability: String,
-    onSpecialtyClick: ((String) -> Unit)? = null
+    onSpecialtyClick: ((String) -> Unit)? = null,
 ) {
     InfoCard(title = "Especialidades") {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -30,7 +30,7 @@ fun TechnicianDetailsCard(
                 AssistChip(
                     onClick = { onSpecialtyClick?.invoke(specialty) },
                     label = { Text(specialty) },
-                    colors = AssistChipDefaults.assistChipColors()
+                    colors = AssistChipDefaults.assistChipColors(),
                 )
             }
         }
@@ -40,12 +40,12 @@ fun TechnicianDetailsCard(
         Text(
             text = "Disponibilidad",
             fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
+            fontSize = 16.sp,
         )
 
         InfoRow(
             icon = painterResource(id = R.drawable.baseline_schedule),
-            text = availability
+            text = availability,
         )
     }
 }

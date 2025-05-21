@@ -27,20 +27,19 @@ import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.ui.theme.RepairYellow
 import java.util.Locale
 
-
 @Composable
 fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = tutorial.title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -48,7 +47,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
             Text(
                 text = "Por: ${tutorial.author}",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = Color.Gray,
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -57,7 +56,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                 Text(
                     text = tutorial.category,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -72,7 +71,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                         "Intermedio" -> RepairYellow
                         "Avanzado" -> Color.Red
                         else -> Color.Gray
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -81,13 +80,14 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
                     tint = RepairYellow,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
 
                 Text(
-                    text = String.format(Locale.getDefault(), "%.1f", tutorial.averageRating),                    style = MaterialTheme.typography.bodyMedium
+                    text = String.format(Locale.getDefault(), "%.1f", tutorial.averageRating),
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
@@ -97,7 +97,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                 text = tutorial.description,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -106,7 +106,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                 Text(
                     text = "Duración: ${tutorial.estimatedDuration}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = Color.Gray,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -115,7 +115,7 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                     text = "Ver tutorial",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }

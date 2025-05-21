@@ -28,7 +28,7 @@ import com.jsborbon.reparalo.viewmodels.FavoritesViewModel
 @Composable
 fun FavoritesScreen(
     navController: NavController,
-    viewModel: FavoritesViewModel = viewModel()
+    viewModel: FavoritesViewModel = viewModel(),
 ) {
     val state by viewModel.favoriteTutorials.collectAsState()
     val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -40,12 +40,12 @@ fun FavoritesScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Text(
             text = "Mis Favoritos",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         when (state) {
@@ -53,7 +53,7 @@ fun FavoritesScreen(
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -67,7 +67,7 @@ fun FavoritesScreen(
                             tutorial = tutorial,
                             onClick = {
                                 navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
-                            }
+                            },
                         )
                     }
                 }
@@ -77,7 +77,7 @@ fun FavoritesScreen(
                 val message = (state as ApiResponse.Failure).errorMessage
                 Text(
                     text = "Error al cargar favoritos: $message",
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }

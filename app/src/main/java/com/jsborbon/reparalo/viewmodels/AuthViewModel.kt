@@ -2,7 +2,6 @@ package com.jsborbon.reparalo.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.impl.AuthRepositoryImpl
 import com.jsborbon.reparalo.data.repository.impl.UserRepositoryImpl
@@ -13,13 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepositoryImpl,
-    private val userRepository: UserRepositoryImpl
+    private val userRepository: UserRepositoryImpl,
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
@@ -44,10 +42,10 @@ class AuthViewModel @Inject constructor(
                     _user.value = userData
                     _loginState.value = ApiResponse.Success(userData)
                 } else {
-                    _loginState.value = ApiResponse.Failure("Failed to retrieve user data.")
+                    _loginState.value = ApiResponse.Failure("Fallo al obtener los datos del usuario.")
                 }
             } else {
-                _loginState.value = ApiResponse.Failure("Invalid credentials or connection error.")
+                _loginState.value = ApiResponse.Failure("Credenciales incorrectas o error de red.")
             }
         }
     }
@@ -64,10 +62,10 @@ class AuthViewModel @Inject constructor(
                     _user.value = userData
                     _signUpState.value = ApiResponse.Success(userData)
                 } else {
-                    _signUpState.value = ApiResponse.Failure("Sign-up succeeded, but user data not retrieved.")
+                    _signUpState.value = ApiResponse.Failure("Registro completo, pero no se pudo obtener los datos del usuario.")
                 }
             } else {
-                _signUpState.value = ApiResponse.Failure("Sign-up failed.")
+                _signUpState.value = ApiResponse.Failure("Registro fallido. Verifica tu conexión a Internet o intenta nuevamente.")
             }
         }
     }
@@ -78,7 +76,7 @@ class AuthViewModel @Inject constructor(
             val updatedUser = currentUser.copy(
                 name = name,
                 phone = phone,
-                availability = availability
+                availability = availability,
             )
 
             userRepository.updateUser(updatedUser).collectLatest { response ->
@@ -89,20 +87,16 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun sendResetPassword(email: String) {
-        _resetState.value = ApiResponse.Loading
+    fun changePassword(
+        newPassword: String,
+        onResult: (ApiResponse<Boolean>) -> Unit
+    ) {
         viewModelScope.launch {
-            val result = try {
-                FirebaseAuth.getInstance().sendPasswordResetEmail(email).await()
-                true
+            try {
+                authRepository.updatePassword(newPassword)
+                onResult(ApiResponse.Success(true))
             } catch (e: Exception) {
-                false
-            }
-
-            _resetState.value = if (result) {
-                ApiResponse.Success(true)
-            } else {
-                ApiResponse.Failure("Failed to send reset email. Please try again later.")
+                onResult(ApiResponse.Failure(e.message ?: "Error al cambiar la contraseña."))
             }
         }
     }

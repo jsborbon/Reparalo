@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun NavigationWrapper(
     navController: NavHostController,
-    auth: FirebaseAuth
+    auth: FirebaseAuth,
 ) {
     val currentUser = auth.currentUser
     val startDestination = if (currentUser != null) {
@@ -18,6 +18,6 @@ fun NavigationWrapper(
 
     AppNavGraph(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     )
 }

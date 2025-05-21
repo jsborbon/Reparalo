@@ -9,13 +9,13 @@ import retrofit2.http.Path
 
 interface CommentApiService {
 
-    @GET("comentarios/tutorial/{tutorialId}")
+    @GET("comments/tutorial/{tutorialId}")
     suspend fun getByTutorial(
-        @Path("tutorialId") tutorialId: String
+        @Path("tutorialId") tutorialId: String,
     ): Response<List<Comment>>
 
-    @POST("comentarios")
+    @POST("comments")
     suspend fun create(
-        @Body comment: Comment
+        @Body comment: Comment,
     ): Response<Comment>
 }

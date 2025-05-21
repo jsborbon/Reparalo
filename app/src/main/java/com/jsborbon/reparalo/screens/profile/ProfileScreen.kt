@@ -35,10 +35,11 @@ import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
+//TODO: Implemebt this screen
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsState()
     val resetState by viewModel.resetState.collectAsState()
@@ -60,7 +61,7 @@ fun ProfileScreen(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             NavigationBottomBar(selectedIndex = 4, navController = navController)
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -68,19 +69,19 @@ fun ProfileScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             user?.let {
                 UserCard(
                     user = it,
-                    padding = PaddingValues(bottom = 24.dp)
+                    padding = PaddingValues(bottom = 24.dp),
                 )
             }
 
             Text(
                 text = "Perfil de Usuario",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -89,7 +90,7 @@ fun ProfileScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -98,7 +99,7 @@ fun ProfileScreen(
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Teléfono") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -108,7 +109,7 @@ fun ProfileScreen(
                 onValueChange = { availability = it },
                 label = { Text("Disponibilidad") },
                 placeholder = { Text("Ej: Lunes a Viernes 8:00 a 18:00") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -118,7 +119,7 @@ fun ProfileScreen(
                 onValueChange = {},
                 label = { Text("Correo electrónico") },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +129,7 @@ fun ProfileScreen(
                 onValueChange = {},
                 label = { Text("Tipo de Usuario") },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -138,22 +139,22 @@ fun ProfileScreen(
                     viewModel.updateUser(
                         name = name,
                         phone = phone,
-                        availability = availability
+                        availability = availability,
                     )
                     message = "Cambios guardados correctamente"
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ),
             ) {
                 Text("Guardar Cambios")
             }
 
             TextButton(
                 onClick = {
-                    user?.email?.let { viewModel.sendResetPassword(it) }
-                }
+                    navController.navigate(Routes.SETTINGS_PASSWORD)
+                },
             ) {
                 Text("Cambiar contraseña")
             }
@@ -175,9 +176,9 @@ fun ProfileScreen(
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
+                    contentColor = MaterialTheme.colorScheme.onError,
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Cerrar Sesión")
             }

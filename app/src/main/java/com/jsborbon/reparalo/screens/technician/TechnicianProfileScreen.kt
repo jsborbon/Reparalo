@@ -1,11 +1,14 @@
 package com.jsborbon.reparalo.screens.technician
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -29,16 +33,17 @@ import com.jsborbon.reparalo.viewmodels.TechnicianViewModel
 fun TechnicianProfileScreen(
     technicianId: String,
     navController: NavController,
-    viewModel: TechnicianViewModel = hiltViewModel()
+    viewModel: TechnicianViewModel = hiltViewModel(),
 ) {
     val technicianState by viewModel.technician.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(technicianId) {
         viewModel.loadTechnician(technicianId)
     }
 
     Scaffold(
-        bottomBar = { NavigationBottomBar(selectedIndex = 2, navController = navController) }
+        bottomBar = { NavigationBottomBar(selectedIndex = 2, navController = navController) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -46,7 +51,7 @@ fun TechnicianProfileScreen(
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (val state = technicianState) {
                 is ApiResponse.Loading -> {
@@ -59,19 +64,57 @@ fun TechnicianProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(text = technician.name, style = MaterialTheme.typography.titleLarge)
                             Text(text = technician.email, style = MaterialTheme.typography.bodyMedium)
                             Text(
                                 text = "Teléfono: ${technician.phone}",
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
                             if (technician.availability.isNotBlank()) {
                                 Text(
                                     text = "Disponibilidad: ${technician.availability}",
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+
+                            if (technician.phone.isNotBlank()) {
+                                Button(
+                                    onClick = {
+                                        val phone = technician.phone.trim().replace(" ", "")
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse("https://wa.me/$phone")
+                                        )
+                                        context.startActivity(intent)
+                                    },
+                                    modifier = Modifier.padding(top = 16.dp)
+                                ) {
+                                    Text("Contactar por WhatsApp")
+                                }
+
+                                Button(
+                                    onClick = {
+                                        val phone = technician.phone.trim().replace(" ", "")
+                                        val intent = Intent(
+                                            Intent.ACTION_DIAL,
+                                            Uri.parse("tel:$phone")
+                                        )
+                                        context.startActivity(intent)
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp)
+                                ) {
+                                    Text("Llamar")
+                                }
+                            } else {
+                                Text(
+                                    text = "Número de teléfono no disponible",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 16.dp)
                                 )
                             }
                         }

@@ -2,6 +2,7 @@ package com.jsborbon.reparalo.di
 
 import com.jsborbon.reparalo.data.api.AuthInterceptor
 import com.jsborbon.reparalo.data.api.service.CommentApiService
+import com.jsborbon.reparalo.data.api.service.HelpApiService
 import com.jsborbon.reparalo.data.api.service.TutorialApiService
 import com.jsborbon.reparalo.data.api.service.UserApiService
 import dagger.Module
@@ -33,9 +34,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+        HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
     @Provides
     @Singleton
@@ -45,7 +44,7 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
     ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -79,4 +78,8 @@ object NetworkModule {
     fun provideCommentApiService(retrofit: Retrofit): CommentApiService =
         retrofit.create(CommentApiService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideHelpApiService(retrofit: Retrofit): HelpApiService =
+        retrofit.create(HelpApiService::class.java)
 }

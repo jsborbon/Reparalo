@@ -45,7 +45,7 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel()
+    viewModel: ForumViewModel = viewModel(),
 ) {
     var selectedCategory by remember { mutableStateOf("Todos") }
     val categories = listOf("Todos", "Electricidad", "Plomería", "Carpintería", "Pintura")
@@ -61,33 +61,34 @@ fun ForumScreen(
                     }) {
                         Icon(Icons.Default.Search, contentDescription = "Buscar en el foro")
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             ScrollableTabRow(
                 selectedTabIndex = categories.indexOf(selectedCategory),
                 edgePadding = 0.dp,
-                divider = {}
+                divider = {},
             ) {
                 categories.forEach { category ->
                     Tab(
                         selected = selectedCategory == category,
-                        onClick = { selectedCategory = category }
+                        onClick = { selectedCategory = category },
                     ) {
                         Text(
                             text = category,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                            color = if (selectedCategory == category)
+                            color = if (selectedCategory == category) {
                                 MaterialTheme.colorScheme.primary
-                            else
+                            } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                         )
                     }
                 }
@@ -100,7 +101,7 @@ fun ForumScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                 Text("Crear nuevo tema")
@@ -118,7 +119,7 @@ fun ForumScreen(
                     Text(
                         text = "Error: $message",
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
 
@@ -128,7 +129,7 @@ fun ForumScreen(
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 80.dp),
                     ) {
                         items(topics, key = { it.id }) { topic ->
                             ForumTopicItem(topic = topic)

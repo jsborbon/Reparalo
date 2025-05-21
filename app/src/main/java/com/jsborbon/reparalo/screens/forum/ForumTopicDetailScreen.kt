@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +39,7 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumTopicDetailScreen(
     navController: NavController,
-    topicId: String
+    topicId: String,
 ) {
     val viewModel: ForumViewModel = viewModel()
     val topicsState by viewModel.topics.collectAsState()
@@ -62,17 +62,19 @@ fun ForumTopicDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Volver",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
             when (topicsState) {
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -82,7 +84,7 @@ fun ForumTopicDetailScreen(
                     Text(
                         text = "No se pudo cargar el tema.",
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 }
 
@@ -90,7 +92,7 @@ fun ForumTopicDetailScreen(
                     if (topic == null) {
                         Text(
                             text = "El tema no fue encontrado.",
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.align(Alignment.Center),
                         )
                     } else {
                         TopicDetailContent(topic = topic)
@@ -106,12 +108,12 @@ private fun TopicDetailContent(topic: com.jsborbon.reparalo.models.ForumTopic) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
         Text(
             text = topic.title,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -119,14 +121,14 @@ private fun TopicDetailContent(topic: com.jsborbon.reparalo.models.ForumTopic) {
         Text(
             text = "Publicado por ${topic.author} el ${formatDate(topic.date.time)}",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = topic.description,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -134,7 +136,7 @@ private fun TopicDetailContent(topic: com.jsborbon.reparalo.models.ForumTopic) {
         ForumStatsRow(
             views = topic.views,
             likes = topic.likes,
-            comments = topic.comments
+            comments = topic.comments,
         )
     }
 }
@@ -143,26 +145,26 @@ private fun TopicDetailContent(topic: com.jsborbon.reparalo.models.ForumTopic) {
 private fun ForumStatsRow(
     views: Int,
     likes: Int,
-    comments: Int
+    comments: Int,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
     ) {
         ForumStatItemPainter(
             icon = painterResource(id = R.drawable.baseline_visibility),
             label = "Vistas",
-            value = views
+            value = views,
         )
         ForumStatItemVector(
             icon = Icons.Default.ThumbUp,
             label = "Me gusta",
-            value = likes
+            value = likes,
         )
         ForumStatItemPainter(
             icon = painterResource(id = R.drawable.baseline_comment),
             label = "Comentarios",
-            value = comments
+            value = comments,
         )
     }
 }
@@ -171,21 +173,21 @@ private fun ForumStatsRow(
 private fun ForumStatItemVector(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
-    value: Int
+    value: Int,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 4.dp),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = "$value $label",
             modifier = Modifier.padding(start = 8.dp),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -194,21 +196,21 @@ private fun ForumStatItemVector(
 private fun ForumStatItemPainter(
     icon: androidx.compose.ui.graphics.painter.Painter,
     label: String,
-    value: Int
+    value: Int,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 4.dp),
     ) {
         Icon(
             painter = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = "$value $label",
             modifier = Modifier.padding(start = 8.dp),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

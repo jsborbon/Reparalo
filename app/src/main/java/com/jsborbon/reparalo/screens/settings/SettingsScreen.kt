@@ -1,37 +1,56 @@
 package com.jsborbon.reparalo.screens.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.viewmodels.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    viewModel: SettingsViewModel = viewModel()
 ) {
-    val context = LocalContext.current
 
     var isDarkTheme by remember { mutableStateOf(false) }
     var isNotificationsEnabled by remember { mutableStateOf(true) }
     var isLocationEnabled by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var showNotificationTypesDialog by remember { mutableStateOf(false) }
+
+    var selectedNotificationTypes by remember { mutableStateOf(setOf<String>()) }
 
     Scaffold(
         topBar = {
@@ -41,23 +60,23 @@ fun SettingsScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = "Atrás",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             item {
                 Text(
                     text = "Configuración de la aplicación",
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = 24.dp),
                 )
 
                 SettingsCategory(title = "Apariencia") {
@@ -66,7 +85,7 @@ fun SettingsScreen(
                         title = "Tema oscuro",
                         description = "Cambiar entre tema claro y oscuro",
                         checked = isDarkTheme,
-                        onCheckedChange = { isDarkTheme = it }
+                        onCheckedChange = { isDarkTheme = it },
                     )
                 }
 
@@ -76,13 +95,13 @@ fun SettingsScreen(
                         title = "Notificaciones",
                         description = "Recibir notificaciones de la aplicación",
                         checked = isNotificationsEnabled,
-                        onCheckedChange = { isNotificationsEnabled = it }
+                        onCheckedChange = { isNotificationsEnabled = it },
                     )
                     SettingsClickableItem(
                         icon = painterResource(id = R.drawable.baseline_notifications_active),
                         title = "Tipos de notificaciones",
                         description = "Configurar qué notificaciones recibir",
-                        onClick = { showNotificationTypesDialog = true }
+                        onClick = { showNotificationTypesDialog = true },
                     )
                 }
 
@@ -92,19 +111,13 @@ fun SettingsScreen(
                         title = "Ubicación",
                         description = "Permitir acceso a tu ubicación",
                         checked = isLocationEnabled,
-                        onCheckedChange = { isLocationEnabled = it }
+                        onCheckedChange = { isLocationEnabled = it },
                     )
                     SettingsClickableItem(
                         icon = painterResource(id = R.drawable.baseline_security),
                         title = "Seguridad",
                         description = "Configurar opciones de seguridad",
-                        onClick = { navController.navigate(Routes.SETTINGS_SECURITY) }
-                    )
-                    SettingsClickableItem(
-                        icon = painterResource(id = R.drawable.baseline_delete),
-                        title = "Eliminar datos",
-                        description = "Eliminar datos de la aplicación",
-                        onClick = { showDeleteDialog = true }
+                        onClick = { navController.navigate(Routes.SETTINGS_SECURITY) },
                     )
                 }
 
@@ -113,19 +126,19 @@ fun SettingsScreen(
                         icon = painterResource(id = R.drawable.baseline_info),
                         title = "Acerca de",
                         description = "Versión 1.0.0",
-                        onClick = { showInfoDialog = true }
+                        onClick = { showInfoDialog = true },
                     )
                     SettingsClickableItem(
                         icon = painterResource(id = R.drawable.baseline_help),
                         title = "Ayuda",
                         description = "Preguntas frecuentes y soporte",
-                        onClick = { navController.navigate(Routes.SETTINGS_HELP) }
+                        onClick = { navController.navigate(Routes.SETTINGS_HELP) },
                     )
                     SettingsClickableItem(
                         icon = painterResource(id = R.drawable.baseline_policy),
                         title = "Términos y condiciones",
                         description = "Políticas de privacidad y uso",
-                        onClick = { navController.navigate(Routes.SETTINGS_TERMS) }
+                        onClick = { navController.navigate(Routes.SETTINGS_TERMS) },
                     )
                 }
 
@@ -140,13 +153,13 @@ fun SettingsScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                         contentDescription = "Cerrar sesión",
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp),
                     )
                     Text("Cerrar sesión")
                 }
@@ -156,33 +169,10 @@ fun SettingsScreen(
                 Text(
                     text = "Reparalo v1.0.0",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
-    }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDeleteDialog = false
-                    viewModel.deleteAppData(context)
-                }) {
-                    Text("Eliminar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
-                }
-            },
-            title = { Text("Confirmar eliminación") },
-            text = {
-                Text("¿Estás seguro de que deseas eliminar todos los datos locales? Esta acción no se puede deshacer.")
-            }
-        )
     }
 
     if (showInfoDialog) {
@@ -196,22 +186,59 @@ fun SettingsScreen(
             title = { Text("Acerca de Reparalo") },
             text = {
                 Text("Aplicación para gestionar tutoriales de reparación. Versión 1.0.0")
-            }
+            },
         )
     }
 
     if (showNotificationTypesDialog) {
-        AlertDialog(
-            onDismissRequest = { showNotificationTypesDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showNotificationTypesDialog = false }) {
-                    Text("Aceptar")
+        NotificationTypesDialog(
+            onDismiss = { showNotificationTypesDialog = false },
+            selectedTypes = selectedNotificationTypes,
+            onToggleType = { type ->
+                selectedNotificationTypes = if (selectedNotificationTypes.contains(type)) {
+                    selectedNotificationTypes - type
+                } else {
+                    selectedNotificationTypes + type
                 }
-            },
-            title = { Text("Tipos de notificaciones") },
-            text = {
-                Text("Próximamente podrás configurar distintos tipos de notificaciones.")
             }
         )
     }
+}
+
+@Composable
+fun NotificationTypesDialog(
+    onDismiss: () -> Unit,
+    selectedTypes: Set<String>,
+    onToggleType: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Aceptar")
+            }
+        },
+        title = { Text("Tipos de notificaciones") },
+        text = {
+            Column {
+                val types = listOf("Promociones", "Novedades", "Alertas técnicas")
+                types.forEach { type ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggleType(type) }
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Checkbox(
+                            checked = selectedTypes.contains(type),
+                            onCheckedChange = { onToggleType(type) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = type)
+                    }
+                }
+            }
+        }
+    )
 }

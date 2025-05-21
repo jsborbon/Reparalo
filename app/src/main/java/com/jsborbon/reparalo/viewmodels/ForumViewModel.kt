@@ -6,9 +6,11 @@ import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.impl.ForumRepositoryImpl
 import com.jsborbon.reparalo.models.ForumTopic
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
@@ -25,6 +27,9 @@ class ForumViewModel @Inject constructor(
     private val _createState = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Loading)
     val createState: StateFlow<ApiResponse<Boolean>> = _createState
 
+    private val _editState = MutableStateFlow<ApiResponse<Boolean>?>(null)
+    val editState: StateFlow<ApiResponse<Boolean>?> = _editState
+
     init {
         loadTopics()
     }
@@ -38,11 +43,19 @@ class ForumViewModel @Inject constructor(
         }
     }
 
-    fun getTopicById(id: String): ForumTopic? {
-        val currentState = _topics.value
-        return if (currentState is ApiResponse.Success) {
-            currentState.data.find { it.id == id }
-        } else null
+    fun getTopicById(topicId: String): Flow<ApiResponse<ForumTopic>> = flow {
+        emit(ApiResponse.Loading)
+        val current = _topics.value
+        if (current is ApiResponse.Success) {
+            val match = current.data.find { it.id == topicId }
+            if (match != null) {
+                emit(ApiResponse.Success(match))
+            } else {
+                emit(ApiResponse.Failure("Tema no encontrado"))
+            }
+        } else if (current is ApiResponse.Failure) {
+            emit(ApiResponse.Failure(current.errorMessage))
+        }
     }
 
     fun createTopic(title: String, description: String, category: String) {
@@ -53,7 +66,7 @@ class ForumViewModel @Inject constructor(
             title = title,
             description = description,
             category = category,
-            author = "anonymous",
+            author = "Anónimo",
             date = Date(),
             preview = description.take(100),
             comments = 0,
@@ -69,5 +82,21 @@ class ForumViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun editTopic(id: String, title: String, description: String, category: String) {
+        _editState.value = ApiResponse.Loading
+        viewModelScope.launch {
+            repository.updateTopic(id, title, description, category).collectLatest { response ->
+                _editState.value = response
+                if (response is ApiResponse.Success) {
+                    loadTopics()
+                }
+            }
+        }
+    }
+
+    fun resetEditState() {
+        _editState.value = null
     }
 }

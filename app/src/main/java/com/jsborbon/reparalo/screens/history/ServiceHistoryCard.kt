@@ -19,7 +19,7 @@ fun ServiceHistoryCard(
     date: Long,
     showButton: Boolean = false,
     buttonText: String = "Ver historial completo",
-    onButtonClick: (() -> Unit)? = null
+    onButtonClick: (() -> Unit)? = null,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -29,7 +29,7 @@ fun ServiceHistoryCard(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
 
@@ -37,7 +37,7 @@ fun ServiceHistoryCard(
                 text = formatDate(date),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
 
             if (showButton && onButtonClick != null) {
@@ -45,7 +45,7 @@ fun ServiceHistoryCard(
                     onClick = onButtonClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .padding(top = 8.dp),
                 ) {
                     Text(text = buttonText)
                 }

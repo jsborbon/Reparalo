@@ -1,25 +1,52 @@
 package com.jsborbon.reparalo.screens.forum
 
-import androidx.compose.foundation.layout.*
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
+import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForumEditScreen(
     navController: NavController,
     topicId: String,
-    viewModel: ForumViewModel = viewModel()
+    viewModel: ForumViewModel = hiltViewModel()
 ) {
-    val topicState by viewModel.getTopicById(topicId).collectAsState(initial = ApiResponse.Loading)
+    val topicFlow: Flow<ApiResponse<ForumTopic>> = viewModel.getTopicById(topicId)
+    val topicState by topicFlow.collectAsState(initial = ApiResponse.Loading)
+    val editState by viewModel.editState.collectAsState()
+    val context = LocalContext.current
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -27,10 +54,28 @@ fun ForumEditScreen(
 
     LaunchedEffect(topicState) {
         if (topicState is ApiResponse.Success) {
-            val topic = (topicState as ApiResponse.Success).data
+            val topic = (topicState as ApiResponse.Success<ForumTopic>).data
             title = topic.title
             description = topic.description
             category = topic.category
+        }
+    }
+
+    LaunchedEffect(editState) {
+        when (editState) {
+            is ApiResponse.Success -> {
+                Toast.makeText(context, "Tema editado con éxito", Toast.LENGTH_SHORT).show()
+                viewModel.resetEditState()
+                navController.popBackStack()
+            }
+
+            is ApiResponse.Failure -> {
+                val errorMessage = (editState as ApiResponse.Failure).errorMessage
+                Toast.makeText(context, "Error al editar: $errorMessage", Toast.LENGTH_SHORT).show()
+                viewModel.resetEditState()
+            }
+
+            else -> {}
         }
     }
 
@@ -40,7 +85,10 @@ fun ForumEditScreen(
                 title = { Text("Editar Tema del Foro") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás"
+                        )
                     }
                 }
             )
@@ -77,21 +125,23 @@ fun ForumEditScreen(
             Button(
                 onClick = {
                     viewModel.editTopic(topicId, title, description, category)
-                    navController.popBackStack()
                 },
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
+                enabled = editState !is ApiResponse.Loading
             ) {
                 Text("Guardar cambios")
             }
 
-            if (topicState is ApiResponse.Loading) {
+            if (topicState is ApiResponse.Loading || editState is ApiResponse.Loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
             if (topicState is ApiResponse.Failure) {
+                val errorMessage = (topicState as ApiResponse.Failure).errorMessage
                 Text(
-                    text = "Error: ${(topicState as ApiResponse.Failure).errorMessage}",
-                    color = MaterialTheme.colorScheme.error
+                    text = "Error: $errorMessage",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
         }
