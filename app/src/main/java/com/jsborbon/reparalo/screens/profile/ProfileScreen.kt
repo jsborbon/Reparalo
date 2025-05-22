@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,7 +36,7 @@ import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
-//TODO: Implemebt this screen
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
@@ -72,10 +73,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             user?.let {
-                UserCard(
-                    user = it,
-                    padding = PaddingValues(bottom = 24.dp),
-                )
+                UserCard(user = it, padding = PaddingValues(bottom = 24.dp))
             }
 
             Text(
@@ -144,17 +142,13 @@ fun ProfileScreen(
                     message = "Cambios guardados correctamente"
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Text("Guardar Cambios")
             }
 
             TextButton(
-                onClick = {
-                    navController.navigate(Routes.SETTINGS_PASSWORD)
-                },
+                onClick = { navController.navigate(Routes.SETTINGS_PASSWORD) },
             ) {
                 Text("Cambiar contraseña")
             }

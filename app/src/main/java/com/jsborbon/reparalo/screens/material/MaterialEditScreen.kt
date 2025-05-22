@@ -40,7 +40,7 @@ import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 fun MaterialEditScreen(
     navController: NavController,
     materialId: String,
-    viewModel: MaterialsViewModel = viewModel()
+    viewModel: MaterialsViewModel = viewModel(),
 ) {
     val materialState = viewModel.materialDetail.collectAsState()
     var name by remember { mutableStateOf("") }
@@ -60,9 +60,9 @@ fun MaterialEditScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         when (val state = materialState.value) {
             is ApiResponse.Loading -> {
@@ -70,7 +70,7 @@ fun MaterialEditScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -81,10 +81,10 @@ fun MaterialEditScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Error: ${state.errorMessage}"
+                        text = "Error: ${state.errorMessage}",
                     )
                 }
             }
@@ -95,7 +95,7 @@ fun MaterialEditScreen(
                 LaunchedEffect(Unit) {
                     name = material.name
                     description = material.description
-                    quantity  = material.quantity.toString()
+                    quantity = material.quantity.toString()
                     price = material.price.toString()
                 }
 
@@ -104,31 +104,31 @@ fun MaterialEditScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
                         label = { Text("Nombre") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
                         label = { Text("Descripción") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = quantity,
                         onValueChange = { quantity = it },
                         label = { Text("Cantidad") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = price,
                         onValueChange = { price = it },
                         label = { Text("Precio") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
 
                     Button(
@@ -137,12 +137,12 @@ fun MaterialEditScreen(
                                 name = name,
                                 description = description,
                                 quantity = quantity.toIntOrNull() ?: 0,
-                                price = price.toFloatOrNull() ?: 0f
+                                price = price.toFloatOrNull() ?: 0f,
                             )
                             viewModel.updateMaterial(updated)
                             navController.popBackStack()
                         },
-                        modifier = Modifier.align(Alignment.End)
+                        modifier = Modifier.align(Alignment.End),
                     ) {
                         Icon(imageVector = Icons.Default.Done, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))

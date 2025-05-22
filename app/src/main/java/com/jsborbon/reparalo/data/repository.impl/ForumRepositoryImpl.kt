@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ForumRepositoryImpl @Inject constructor(
-    private val api: ForumApiService
+    private val api: ForumApiService,
 ) : ForumRepository {
 
     override suspend fun getTopics(): Flow<ApiResponse<List<ForumTopic>>> = flow {
@@ -18,7 +18,7 @@ class ForumRepositoryImpl @Inject constructor(
             val topics = api.getTopics()
             emit(ApiResponse.Success(topics))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error while fetching forum topics"))
+            emit(ApiResponse.Failure(e.message ?: "Error mientras se obtenían los temas"))
         }
     }
 
@@ -28,7 +28,7 @@ class ForumRepositoryImpl @Inject constructor(
             api.createTopic(topic)
             emit(ApiResponse.Success(true))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error while creating topic"))
+            emit(ApiResponse.Failure(e.message ?: "Error mientras se creaba el tema"))
         }
     }
 
@@ -38,22 +38,17 @@ class ForumRepositoryImpl @Inject constructor(
             val topic = api.getTopicById(topicId)
             emit(ApiResponse.Success(topic))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error while fetching topic"))
+            emit(ApiResponse.Failure(e.message ?: "Error mientras se obtenía el tema"))
         }
     }
 
-    override suspend fun updateTopic(
-        id: String,
-        title: String,
-        description: String,
-        category: String
-    ): Flow<ApiResponse<Boolean>> = flow {
+    override suspend fun updateTopic(topic: ForumTopic): Flow<ApiResponse<Boolean>> = flow {
         emit(ApiResponse.Loading)
         try {
-            api.updateTopic(id, title, description, category)
+            api.updateTopic(topic.id, topic)
             emit(ApiResponse.Success(true))
         } catch (e: Exception) {
-            emit(ApiResponse.Failure(e.message ?: "Error while updating topic"))
+            emit(ApiResponse.Failure(e.message ?: "Error mientras se actualizaba el tema"))
         }
     }
 }

@@ -14,6 +14,7 @@ import com.jsborbon.reparalo.screens.forum.ForumEditScreen
 import com.jsborbon.reparalo.screens.forum.ForumScreen
 import com.jsborbon.reparalo.screens.forum.ForumSearchScreen
 import com.jsborbon.reparalo.screens.forum.ForumTopicDetailScreen
+import com.jsborbon.reparalo.screens.history.ServiceDetailScreen
 import com.jsborbon.reparalo.screens.history.ServiceHistoryScreen
 import com.jsborbon.reparalo.screens.material.MaterialDetailScreen
 import com.jsborbon.reparalo.screens.material.MaterialEditScreen
@@ -21,6 +22,7 @@ import com.jsborbon.reparalo.screens.material.MaterialsListScreen
 import com.jsborbon.reparalo.screens.notifications.NotificationScreen
 import com.jsborbon.reparalo.screens.profile.ChangePasswordScreen
 import com.jsborbon.reparalo.screens.profile.FavoritesScreen
+import com.jsborbon.reparalo.screens.profile.ProfileScreen
 import com.jsborbon.reparalo.screens.profile.UserProfileScreen
 import com.jsborbon.reparalo.screens.settings.SettingsHelpScreen
 import com.jsborbon.reparalo.screens.settings.SettingsScreen
@@ -93,7 +95,11 @@ fun AppNavGraph(
             arguments = listOf(navArgument("edit") { defaultValue = false }),
         ) { backStackEntry ->
             val isEdit = backStackEntry.arguments?.getBoolean("edit") ?: false
-            UserProfileScreen(navController = navController, isEditMode = isEdit)
+            if (isEdit) {
+                ProfileScreen(navController = navController)
+            } else {
+                UserProfileScreen(navController = navController)
+            }
         }
 
         composable("${Routes.FORUM_TOPIC_DETAIL}/{topicId}") { backStackEntry ->
@@ -103,6 +109,16 @@ fun AppNavGraph(
 
         composable(Routes.TUTORIAL_CREATE) {
             TutorialCreateScreen(navController = navController)
+        }
+
+        composable("${Routes.SERVICE_DETAIL}/{serviceId}") { backStackEntry ->
+            val serviceId = backStackEntry.arguments?.getString("serviceId").orEmpty()
+            ServiceDetailScreen(navController = navController, serviceId = serviceId)
+        }
+
+        composable("detalle_servicio/{id}") { backStackEntry ->
+            val serviceId = backStackEntry.arguments?.getString("id").orEmpty()
+            ServiceDetailScreen(navController = navController, serviceId = serviceId)
         }
 
         composable(

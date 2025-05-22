@@ -17,7 +17,7 @@ class TutorialRepositoryImpl @Inject constructor(
     private val TAG = "TutorialRepositoryImpl"
 
     override fun getTutorials(): Flow<ApiResponse<List<Tutorial>>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<List<Tutorial>>())
         val response = apiService.getAll()
         if (response.isSuccessful) {
             response.body()?.let {
@@ -32,7 +32,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun getTutorialsByCategory(category: String): Flow<ApiResponse<List<Tutorial>>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<List<Tutorial>>())
         val response = apiService.getByCategory(category)
         if (response.isSuccessful) {
             response.body()?.let {
@@ -47,7 +47,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun getTutorial(id: String): Flow<ApiResponse<Tutorial>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Tutorial>())
         val response = apiService.getById(id)
         if (response.isSuccessful) {
             response.body()?.let {
@@ -62,7 +62,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun createTutorial(tutorial: Tutorial): Flow<ApiResponse<Tutorial>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Tutorial>())
         val response = apiService.create(tutorial)
         if (response.isSuccessful && response.body() != null) {
             emit(ApiResponse.success(response.body()!!))
@@ -75,7 +75,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun updateTutorial(id: String, tutorial: Tutorial): Flow<ApiResponse<Tutorial>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Tutorial>())
         val response = apiService.update(id, tutorial)
         if (response.isSuccessful && response.body() != null) {
             emit(ApiResponse.success(response.body()!!))
@@ -88,7 +88,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun deleteTutorial(id: String): Flow<ApiResponse<Unit>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Unit>())
         val response = apiService.delete(id)
         if (response.isSuccessful) {
             emit(ApiResponse.success(Unit))
@@ -101,7 +101,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun isFavorite(tutorialId: String): Flow<ApiResponse<Boolean>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Boolean>())
         val response = apiService.isFavorite(tutorialId)
         if (response.isSuccessful) {
             response.body()?.let {
@@ -116,7 +116,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun addFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Unit>())
         val response = apiService.addFavorite(tutorialId)
         if (response.isSuccessful) {
             emit(ApiResponse.success(Unit))
@@ -129,7 +129,7 @@ class TutorialRepositoryImpl @Inject constructor(
     }
 
     override fun removeFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
-        emit(ApiResponse.Loading)
+        emit(ApiResponse.loading<Unit>())
         val response = apiService.removeFavorite(tutorialId)
         if (response.isSuccessful) {
             emit(ApiResponse.success(Unit))

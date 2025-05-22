@@ -1,8 +1,7 @@
 package com.jsborbon.reparalo.models
 
-data class ServiceHistoryItem(
+data class NotificationItem(
     val id: String,
     val title: String,
-    val description: String,
-    val date: Long,
+    val message: String,
 )

@@ -2,7 +2,12 @@ package com.jsborbon.reparalo.di
 
 import com.jsborbon.reparalo.data.api.AuthInterceptor
 import com.jsborbon.reparalo.data.api.service.CommentApiService
+import com.jsborbon.reparalo.data.api.service.FavoritesApiService
+import com.jsborbon.reparalo.data.api.service.ForumApiService
 import com.jsborbon.reparalo.data.api.service.HelpApiService
+import com.jsborbon.reparalo.data.api.service.MaterialApiService
+import com.jsborbon.reparalo.data.api.service.NotificationApiService
+import com.jsborbon.reparalo.data.api.service.TermsApiService
 import com.jsborbon.reparalo.data.api.service.TutorialApiService
 import com.jsborbon.reparalo.data.api.service.UserApiService
 import dagger.Module
@@ -82,4 +87,29 @@ object NetworkModule {
     @Singleton
     fun provideHelpApiService(retrofit: Retrofit): HelpApiService =
         retrofit.create(HelpApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNotificationApiService(retrofit: Retrofit): NotificationApiService =
+        retrofit.create(NotificationApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMaterialApiService(retrofit: Retrofit): MaterialApiService =
+        retrofit.create(MaterialApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTermsApiService(retrofit: Retrofit): TermsApiService =
+        retrofit.create(TermsApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFavoritesApiService(retrofit: Retrofit): FavoritesApiService =
+        retrofit.create(FavoritesApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideForumApiService(retrofit: Retrofit): ForumApiService =
+        retrofit.create(ForumApiService::class.java)
 }

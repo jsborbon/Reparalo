@@ -3,7 +3,7 @@ package com.jsborbon.reparalo.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.repository.impl.TutorialRepositoryImpl
+import com.jsborbon.reparalo.data.repository.TutorialRepository
 import com.jsborbon.reparalo.models.Tutorial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorialsViewModel @Inject constructor(
-    private val repository: TutorialRepositoryImpl,
+    private val repository: TutorialRepository,
 ) : ViewModel() {
 
     private val _tutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)
@@ -39,7 +39,10 @@ class TutorialsViewModel @Inject constructor(
     private val _uiMessage = MutableSharedFlow<String>()
     val uiMessage = _uiMessage.asSharedFlow()
 
-    private val _isFavorite = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Loading)
+    private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteIds: StateFlow<Set<String>> = _favoriteIds
+
+    private val _isFavorite = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Success(false))
     val isFavorite: StateFlow<ApiResponse<Boolean>> = _isFavorite
 
     fun loadTutorials() {
@@ -124,35 +127,37 @@ class TutorialsViewModel @Inject constructor(
         }
     }
 
-    fun loadIsFavorite(tutorialId: String) {
-        viewModelScope.launch {
-            repository.isFavorite(tutorialId).collect {
-                _isFavorite.value = it
-            }
-        }
-    }
-
     fun toggleFavorite(tutorialId: String) {
+        _isFavorite.value = ApiResponse.Loading
         viewModelScope.launch {
-            when (val current = _isFavorite.value) {
-                is ApiResponse.Success -> {
-                    val currentlyFavorite = current.data
-                    if (currentlyFavorite) {
-                        repository.removeFavorite(tutorialId).collect {
-                            if (it is ApiResponse.Success) {
-                                _isFavorite.value = ApiResponse.Success(false)
-                            }
+            val current = _favoriteIds.value
+            val isCurrentlyFavorite = current.contains(tutorialId)
+
+            if (isCurrentlyFavorite) {
+                repository.removeFavorite(tutorialId).collect {
+                    when (it) {
+                        is ApiResponse.Success -> {
+                            _favoriteIds.value = current - tutorialId
+                            _isFavorite.value = ApiResponse.Success(false)
                         }
-                    } else {
-                        repository.addFavorite(tutorialId).collect {
-                            if (it is ApiResponse.Success) {
-                                _isFavorite.value = ApiResponse.Success(true)
-                            }
+                        is ApiResponse.Failure -> {
+                            _isFavorite.value = ApiResponse.Failure(it.errorMessage)
                         }
+                        else -> {}
                     }
                 }
-                else -> {
-                    loadIsFavorite(tutorialId)
+            } else {
+                repository.addFavorite(tutorialId).collect {
+                    when (it) {
+                        is ApiResponse.Success -> {
+                            _favoriteIds.value = current + tutorialId
+                            _isFavorite.value = ApiResponse.Success(true)
+                        }
+                        is ApiResponse.Failure -> {
+                            _isFavorite.value = ApiResponse.Failure(it.errorMessage)
+                        }
+                        else -> {}
+                    }
                 }
             }
         }

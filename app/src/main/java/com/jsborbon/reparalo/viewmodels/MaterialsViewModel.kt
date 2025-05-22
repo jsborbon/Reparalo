@@ -3,7 +3,7 @@ package com.jsborbon.reparalo.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.repository.impl.MaterialRepositoryImpl
+import com.jsborbon.reparalo.data.repository.MaterialRepository
 import com.jsborbon.reparalo.models.Material
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MaterialsViewModel @Inject constructor(
-    private val repository: MaterialRepositoryImpl,
+    private val repository: MaterialRepository,
 ) : ViewModel() {
 
     private val _materials = MutableStateFlow<ApiResponse<List<Material>>>(ApiResponse.Loading)

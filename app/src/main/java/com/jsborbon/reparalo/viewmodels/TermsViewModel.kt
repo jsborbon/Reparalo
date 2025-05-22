@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TermsViewModel @Inject constructor(
-    private val repository: TermsRepository
+    private val repository: TermsRepository,
 ) : ViewModel() {
 
     private val _terms = MutableStateFlow<ApiResponse<TermsAndConditions>>(ApiResponse.Loading)

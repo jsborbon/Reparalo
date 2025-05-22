@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class TechnicianRepositoryImpl @Inject constructor(
-    private val api: UserApiService
+    private val api: UserApiService,
 ) : TechnicianRepository {
 
     private val TAG = "TechnicianRepositoryImpl"
@@ -32,7 +32,7 @@ class TechnicianRepositoryImpl @Inject constructor(
     override fun getTechniciansBySpecialty(
         specialty: String,
         page: Int?,
-        pageSize: Int?
+        pageSize: Int?,
     ): Flow<ApiResponse<List<User>>> = flow {
         emit(ApiResponse.Loading)
         val response = api.getTechniciansBySpecialty(specialty, page, pageSize)
@@ -60,7 +60,7 @@ class TechnicianRepositoryImpl @Inject constructor(
             emit(ApiResponse.Failure("Error ${response.code()}: ${response.message()}"))
         }
     }.catch { e ->
-        Log.e(TAG, "getTechnicianById failed", e)
-        emit(ApiResponse.Failure("Error retrieving technician: ${e.localizedMessage}"))
+        Log.e(TAG, "Fallo el obtener al técino por el ID", e)
+        emit(ApiResponse.Failure("Error obteniendo al técnico: ${e.localizedMessage}"))
     }
 }

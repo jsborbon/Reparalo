@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val repository: HelpRepository
+    private val repository: HelpRepository,
 ) : ViewModel() {
 
     private val _helpItems = MutableStateFlow<ApiResponse<List<HelpItem>>>(ApiResponse.Loading)

@@ -36,12 +36,13 @@ class UserRepositoryImpl @Inject constructor(
         val response = apiService.updateUser(user.uid, user)
         if (response.isSuccessful) {
             response.body()?.let {
-                emit(ApiResponse.success(it))
-            } ?: emit(ApiResponse.failure("Empty response body"))
+                emit(ApiResponse.Success(it))
+            } ?: emit(ApiResponse.Failure("Empty response body"))
         } else {
-            emit(ApiResponse.failure("Error ${response.code()}: ${response.message()}"))
+            emit(ApiResponse.Failure("Error ${response.code()}: ${response.message()}"))
         }
     }.catch { e ->
-        emit(ApiResponse.failure("Exception: ${e.localizedMessage}"))
+        Log.e(TAG, "updateUser exception: ${e.message}", e)
+        emit(ApiResponse.Failure("Exception: ${e.localizedMessage}"))
     }
 }

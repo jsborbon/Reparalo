@@ -33,12 +33,8 @@ object Routes {
     const val FORUM_SEARCH = "forum_search"
     const val FORUM_TOPIC_DETAIL = "forum_topic_detail"
     const val FORUM_EDIT = "forum_edit"
+    const val SERVICE_DETAIL = "detalle_servicio"
 
-    fun forumTopicDetailWithId(topicId: String): String = "$FORUM_TOPIC_DETAIL/$topicId"
-    fun forumEditWithId(topicId: String): String = "$FORUM_EDIT/$topicId"
-    fun tutorialDetailWithId(tutorialId: String): String = "$TUTORIAL_DETAIL/$tutorialId"
-    fun tutorialEditWithId(tutorialId: String): String = "$TUTORIAL_EDIT/$tutorialId"
-    fun materialDetailWithId(materialId: String): String = "$MATERIAL_DETAIL/$materialId" //TODO
-    fun materialEditWithId(materialId: String): String = "$MATERIAL_EDIT/$materialId" //TODO
-    fun technicianProfileWithId(technicianId: String): String = "$TECHNICIAN_PROFILE/$technicianId"
+    fun serviceDetailWithId(serviceId: String): String = "$SERVICE_DETAIL/$serviceId"
+    fun userProfileRoute(edit: Boolean = false): String = "$USER_PROFILE?edit=$edit"
 }

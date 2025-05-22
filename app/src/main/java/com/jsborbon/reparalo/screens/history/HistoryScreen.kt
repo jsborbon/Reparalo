@@ -22,11 +22,11 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.ServiceHistoryItem
-import com.jsborbon.reparalo.viewmodels.HistoryViewModel
+import com.jsborbon.reparalo.navigation.Routes
 
 @Composable
 fun ServiceHistoryScreen(
-    navController: NavController, //TODO
+    navController: NavController,
     viewModel: HistoryViewModel = viewModel(),
 ) {
     val state by viewModel.historyItems.collectAsState()
@@ -67,6 +67,10 @@ fun ServiceHistoryScreen(
                             title = item.title,
                             description = item.description,
                             date = item.date,
+                            showButton = true,
+                            onButtonClick = {
+                                navController.navigate(Routes.serviceDetailWithId(item.id))
+                            },
                         )
                     }
                 }

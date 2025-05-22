@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.Flow
 fun ForumEditScreen(
     navController: NavController,
     topicId: String,
-    viewModel: ForumViewModel = hiltViewModel()
+    viewModel: ForumViewModel = hiltViewModel(),
 ) {
     val topicFlow: Flow<ApiResponse<ForumTopic>> = viewModel.getTopicById(topicId)
     val topicState by topicFlow.collectAsState(initial = ApiResponse.Loading)
@@ -52,12 +52,15 @@ fun ForumEditScreen(
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
+    var loadedTopic by remember { mutableStateOf<ForumTopic?>(null) }
+
     LaunchedEffect(topicState) {
         if (topicState is ApiResponse.Success) {
             val topic = (topicState as ApiResponse.Success<ForumTopic>).data
             title = topic.title
             description = topic.description
             category = topic.category
+            loadedTopic = topic
         }
     }
 
@@ -87,47 +90,55 @@ fun ForumEditScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = "Atrás",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Título") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Button(
                 onClick = {
-                    viewModel.editTopic(topicId, title, description, category)
+                    loadedTopic?.let { original ->
+                        val updatedTopic = original.copy(
+                            title = title,
+                            description = description,
+                            category = category,
+                            preview = description.take(100),
+                        )
+                        viewModel.editTopic(updatedTopic)
+                    }
                 },
                 modifier = Modifier.align(Alignment.End),
-                enabled = editState !is ApiResponse.Loading
+                enabled = editState !is ApiResponse.Loading && loadedTopic != null,
             ) {
                 Text("Guardar cambios")
             }
@@ -141,7 +152,7 @@ fun ForumEditScreen(
                 Text(
                     text = "Error: $errorMessage",
                     color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                 )
             }
         }

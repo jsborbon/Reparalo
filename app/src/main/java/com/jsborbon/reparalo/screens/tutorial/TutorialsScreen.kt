@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,8 +37,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,8 +50,6 @@ import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +59,7 @@ fun TutorialsScreen(navController: NavController) {
     val tutorialsByCategory by viewModel.tutorialsByCategory.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val deleteState by viewModel.deleteState.collectAsState()
+    val favoriteIds by viewModel.favoriteIds.collectAsState()
     val context = LocalContext.current
 
     var searchQuery by remember { mutableStateOf("") }
@@ -71,8 +73,14 @@ fun TutorialsScreen(navController: NavController) {
     }
 
     val availableCategories = listOf(
-        "Electricidad", "Plomería", "Carpintería", "Electrónica",
-        "Jardinería", "Automotriz", "Pintura", "Albañilería",
+        "Electricidad",
+        "Plomería",
+        "Carpintería",
+        "Electrónica",
+        "Jardinería",
+        "Automotriz",
+        "Pintura",
+        "Albañilería",
     )
 
     Scaffold(
@@ -88,7 +96,7 @@ fun TutorialsScreen(navController: NavController) {
                     IconButton(onClick = { triggerSearch = true }) {
                         Icon(Icons.Default.Search, contentDescription = "Buscar")
                     }
-                }
+                },
             )
         },
     ) { innerPadding ->
@@ -108,9 +116,7 @@ fun TutorialsScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 placeholder = { Text("Buscar por título, descripción o autor") },
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null)
-                },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
             )
 
@@ -191,11 +197,13 @@ fun TutorialsScreen(navController: NavController) {
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             items(filteredTutorials, key = { it.id }) { tutorial ->
+                                val isFavorite = favoriteIds.contains(tutorial.id)
+
                                 ElevatedCard(
                                     modifier = Modifier.fillMaxWidth(),
                                     onClick = {
                                         navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
-                                    }
+                                    },
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text(tutorial.title, style = MaterialTheme.typography.titleMedium)
@@ -204,17 +212,35 @@ fun TutorialsScreen(navController: NavController) {
                                         Row(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier.fillMaxWidth(),
                                         ) {
-                                            Text("Autor: ${tutorial.author}", style = MaterialTheme.typography.labelMedium)
-                                            IconButton(onClick = {
-                                                tutorialToDeleteId = tutorial.id
-                                            }) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Eliminar",
-                                                    tint = MaterialTheme.colorScheme.error
-                                                )
+                                            Text(
+                                                text = "Autor: ${tutorial.author}",
+                                                style = MaterialTheme.typography.labelMedium,
+                                            )
+                                            Row {
+                                                IconButton(onClick = {
+                                                    viewModel.toggleFavorite(tutorial.id)
+                                                }) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Star,
+                                                        contentDescription = "Favorito",
+                                                        tint = if (isFavorite) {
+                                                            MaterialTheme.colorScheme.primary
+                                                        } else {
+                                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                                        },
+                                                    )
+                                                }
+                                                IconButton(onClick = {
+                                                    tutorialToDeleteId = tutorial.id
+                                                }) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Delete,
+                                                        contentDescription = "Eliminar",
+                                                        tint = MaterialTheme.colorScheme.error,
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -244,7 +270,7 @@ fun TutorialsScreen(navController: NavController) {
                 TextButton(onClick = { tutorialToDeleteId = null }) {
                     Text("Cancelar")
                 }
-            }
+            },
         )
     }
 }

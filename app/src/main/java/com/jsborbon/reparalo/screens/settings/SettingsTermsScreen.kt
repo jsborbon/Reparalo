@@ -29,7 +29,7 @@ import com.jsborbon.reparalo.viewmodels.TermsViewModel
 @Composable
 fun SettingsTermsScreen(
     navController: NavController,
-    termsViewModel: TermsViewModel = hiltViewModel()
+    termsViewModel: TermsViewModel = hiltViewModel(),
 ) {
     val termsState by termsViewModel.terms.collectAsState()
 
@@ -59,7 +59,7 @@ fun SettingsTermsScreen(
                     Text(
                         text = "Error: ${(termsState as ApiResponse.Failure).errorMessage}",
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
                 is ApiResponse.Success -> {
@@ -78,8 +78,8 @@ fun SettingsTermsScreen(
                     }
 
                     Text(
-                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos términos" +
-                            " y condiciones.",
+                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos" +
+                            " términos y condiciones.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -95,7 +95,7 @@ fun SectionTitle(title: String) {
         text = title,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 4.dp)
+        modifier = Modifier.padding(bottom = 4.dp),
     )
 }
 
@@ -105,6 +105,6 @@ fun SectionText(text: String) {
         text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier.padding(bottom = 8.dp),
     )
 }

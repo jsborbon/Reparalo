@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,16 +24,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.NotificationItem
+import com.jsborbon.reparalo.viewmodels.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavController) {
-    val notifications = remember { sampleNotifications }
+    val viewModel: NotificationViewModel = hiltViewModel()
+    val notificationState by viewModel.notifications.collectAsState()
 
     Scaffold(
         topBar = {
@@ -40,31 +47,58 @@ fun NotificationScreen(navController: NavController) {
                 title = { Text("Notificaciones") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 },
             )
         },
     ) { innerPadding ->
-        if (notifications.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("No tienes notificaciones por ahora.")
+        when (val state = notificationState) {
+            is ApiResponse.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(notifications) { notification ->
-                    NotificationCard(notification = notification)
+
+            is ApiResponse.Failure -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Error: ${state.errorMessage}")
+                }
+            }
+
+            is ApiResponse.Success -> {
+                val notifications = state.data
+                if (notifications.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text("No tienes notificaciones por ahora.")
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(notifications) { notification ->
+                            NotificationCard(notification = notification)
+                        }
+                    }
                 }
             }
         }
@@ -84,17 +118,3 @@ fun NotificationCard(notification: NotificationItem) {
         }
     }
 }
-
-data class NotificationItem(
-    val id: String,
-    val title: String,
-    val message: String,
-)
-
-//TODO: Replace with actual data fetching logic
-// Simulated data
-val sampleNotifications = listOf(
-    NotificationItem("1", "Nuevo tutorial disponible", "Explora el tutorial sobre fontanería básica."),
-    NotificationItem("2", "Actualización del foro", "Tu tema ha recibido una nueva respuesta."),
-    NotificationItem("3", "Técnico verificado", "Tu perfil ha sido verificado correctamente."),
-)

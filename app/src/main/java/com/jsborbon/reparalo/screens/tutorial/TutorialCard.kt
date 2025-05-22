@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +30,12 @@ import com.jsborbon.reparalo.ui.theme.RepairYellow
 import java.util.Locale
 
 @Composable
-fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
+fun TutorialCard(
+    tutorial: Tutorial,
+    isFavorite: Boolean = false,
+    onClick: () -> Unit,
+    onToggleFavorite: (() -> Unit)? = null,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,6 +96,17 @@ fun TutorialCard(tutorial: Tutorial, onClick: () -> Unit) {
                     text = String.format(Locale.getDefault(), "%.1f", tutorial.averageRating),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+
+                if (onToggleFavorite != null) {
+                    Spacer(modifier = Modifier.width(12.dp))
+                    IconButton(onClick = onToggleFavorite) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                            contentDescription = "Favorito",
+                            tint = if (isFavorite) RepairYellow else Color.Gray,
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

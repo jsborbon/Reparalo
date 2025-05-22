@@ -20,14 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.navigation.navigateToTechnicianProfile
 import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfessionalConnectionScreen(
     navController: NavController,
-    viewModel: TechnicianListViewModel = viewModel()
+    viewModel: TechnicianListViewModel = viewModel(),
 ) {
     val technicianState = viewModel.technicians.collectAsState()
 
@@ -38,7 +37,7 @@ fun ProfessionalConnectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Profesionales disponibles") })
-        }
+        },
     ) { innerPadding ->
         when (val state = technicianState.value) {
             is ApiResponse.Loading -> {
@@ -52,14 +51,14 @@ fun ProfessionalConnectionScreen(
                         .padding(innerPadding)
                         .padding(16.dp)
                         .fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(technicians, key = { it.uid }) { technician ->
                         TechnicianCard(
                             technician = technician,
                             onClick = {
-                                navController.navigateToTechnicianProfile(technician.uid)
-                            }
+                                navController.navigate("technician_profile/${technician.uid}")
+                            },
                         )
                     }
                 }
@@ -69,11 +68,11 @@ fun ProfessionalConnectionScreen(
                 Column(
                     modifier = Modifier
                         .padding(innerPadding)
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Text(
                         text = "Error al cargar profesionales: ${state.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
             }

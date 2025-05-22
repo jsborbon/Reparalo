@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.repository.impl.CommentRepositoryImpl
-import com.jsborbon.reparalo.data.repository.impl.TutorialRepositoryImpl
-import com.jsborbon.reparalo.data.repository.impl.UserRepositoryImpl
+import com.jsborbon.reparalo.data.repository.CommentRepository
+import com.jsborbon.reparalo.data.repository.TutorialRepository
+import com.jsborbon.reparalo.data.repository.UserRepository
 import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.models.User
@@ -20,9 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorialDetailViewModel @Inject constructor(
-    private val tutorialRepository: TutorialRepositoryImpl,
-    private val commentRepository: CommentRepositoryImpl,
-    private val userRepository: UserRepositoryImpl,
+    private val tutorialRepository: TutorialRepository,
+    private val commentRepository: CommentRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _tutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Loading)

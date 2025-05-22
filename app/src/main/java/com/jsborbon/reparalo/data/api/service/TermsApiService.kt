@@ -8,5 +8,4 @@ interface TermsApiService {
 
     @GET("api/terms")
     suspend fun fetchTerms(): Response<TermsAndConditions>
-
 }

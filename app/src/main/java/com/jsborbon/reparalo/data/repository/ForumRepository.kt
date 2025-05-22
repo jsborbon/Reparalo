@@ -8,10 +8,5 @@ interface ForumRepository {
     suspend fun getTopics(): Flow<ApiResponse<List<ForumTopic>>>
     suspend fun getTopicById(topicId: String): Flow<ApiResponse<ForumTopic>>
     suspend fun createTopic(topic: ForumTopic): Flow<ApiResponse<Boolean>>
-    suspend fun updateTopic(
-        id: String,
-        title: String,
-        description: String,
-        category: String
-    ): Flow<ApiResponse<Boolean>>
+    suspend fun updateTopic(topic: ForumTopic): Flow<ApiResponse<Boolean>>
 }

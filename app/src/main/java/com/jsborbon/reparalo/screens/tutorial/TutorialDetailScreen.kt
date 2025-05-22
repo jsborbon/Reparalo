@@ -72,13 +72,13 @@ import java.util.Locale
 fun TutorialDetailScreen(
     navController: NavController,
     tutorialId: String,
-    sharedViewModel: TutorialsViewModel = hiltViewModel()
+    sharedViewModel: TutorialsViewModel = hiltViewModel(),
 ) {
     val detailViewModel: TutorialDetailViewModel = hiltViewModel()
     val tutorialState by detailViewModel.tutorial.collectAsState()
     val commentsState by detailViewModel.comments.collectAsState()
     val deleteState by sharedViewModel.deleteState.collectAsState()
-    val favoriteState by sharedViewModel.isFavorite.collectAsState()
+    val favoriteState: ApiResponse<Boolean> by sharedViewModel.isFavorite.collectAsState()
     val isFavorite = (favoriteState as? Success<Boolean>)?.data == true
     val isLoadingFavorite = favoriteState is ApiResponse.Loading
 
@@ -117,7 +117,7 @@ fun TutorialDetailScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Regresar"
+                            contentDescription = "Regresar",
                         )
                     }
                 },
@@ -126,46 +126,49 @@ fun TutorialDetailScreen(
                         onClick = {
                             val shareIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "Mira este tutorial: https://tuapp.com/tutorial/${tutorialId}")
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "Mira este tutorial: https://tuapp.com/tutorial/$tutorialId",
+                                )
                                 type = "text/plain"
                             }
                             context.startActivity(Intent.createChooser(shareIntent, "Compartir tutorial"))
-                        }
+                        },
                     ) {
                         Icon(Icons.Default.Share, contentDescription = "Compartir")
                     }
 
                     IconButton(
                         onClick = { sharedViewModel.toggleFavorite(tutorialId) },
-                        enabled = !isLoadingFavorite
+                        enabled = !isLoadingFavorite,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                            tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
+                            tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface,
                         )
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Eliminar",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         AnimatedVisibility(
             visible = true,
             enter = slideInHorizontally { it } + fadeIn(),
-            exit = slideOutHorizontally { -it } + fadeOut()
+            exit = slideOutHorizontally { -it } + fadeOut(),
         ) {
             when (val state = tutorialState) {
                 is ApiResponse.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -174,7 +177,7 @@ fun TutorialDetailScreen(
                 is ApiResponse.Failure -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("Error al cargar el tutorial")
@@ -191,7 +194,7 @@ fun TutorialDetailScreen(
                         tutorial = state.data,
                         commentsState = commentsState,
                         viewModel = detailViewModel,
-                        innerPadding = innerPadding
+                        innerPadding = innerPadding,
                     )
                 }
             }
@@ -201,7 +204,11 @@ fun TutorialDetailScreen(
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
                 title = { Text("Eliminar tutorial") },
-                text = { Text("¿Estás seguro de que deseas eliminar este tutorial? Esta acción no se puede deshacer.") },
+                text = {
+                    Text(
+                        "¿Estás seguro de que deseas eliminar este tutorial? Esta acción no se puede deshacer.",
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = {
                         sharedViewModel.deleteTutorial(tutorialId)
@@ -214,7 +221,7 @@ fun TutorialDetailScreen(
                     TextButton(onClick = { showDeleteDialog = false }) {
                         Text("Cancelar")
                     }
-                }
+                },
             )
         }
     }
@@ -225,7 +232,7 @@ fun TutorialDetailContent(
     tutorial: Tutorial,
     commentsState: ApiResponse<List<Comment>>,
     viewModel: TutorialDetailViewModel,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
     val commentText = remember { mutableStateOf("") }
     val rating = remember { mutableIntStateOf(5) }
@@ -234,7 +241,7 @@ fun TutorialDetailContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         item {
             if (tutorial.videoUrl.isNotBlank()) {
@@ -245,7 +252,7 @@ fun TutorialDetailContent(
                         .fillMaxWidth()
                         .height(220.dp)
                         .background(Color.DarkGray),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text("No hay video disponible", color = Color.White)
                 }
@@ -257,14 +264,14 @@ fun TutorialDetailContent(
                 Text(
                     text = tutorial.title,
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = tutorial.category,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("•", color = Color.Gray)
@@ -277,7 +284,7 @@ fun TutorialDetailContent(
                             "Avanzado" -> Color.Red
                             else -> Color.Gray
                         },
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -286,7 +293,7 @@ fun TutorialDetailContent(
                         Text(
                             text = String.format(Locale.getDefault(), "%.1f", tutorial.averageRating),
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
@@ -304,16 +311,24 @@ fun TutorialDetailContent(
             item {
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Materiales necesarios", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Materiales necesarios",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             tutorial.materials.forEachIndexed { index, material ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text("${material.name} (${material.quantity})")
                                 }
@@ -336,11 +351,11 @@ fun TutorialDetailContent(
                         viewModel.submitComment(
                             tutorialId = tutorial.id,
                             text = commentText.value,
-                            rating = rating.intValue
+                            rating = rating.intValue,
                         )
                         commentText.value = ""
                     }
-                }
+                },
             )
         }
 
@@ -348,7 +363,7 @@ fun TutorialDetailContent(
             CommentListSection(
                 commentsState = commentsState,
                 viewModel = viewModel,
-                tutorialId = tutorial.id
+                tutorialId = tutorial.id,
             )
         }
     }

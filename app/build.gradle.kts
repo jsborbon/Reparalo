@@ -2,10 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp) // Added
+    alias(libs.plugins.ksp)
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
-    // kotlin("kapt") has been removed
 }
 
 android {

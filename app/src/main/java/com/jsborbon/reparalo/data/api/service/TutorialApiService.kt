@@ -36,5 +36,4 @@ interface TutorialApiService {
 
     @DELETE("tutoriales/{id}/favorite")
     suspend fun removeFavorite(@Path("id") tutorialId: String): Response<Unit>
-
 }

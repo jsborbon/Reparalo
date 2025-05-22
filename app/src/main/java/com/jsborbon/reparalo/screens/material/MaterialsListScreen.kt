@@ -55,7 +55,7 @@ fun MaterialsListScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         OutlinedTextField(
             value = searchQuery,
@@ -66,36 +66,36 @@ fun MaterialsListScreen(navController: NavController) {
             placeholder = { Text("Buscar materiales...") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
             singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
         )
 
         Text(
             text = "Categorías",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             CategoryChip(
                 icon = Icons.Default.Build,
                 text = "Herramientas",
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
             CategoryChip(
                 icon = Icons.Default.ShoppingCart,
                 text = "Materiales",
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
             )
             CategoryChip(
                 icon = Icons.Default.LocationOn,
                 text = "Tiendas",
-                color = MaterialTheme.colorScheme.tertiary
+                color = MaterialTheme.colorScheme.tertiary,
             )
         }
 
@@ -103,7 +103,7 @@ fun MaterialsListScreen(navController: NavController) {
             text = "Materiales Populares",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         )
 
         when (val state = materialsState) {
@@ -117,7 +117,7 @@ fun MaterialsListScreen(navController: NavController) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = "Error: ${state.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
             }
@@ -136,14 +136,14 @@ fun MaterialsListScreen(navController: NavController) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(filteredMaterials, key = { it.id }) { material ->
                             MaterialItem(
                                 material = material,
                                 onClick = {
                                     navController.navigate("${Routes.MATERIAL_DETAIL}/${material.id}")
-                                }
+                                },
                             )
                         }
                     }

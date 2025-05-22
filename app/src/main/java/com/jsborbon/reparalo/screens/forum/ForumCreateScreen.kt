@@ -27,22 +27,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
+import java.util.Date
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForumCreateScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel(),
+    forumViewModel: ForumViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
-    val createState by viewModel.createState.collectAsState()
+
+    val createState by forumViewModel.createState.collectAsState()
+    val currentUser by authViewModel.user.collectAsState()
 
     Scaffold(
         topBar = {
@@ -50,7 +57,7 @@ fun ForumCreateScreen(
                 title = { Text("Nuevo Tema") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 },
             )
@@ -97,7 +104,19 @@ fun ForumCreateScreen(
             Button(
                 onClick = {
                     if (title.isNotBlank() && description.isNotBlank() && category.isNotBlank()) {
-                        viewModel.createTopic(title, description, category)
+                        val topic = ForumTopic(
+                            id = UUID.randomUUID().toString(),
+                            title = title,
+                            description = description,
+                            category = category,
+                            author = currentUser?.name ?: "Anónimo",
+                            date = Date(),
+                            preview = description.take(100),
+                            comments = 0,
+                            likes = 0,
+                            views = 0,
+                        )
+                        forumViewModel.createTopic(topic)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

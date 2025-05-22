@@ -33,7 +33,8 @@ class AuthRepositoryImpl @Inject constructor(
         password: String,
         name: String,
         phone: String,
-        userType: UserType): FirebaseUser? {
+        userType: UserType,
+    ): FirebaseUser? {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
@@ -77,7 +78,6 @@ class AuthRepositoryImpl @Inject constructor(
             false
         }
     }
-
 
     override fun signOut() {
         auth.signOut()

@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.navigation.navigateAndPopUpTo
 import com.jsborbon.reparalo.screens.dashboard.DashboardScreen
 import com.jsborbon.reparalo.screens.forum.ForumScreen
 import com.jsborbon.reparalo.screens.material.MaterialsListScreen
@@ -183,5 +182,16 @@ fun BottomNavHost(
             onTabChange(5)
             UserProfileScreen(navController = navController)
         }
+    }
+}
+
+private fun NavController.navigateAndPopUpTo(
+    route: String,
+    popUpToRoute: String,
+    inclusive: Boolean = false,
+) {
+    navigate(route) {
+        popUpTo(popUpToRoute) { this.inclusive = inclusive }
+        launchSingleTop = true
     }
 }

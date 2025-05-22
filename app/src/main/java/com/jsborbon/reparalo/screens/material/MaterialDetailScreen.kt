@@ -35,7 +35,7 @@ import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 fun MaterialDetailScreen(
     navController: NavController,
     materialId: String,
-    viewModel: MaterialsViewModel = viewModel()
+    viewModel: MaterialsViewModel = viewModel(),
 ) {
     val materialState = viewModel.materialDetail.collectAsState()
 
@@ -51,9 +51,9 @@ fun MaterialDetailScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         when (val state = materialState.value) {
             is ApiResponse.Loading -> {
@@ -61,7 +61,7 @@ fun MaterialDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -74,11 +74,11 @@ fun MaterialDetailScreen(
                         .padding(innerPadding)
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "Error: ${state.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
             }
@@ -90,23 +90,23 @@ fun MaterialDetailScreen(
                         .padding(innerPadding)
                         .padding(16.dp)
                         .fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = material.name,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
                         text = "Descripción: ${material.description}",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
                         text = "Cantidad: ${material.quantity}",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
                         text = "Precio: $${material.price}",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -115,7 +115,7 @@ fun MaterialDetailScreen(
                         onClick = {
                             navController.navigate("${Routes.MATERIAL_EDIT}/${material.id}")
                         },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
                         Text("Editar material")
                     }

@@ -35,7 +35,7 @@ import com.jsborbon.reparalo.viewmodels.HelpViewModel
 @Composable
 fun SettingsHelpScreen(
     navController: NavController,
-    helpViewModel: HelpViewModel = hiltViewModel()
+    helpViewModel: HelpViewModel = hiltViewModel(),
 ) {
     val helpState by helpViewModel.helpItems.collectAsState()
 

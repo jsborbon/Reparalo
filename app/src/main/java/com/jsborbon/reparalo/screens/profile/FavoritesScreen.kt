@@ -20,7 +20,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.tutorial.TutorialCard
 import com.jsborbon.reparalo.viewmodels.FavoritesViewModel
@@ -48,11 +47,13 @@ fun FavoritesScreen(
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
-        when (state) {
+        when (val result = state) {
             is ApiResponse.Loading -> {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 32.dp),
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator()
@@ -60,24 +61,34 @@ fun FavoritesScreen(
             }
 
             is ApiResponse.Success -> {
-                val tutorials = (state as ApiResponse.Success<List<Tutorial>>).data
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(tutorials) { tutorial ->
-                        TutorialCard(
-                            tutorial = tutorial,
-                            onClick = {
-                                navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
-                            },
-                        )
+                val tutorials = result.data
+                if (tutorials.isEmpty()) {
+                    Text(
+                        text = "Aún no tienes tutoriales marcados como favoritos.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(tutorials) { tutorial ->
+                            TutorialCard(
+                                tutorial = tutorial,
+                                onClick = {
+                                    navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
+                                },
+                            )
+                        }
                     }
                 }
             }
 
             is ApiResponse.Failure -> {
-                val message = (state as ApiResponse.Failure).errorMessage
                 Text(
-                    text = "Error al cargar favoritos: $message",
+                    text = "Error al cargar favoritos: ${result.errorMessage}",
                     color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }

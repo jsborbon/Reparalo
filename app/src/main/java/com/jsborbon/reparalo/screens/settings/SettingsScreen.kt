@@ -43,7 +43,6 @@ import com.jsborbon.reparalo.navigation.Routes
 fun SettingsScreen(
     navController: NavController,
 ) {
-
     var isDarkTheme by remember { mutableStateOf(false) }
     var isNotificationsEnabled by remember { mutableStateOf(true) }
     var isLocationEnabled by remember { mutableStateOf(false) }
@@ -200,7 +199,7 @@ fun SettingsScreen(
                 } else {
                     selectedNotificationTypes + type
                 }
-            }
+            },
         )
     }
 }
@@ -209,7 +208,7 @@ fun SettingsScreen(
 fun NotificationTypesDialog(
     onDismiss: () -> Unit,
     selectedTypes: Set<String>,
-    onToggleType: (String) -> Unit
+    onToggleType: (String) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -228,17 +227,17 @@ fun NotificationTypesDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onToggleType(type) }
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = 8.dp),
                     ) {
                         Checkbox(
                             checked = selectedTypes.contains(type),
-                            onCheckedChange = { onToggleType(type) }
+                            onCheckedChange = { onToggleType(type) },
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = type)
                     }
                 }
             }
-        }
+        },
     )
 }

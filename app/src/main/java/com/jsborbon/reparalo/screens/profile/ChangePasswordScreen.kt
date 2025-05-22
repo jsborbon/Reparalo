@@ -36,7 +36,7 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun ChangePasswordScreen(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 
@@ -54,12 +54,12 @@ fun ChangePasswordScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = "Atrás",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -67,7 +67,7 @@ fun ChangePasswordScreen(
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
                 value = newPassword,
@@ -78,7 +78,7 @@ fun ChangePasswordScreen(
                 },
                 label = { Text("Nueva contraseña") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
             )
 
             OutlinedTextField(
@@ -90,7 +90,7 @@ fun ChangePasswordScreen(
                 },
                 label = { Text("Confirmar contraseña") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
             )
 
             errorMessage?.let {
@@ -132,7 +132,7 @@ fun ChangePasswordScreen(
                     }
                 },
                 enabled = !isSubmitting,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
             ) {
                 Text("Guardar")
             }

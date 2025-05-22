@@ -4,14 +4,17 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,8 +30,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.NavigationBottomBar
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.screens.profile.ContactInfoCard
 import com.jsborbon.reparalo.viewmodels.TechnicianViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TechnicianProfileScreen(
     technicianId: String,
@@ -43,7 +48,9 @@ fun TechnicianProfileScreen(
     }
 
     Scaffold(
-        bottomBar = { NavigationBottomBar(selectedIndex = 2, navController = navController) },
+        bottomBar = {
+            NavigationBottomBar(selectedIndex = 2, navController = navController)
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -60,6 +67,8 @@ fun TechnicianProfileScreen(
 
                 is ApiResponse.Success -> {
                     val technician = state.data
+                    val joinDate = technician.registrationDate
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -67,17 +76,24 @@ fun TechnicianProfileScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(text = technician.name, style = MaterialTheme.typography.titleLarge)
-                            Text(text = technician.email, style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                text = "Teléfono: ${technician.phone}",
-                                style = MaterialTheme.typography.bodySmall,
+                                text = technician.name,
+                                style = MaterialTheme.typography.titleLarge,
                             )
+
+                            ContactInfoCard(
+                                email = technician.email,
+                                phone = technician.phone,
+                                joinDate = joinDate,
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
                             if (technician.availability.isNotBlank()) {
                                 Text(
                                     text = "Disponibilidad: ${technician.availability}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    modifier = Modifier.padding(top = 4.dp),
                                 )
                             }
 
@@ -85,13 +101,10 @@ fun TechnicianProfileScreen(
                                 Button(
                                     onClick = {
                                         val phone = technician.phone.trim().replace(" ", "")
-                                        val intent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            Uri.parse("https://wa.me/$phone")
-                                        )
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$phone"))
                                         context.startActivity(intent)
                                     },
-                                    modifier = Modifier.padding(top = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp),
                                 ) {
                                     Text("Contactar por WhatsApp")
                                 }
@@ -99,13 +112,10 @@ fun TechnicianProfileScreen(
                                 Button(
                                     onClick = {
                                         val phone = technician.phone.trim().replace(" ", "")
-                                        val intent = Intent(
-                                            Intent.ACTION_DIAL,
-                                            Uri.parse("tel:$phone")
-                                        )
+                                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
                                         context.startActivity(intent)
                                     },
-                                    modifier = Modifier.padding(top = 8.dp)
+                                    modifier = Modifier.padding(top = 8.dp),
                                 ) {
                                     Text("Llamar")
                                 }
@@ -114,7 +124,7 @@ fun TechnicianProfileScreen(
                                     text = "Número de teléfono no disponible",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(top = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp),
                                 )
                             }
                         }

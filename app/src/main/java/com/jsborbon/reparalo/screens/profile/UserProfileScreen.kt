@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,43 +32,43 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.components.InfoCard
-import com.jsborbon.reparalo.components.InfoRow
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.history.ServiceHistoryCard
 import com.jsborbon.reparalo.screens.technician.TechnicianDetailsCard
 import com.jsborbon.reparalo.screens.technician.TechnicianStatsCard
 import com.jsborbon.reparalo.utils.formatDate
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
     navController: NavController,
-    isEditMode: Boolean = false
+    isEditMode: Boolean = false,
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
     val editMode = remember { mutableStateOf(isEditMode) }
+    val userState by authViewModel.user.collectAsState()
+    val user = userState ?: return
 
-    var userIsTechnician by remember { mutableStateOf(true) }
-    var userName by remember { mutableStateOf(currentUser?.displayName ?: "Usuario") }
-    var userEmail by remember { mutableStateOf(currentUser?.email ?: "correo@ejemplo.com") }
-    var userPhone by remember { mutableStateOf("123456789") }
-    val userPhoto = remember { mutableStateOf(currentUser?.photoUrl?.toString() ?: "") }
-    var userRating by remember { mutableFloatStateOf(4.8f) }
-    val userJoinDate = remember {
-        formatDate(currentUser?.metadata?.creationTimestamp ?: System.currentTimeMillis())
+    var userName by remember { mutableStateOf(user.name) }
+    var userPhone by remember { mutableStateOf(user.phone) }
+    val userEmail = user.email
+    val userJoinDate = if (user.registrationDate.isNotBlank()) {
+        formatDate(user.registrationDate)
+    } else {
+        "Desconocido"
     }
-
+    val userIsTechnician = user.userType.name == "TECNICO"
+    val availability = remember { mutableStateOf(user.availability) }
     val specialties = remember { mutableStateOf(listOf("Electricidad", "Plomería", "Carpintería")) }
     val completedServices = remember { mutableIntStateOf(24) }
-    val isVerified = remember { mutableStateOf(true) }
-    val availability = remember { mutableStateOf("Lunes a Viernes, 9:00 - 18:00") }
-
+    val userRating = remember { mutableFloatStateOf(user.rating) }
     val favoriteCount = remember { mutableIntStateOf(12) }
     val lastServiceTimestamp = remember { mutableLongStateOf(System.currentTimeMillis() - 86400000L * 3) }
 
@@ -76,83 +77,65 @@ fun UserProfileScreen(
             TopAppBar(
                 title = { Text("Mi Perfil") },
                 actions = {
-                    IconButton(onClick = { /*TODO Future settings */ }) {
+                    IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
                         Icon(imageVector = Icons.Default.Settings, contentDescription = "Configuración")
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
-                ProfileHeader(
-                    userName = userName,
-                    userPhoto = userPhoto.value,
-                    isTechnician = userIsTechnician,
-                    isVerified = isVerified.value,
-                    userRating = userRating,
-                    completedServices = completedServices.intValue
-                )
-            }
-
-            item {
-                InfoCard(title = "Información de contacto") {
-                    if (editMode.value) {
+                if (editMode.value) {
+                    InfoCard(title = "Información de contacto") {
                         OutlinedTextField(
                             value = userName,
                             onValueChange = { userName = it },
                             label = { Text("Nombre") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp)
+                                .padding(bottom = 8.dp),
                         )
                         OutlinedTextField(
                             value = userPhone,
                             onValueChange = { userPhone = it },
                             label = { Text("Teléfono") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                         Text(
                             text = "Miembro desde: $userJoinDate",
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    } else {
-                        InfoRow(
-                            icon = painterResource(id = com.jsborbon.reparalo.R.drawable.baseline_email),
-                            text = userEmail
-                        )
-                        InfoRow(
-                            icon = painterResource(id = com.jsborbon.reparalo.R.drawable.baseline_phone),
-                            text = userPhone
-                        )
-                        InfoRow(
-                            icon = painterResource(id = com.jsborbon.reparalo.R.drawable.baseline_date_range),
-                            text = "Miembro desde: $userJoinDate"
+                            modifier = Modifier.padding(top = 8.dp),
                         )
                     }
+                } else {
+                    ContactInfoCard(
+                        email = userEmail,
+                        phone = userPhone,
+                        joinDate = userJoinDate,
+                    )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             if (userIsTechnician) {
                 item {
                     TechnicianDetailsCard(
                         specialties = specialties.value,
-                        availability = availability.value
+                        availability = availability.value,
                     )
                 }
-
                 item {
                     TechnicianStatsCard(
                         completedServices = completedServices.intValue,
-                        rating = userRating
+                        rating = userRating.floatValue,
                     )
                 }
             } else {
@@ -161,10 +144,9 @@ fun UserProfileScreen(
                         favoriteCount = favoriteCount.intValue,
                         onViewFavoritesClick = {
                             navController.navigate(Routes.FAVORITES)
-                        }
+                        },
                     )
                 }
-
                 item {
                     ServiceHistoryCard(
                         title = "Último servicio",
@@ -172,7 +154,7 @@ fun UserProfileScreen(
                         showButton = true,
                         onButtonClick = {
                             navController.navigate(Routes.SERVICE_HISTORY)
-                        }
+                        },
                     )
                 }
             }
@@ -183,24 +165,28 @@ fun UserProfileScreen(
                 if (editMode.value) {
                     Button(
                         onClick = {
-                            //TODO Save changes logic here
-                            navController.navigate(Routes.USER_PROFILE)
+                            authViewModel.updateUser(
+                                name = userName,
+                                phone = userPhone,
+                                availability = availability.value,
+                            )
+                            navController.navigate(Routes.userProfileRoute(edit = false))
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text("Guardar cambios")
                     }
                 } else {
                     Button(
                         onClick = {
-                            navController.navigate("${Routes.USER_PROFILE}?edit=true")
+                            navController.navigate(Routes.userProfileRoute(edit = true))
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
+                            contentDescription = "Editar perfil",
+                            modifier = Modifier.padding(end = 8.dp),
                         )
                         Text("Editar perfil")
                     }
@@ -215,12 +201,12 @@ fun UserProfileScreen(
                             popUpTo(Routes.DASHBOARD) { inclusive = true }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        contentDescription = "Cerrar sesión",
+                        modifier = Modifier.padding(end = 8.dp),
                     )
                     Text("Cerrar sesión")
                 }

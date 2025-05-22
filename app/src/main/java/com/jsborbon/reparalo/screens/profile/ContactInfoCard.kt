@@ -6,7 +6,6 @@ import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.components.InfoCard
 import com.jsborbon.reparalo.components.InfoRow
 
-//TODO: Add this component
 @Composable
 fun ContactInfoCard(email: String, phone: String, joinDate: String) {
     InfoCard(title = "Información de contacto") {

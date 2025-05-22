@@ -3,7 +3,7 @@ package com.jsborbon.reparalo.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.repository.impl.ForumRepositoryImpl
+import com.jsborbon.reparalo.data.repository.ForumRepository
 import com.jsborbon.reparalo.models.ForumTopic
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import java.util.Date
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ForumViewModel @Inject constructor(
-    private val repository: ForumRepositoryImpl
+    private val repository: ForumRepository,
 ) : ViewModel() {
 
     private val _topics = MutableStateFlow<ApiResponse<List<ForumTopic>>>(ApiResponse.Loading)
@@ -58,24 +56,10 @@ class ForumViewModel @Inject constructor(
         }
     }
 
-    fun createTopic(title: String, description: String, category: String) {
+    fun createTopic(topic: ForumTopic) {
         _createState.value = ApiResponse.Loading
-
-        val newTopic = ForumTopic(
-            id = UUID.randomUUID().toString(),
-            title = title,
-            description = description,
-            category = category,
-            author = "Anónimo",
-            date = Date(),
-            preview = description.take(100),
-            comments = 0,
-            likes = 0,
-            views = 0
-        )
-
         viewModelScope.launch {
-            repository.createTopic(newTopic).collectLatest { response ->
+            repository.createTopic(topic).collectLatest { response ->
                 _createState.value = response
                 if (response is ApiResponse.Success) {
                     loadTopics()
@@ -84,10 +68,10 @@ class ForumViewModel @Inject constructor(
         }
     }
 
-    fun editTopic(id: String, title: String, description: String, category: String) {
+    fun editTopic(topic: ForumTopic) {
         _editState.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.updateTopic(id, title, description, category).collectLatest { response ->
+            repository.updateTopic(topic).collectLatest { response ->
                 _editState.value = response
                 if (response is ApiResponse.Success) {
                     loadTopics()

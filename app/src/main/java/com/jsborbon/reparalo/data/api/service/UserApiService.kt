@@ -17,17 +17,17 @@ interface UserApiService {
     suspend fun getTechniciansBySpecialty(
         @Query("especialidad") specialty: String,
         @Query("page") page: Int? = null,
-        @Query("pageSize") pageSize: Int? = null
+        @Query("pageSize") pageSize: Int? = null,
     ): Response<List<User>>
 
     @GET("usuarios/{uid}")
     suspend fun getUser(
-        @Path("uid") uid: String
+        @Path("uid") uid: String,
     ): Response<User>
 
     @PUT("usuarios/{uid}")
     suspend fun updateUser(
         @Path("uid") uid: String,
-        @Body user: User
+        @Body user: User,
     ): Response<User>
 }

@@ -42,9 +42,14 @@ fun TechnicianSearchScreen(
     val query = remember { mutableStateOf("") }
 
     val specialties = listOf(
-        "Electricidad", "Plomería", "Carpintería",
-        "Electrónica", "Jardinería", "Automotriz",
-        "Pintura", "Albañilería"
+        "Electricidad",
+        "Plomería",
+        "Carpintería",
+        "Electrónica",
+        "Jardinería",
+        "Automotriz",
+        "Pintura",
+        "Albañilería",
     )
 
     LaunchedEffect(Unit) {
@@ -54,17 +59,17 @@ fun TechnicianSearchScreen(
     Scaffold(
         bottomBar = {
             NavigationBottomBar(selectedIndex = 2, navController = navController)
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             Text(
                 text = "Buscar Técnicos",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
 
             OutlinedTextField(
@@ -73,13 +78,13 @@ fun TechnicianSearchScreen(
                 label = { Text("Buscar por nombre o correo") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
             )
 
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
+                contentPadding = PaddingValues(bottom = 16.dp),
             ) {
                 items(specialties) { specialty ->
                     val isSelected = specialty == selectedSpecialty
@@ -92,7 +97,7 @@ fun TechnicianSearchScreen(
                                 viewModel.loadTechniciansBySpecialty(specialty)
                             }
                         },
-                        label = { Text(specialty) }
+                        label = { Text(specialty) },
                     )
                 }
             }
@@ -107,7 +112,7 @@ fun TechnicianSearchScreen(
                 is ApiResponse.Failure -> {
                     Text(
                         text = "Error al cargar técnicos: ${state.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
 
@@ -120,7 +125,7 @@ fun TechnicianSearchScreen(
                             items(filtered, key = { it.uid }) { technician ->
                                 TechnicianCard(
                                     technician = technician,
-                                    padding = PaddingValues(vertical = 8.dp)
+                                    padding = PaddingValues(vertical = 8.dp),
                                 )
                             }
                         }

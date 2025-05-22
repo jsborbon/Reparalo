@@ -1,6 +1,7 @@
 package com.jsborbon.reparalo.data.api.service
 
 import com.jsborbon.reparalo.models.ForumTopic
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -13,16 +14,14 @@ interface ForumApiService {
     suspend fun getTopics(): List<ForumTopic>
 
     @POST("forum/topics")
-    suspend fun createTopic(@Body topic: ForumTopic)
+    suspend fun createTopic(@Body topic: ForumTopic): Response<Unit>
 
     @GET("forum/topics/{id}")
-    fun getTopicById(@Path("id") id: String): ForumTopic
+    suspend fun getTopicById(@Path("id") id: String): ForumTopic
 
     @PUT("forum/topics/{id}")
-    fun updateTopic(
+    suspend fun updateTopic(
         @Path("id") id: String,
-        @Body title: String,
-        @Body description: String,
-        @Body category: String
-    )
+        @Body topic: ForumTopic,
+    ): Unit
 }

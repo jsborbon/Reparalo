@@ -7,6 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface CommentRepository {
 
     fun getCommentsByTutorial(tutorialId: String): Flow<ApiResponse<List<Comment>>>
-
     fun createComment(comment: Comment): Flow<ApiResponse<Comment>>
 }

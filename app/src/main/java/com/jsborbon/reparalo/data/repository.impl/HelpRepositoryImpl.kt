@@ -7,7 +7,7 @@ import com.jsborbon.reparalo.models.HelpItem
 import javax.inject.Inject
 
 class HelpRepositoryImpl @Inject constructor(
-    private val apiService: HelpApiService
+    private val apiService: HelpApiService,
 ) : HelpRepository {
 
     override suspend fun getHelpItems(): ApiResponse<List<HelpItem>> {

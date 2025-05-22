@@ -1,9 +1,10 @@
-package com.jsborbon.reparalo.viewmodels
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.repository.impl.HistoryRepositoryImpl
+import com.jsborbon.reparalo.data.repository.HistoryRepository
 import com.jsborbon.reparalo.models.ServiceHistoryItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val repository: HistoryRepositoryImpl,
+    private val repository: HistoryRepository,
 ) : ViewModel() {
 
     private val _historyItems = MutableStateFlow<ApiResponse<List<ServiceHistoryItem>>>(ApiResponse.Loading)
@@ -29,6 +30,16 @@ class HistoryViewModel @Inject constructor(
             } catch (e: Exception) {
                 _historyItems.value = ApiResponse.Failure(e.message ?: "Error desconocido")
             }
+        }
+    }
+
+    private val _serviceDetail = mutableStateOf<ApiResponse<ServiceHistoryItem>>(ApiResponse.Loading)
+    val serviceDetail: State<ApiResponse<ServiceHistoryItem>> = _serviceDetail
+
+    fun loadService(id: String) {
+        viewModelScope.launch {
+            _serviceDetail.value = ApiResponse.Loading
+            _serviceDetail.value = repository.fetchServiceById(id)
         }
     }
 }

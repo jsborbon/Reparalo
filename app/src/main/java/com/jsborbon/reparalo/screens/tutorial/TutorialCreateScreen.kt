@@ -119,7 +119,7 @@ fun TutorialCreateScreen(
                         materials = emptyList(),
                         averageRating = 0f,
                         videoUrl = "",
-                        publicationDate = Date()
+                        publicationDate = Date(),
                     )
                     viewModel.createTutorial(tutorial)
                 },
