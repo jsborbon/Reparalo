@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -28,33 +29,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.NavigationBottomBar
 import com.jsborbon.reparalo.components.UserCard
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.viewmodels.AuthViewModel
+import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: UserProfileViewModel = androidx.hilt.navigation.compose.hiltViewModel(),
 ) {
-    val user by viewModel.user.collectAsState()
-    val resetState by viewModel.resetState.collectAsState()
+    val state by viewModel.user.collectAsState()
 
-    var name by remember { mutableStateOf(user?.name ?: "") }
-    var phone by remember { mutableStateOf(user?.phone ?: "") }
-    var availability by remember { mutableStateOf(user?.availability ?: "") }
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var availability by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(resetState) {
-        when (val result = resetState) {
-            is ApiResponse.Success -> message = "Se envió un correo para cambiar la contraseña."
-            is ApiResponse.Failure -> message = result.errorMessage
-            else -> Unit
+    LaunchedEffect(state) {
+        if (state is ApiResponse.Success) {
+            val user = (state as ApiResponse.Success).data
+            name = user.name
+            phone = user.phone
+            availability = user.availability
         }
     }
 
@@ -72,109 +72,112 @@ fun ProfileScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            user?.let {
-                UserCard(user = it, padding = PaddingValues(bottom = 24.dp))
-            }
+            if (state is ApiResponse.Success) {
+                val user = (state as ApiResponse.Success).data
+                UserCard(user = user, padding = PaddingValues(bottom = 24.dp))
 
-            Text(
-                text = "Perfil de Usuario",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-            )
+                Text(
+                    text = "Perfil de Usuario",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nombre") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Teléfono") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Teléfono") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = availability,
-                onValueChange = { availability = it },
-                label = { Text("Disponibilidad") },
-                placeholder = { Text("Ej: Lunes a Viernes 8:00 a 18:00") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+                OutlinedTextField(
+                    value = availability,
+                    onValueChange = { availability = it },
+                    label = { Text("Disponibilidad") },
+                    placeholder = { Text("Ej: Lunes a Viernes 8:00 a 18:00") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = user?.email ?: "",
-                onValueChange = {},
-                label = { Text("Correo electrónico") },
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                OutlinedTextField(
+                    value = user.email,
+                    onValueChange = {},
+                    label = { Text("Correo electrónico") },
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = user?.userType?.name ?: "",
-                onValueChange = {},
-                label = { Text("Tipo de Usuario") },
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                OutlinedTextField(
+                    value = user.userType.name,
+                    onValueChange = {},
+                    label = { Text("Tipo de Usuario") },
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = {
-                    viewModel.updateUser(
-                        name = name,
-                        phone = phone,
-                        availability = availability,
-                    )
-                    message = "Cambios guardados correctamente"
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            ) {
-                Text("Guardar Cambios")
-            }
+                Button(
+                    onClick = {
+                        viewModel.updateUserData(name, phone, availability)
+                        message = "Cambios guardados correctamente"
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                ) {
+                    Text("Guardar Cambios")
+                }
 
-            TextButton(
-                onClick = { navController.navigate(Routes.SETTINGS_PASSWORD) },
-            ) {
-                Text("Cambiar contraseña")
-            }
+                TextButton(
+                    onClick = { navController.navigate(Routes.SETTINGS_PASSWORD) },
+                ) {
+                    Text("Cambiar contraseña")
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            message?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.primary)
-            }
+                message?.let {
+                    Text(text = it, color = MaterialTheme.colorScheme.primary)
+                }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = {
-                    viewModel.logout()
-                    navController.navigate(Routes.AUTHENTICATION) {
-                        popUpTo(Routes.DASHBOARD) { inclusive = true }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Cerrar Sesión")
+                Button(
+                    onClick = {
+                        navController.navigate(Routes.AUTHENTICATION) {
+                            popUpTo(Routes.DASHBOARD) { inclusive = true }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Cerrar Sesión")
+                }
+            } else if (state is ApiResponse.Failure) {
+                Text(
+                    text = "Error al cargar el perfil: ${(state as ApiResponse.Failure).errorMessage}",
+                    color = MaterialTheme.colorScheme.error,
+                )
+            } else {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 48.dp))
             }
         }
     }

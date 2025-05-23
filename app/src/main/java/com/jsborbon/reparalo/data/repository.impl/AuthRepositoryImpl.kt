@@ -9,11 +9,10 @@ import com.jsborbon.reparalo.models.User
 import com.jsborbon.reparalo.models.UserType
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
-import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore,
+class AuthRepositoryImpl(
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : AuthRepository {
 
     private val TAG = "AuthRepositoryImpl"
@@ -33,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
         password: String,
         name: String,
         phone: String,
-        userType: UserType,
+        userType: UserType
     ): FirebaseUser? {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
@@ -47,7 +46,7 @@ class AuthRepositoryImpl @Inject constructor(
                     email = email,
                     phone = phone,
                     userType = userType,
-                    registrationDate = registrationDate,
+                    registrationDate = registrationDate
                 )
                 firestore.collection("users").document(user.uid).set(profile).await()
             }

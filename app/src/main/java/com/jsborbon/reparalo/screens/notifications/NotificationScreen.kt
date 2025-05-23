@@ -26,10 +26,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.NotificationItem
@@ -38,7 +38,7 @@ import com.jsborbon.reparalo.viewmodels.NotificationViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavController) {
-    val viewModel: NotificationViewModel = hiltViewModel()
+    val viewModel: NotificationViewModel = remember { NotificationViewModel() }
     val notificationState by viewModel.notifications.collectAsState()
 
     Scaffold(

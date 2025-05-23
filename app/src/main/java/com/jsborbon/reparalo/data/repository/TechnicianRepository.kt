@@ -5,7 +5,6 @@ import com.jsborbon.reparalo.models.User
 import kotlinx.coroutines.flow.Flow
 
 interface TechnicianRepository {
-
     fun getAllTechnicians(): Flow<ApiResponse<List<User>>>
     fun getTechniciansBySpecialty(
         specialty: String,

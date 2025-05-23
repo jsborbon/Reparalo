@@ -1,12 +1,9 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.api.service.FavoritesApiService
-import com.jsborbon.reparalo.data.repository.FavoritesRepository
 import com.jsborbon.reparalo.models.Tutorial
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
 class FavoritesRepositoryImpl @Inject constructor(
     private val apiService: FavoritesApiService,

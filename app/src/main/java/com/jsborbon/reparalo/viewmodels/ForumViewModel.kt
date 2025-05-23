@@ -4,19 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.ForumRepository
+import com.jsborbon.reparalo.data.repository.impl.ForumRepositoryImpl
 import com.jsborbon.reparalo.models.ForumTopic
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ForumViewModel @Inject constructor(
-    private val repository: ForumRepository,
+class ForumViewModel(
+    private val repository: ForumRepository = ForumRepositoryImpl()
 ) : ViewModel() {
 
     private val _topics = MutableStateFlow<ApiResponse<List<ForumTopic>>>(ApiResponse.Loading)

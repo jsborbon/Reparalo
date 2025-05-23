@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
@@ -36,8 +35,8 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun ChangePasswordScreen(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel(),
-) {
+    viewModel: AuthViewModel = remember { AuthViewModel() }
+){
     val context = LocalContext.current
 
     var newPassword by remember { mutableStateOf("") }

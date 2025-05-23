@@ -7,22 +7,22 @@ import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.CommentRepository
 import com.jsborbon.reparalo.data.repository.TutorialRepository
 import com.jsborbon.reparalo.data.repository.UserRepository
+import com.jsborbon.reparalo.data.repository.impl.CommentRepositoryImpl
+import com.jsborbon.reparalo.data.repository.impl.TutorialRepositoryImpl
+import com.jsborbon.reparalo.data.repository.impl.UserRepositoryImpl
 import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.models.User
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Date
-import javax.inject.Inject
 
-@HiltViewModel
-class TutorialDetailViewModel @Inject constructor(
-    private val tutorialRepository: TutorialRepository,
-    private val commentRepository: CommentRepository,
-    private val userRepository: UserRepository,
+class TutorialDetailViewModel(
+    private val tutorialRepository: TutorialRepository = TutorialRepositoryImpl(),
+    private val commentRepository: CommentRepository = CommentRepositoryImpl(),
+    private val userRepository: UserRepository = UserRepositoryImpl()
 ) : ViewModel() {
 
     private val _tutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Loading)

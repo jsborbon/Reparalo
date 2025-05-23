@@ -1,25 +1,30 @@
 package com.jsborbon.reparalo.data.repository.impl
 
+import android.util.Log
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.data.api.service.TermsApiService
 import com.jsborbon.reparalo.data.repository.TermsRepository
 import com.jsborbon.reparalo.models.TermsAndConditions
-import javax.inject.Inject
+import kotlinx.coroutines.tasks.await
 
-class TermsRepositoryImpl @Inject constructor(
-    private val apiService: TermsApiService,
-) : TermsRepository {
+class TermsRepositoryImpl : TermsRepository {
+
+    private val db = Firebase.firestore
+    private val TAG = "TermsRepositoryImpl"
 
     override suspend fun getTermsAndConditions(): ApiResponse<TermsAndConditions> {
         return try {
-            val response = apiService.fetchTerms()
-            if (response.isSuccessful) {
-                ApiResponse.Success(response.body()!!)
+            val snapshot = db.collection("terms").document("actual").get().await()
+            val terms = snapshot.toObject(TermsAndConditions::class.java)
+            if (terms != null) {
+                ApiResponse.Success(terms)
             } else {
-                ApiResponse.Failure("Error al cargar términos: ${response.message()}")
+                ApiResponse.Failure("Términos no encontrados")
             }
         } catch (e: Exception) {
-            ApiResponse.Failure(e.message ?: "Error desconocido")
+            Log.e(TAG, "getTermsAndConditions exception: ${e.message}", e)
+            ApiResponse.Failure("Error al cargar los términos y condiciones")
         }
     }
 }

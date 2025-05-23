@@ -1,71 +1,62 @@
 package com.jsborbon.reparalo.screens.profile
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.components.InfoCard
+import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.history.ServiceHistoryCard
 import com.jsborbon.reparalo.screens.technician.TechnicianDetailsCard
 import com.jsborbon.reparalo.screens.technician.TechnicianStatsCard
 import com.jsborbon.reparalo.utils.formatDate
-import com.jsborbon.reparalo.viewmodels.AuthViewModel
+import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
     navController: NavController,
     isEditMode: Boolean = false,
-    authViewModel: AuthViewModel = hiltViewModel(),
+    viewModel: UserProfileViewModel = remember { UserProfileViewModel() }
 ) {
     val editMode = remember { mutableStateOf(isEditMode) }
-    val userState by authViewModel.user.collectAsState()
-    val user = userState ?: return
+    val userState by viewModel.user.collectAsState()
+
+    val user = when (val state = userState) {
+        is ApiResponse.Success -> state.data
+        is ApiResponse.Loading -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            return
+        }
+        is ApiResponse.Failure -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = state.errorMessage)
+            }
+            return
+        }
+    }
 
     var userName by remember { mutableStateOf(user.name) }
     var userPhone by remember { mutableStateOf(user.phone) }
     val userEmail = user.email
-    val userJoinDate = if (user.registrationDate.isNotBlank()) {
-        formatDate(user.registrationDate)
-    } else {
-        "Desconocido"
-    }
-    val userIsTechnician = user.userType.name == "TECNICO"
+    val userJoinDate = if (user.registrationDate.isNotBlank()) formatDate(user.registrationDate) else "Desconocido"
+    val userIsTechnician = user.userType.name == "TECHNICIAN"
     val availability = remember { mutableStateOf(user.availability) }
+
     val specialties = remember { mutableStateOf(listOf("Electricidad", "Plomería", "Carpintería")) }
     val completedServices = remember { mutableIntStateOf(24) }
     val userRating = remember { mutableFloatStateOf(user.rating) }
@@ -80,9 +71,9 @@ fun UserProfileScreen(
                     IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
                         Icon(imageVector = Icons.Default.Settings, contentDescription = "Configuración")
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -165,7 +156,7 @@ fun UserProfileScreen(
                 if (editMode.value) {
                     Button(
                         onClick = {
-                            authViewModel.updateUser(
+                            viewModel.updateUserData(
                                 name = userName,
                                 phone = userPhone,
                                 availability = availability.value,

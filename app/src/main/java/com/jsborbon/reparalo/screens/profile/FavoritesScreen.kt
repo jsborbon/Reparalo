@@ -13,27 +13,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.tutorial.TutorialCard
-import com.jsborbon.reparalo.viewmodels.FavoritesViewModel
+import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 
 @Composable
 fun FavoritesScreen(
     navController: NavController,
-    viewModel: FavoritesViewModel = viewModel(),
+    viewModel: TutorialsViewModel = remember { TutorialsViewModel() },
 ) {
     val state by viewModel.favoriteTutorials.collectAsState()
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-    LaunchedEffect(userId) {
-        userId?.let { viewModel.fetchFavorites(it) }
+    LaunchedEffect(Unit) {
+        viewModel.fetchFavoriteTutorials()
     }
 
     Column(

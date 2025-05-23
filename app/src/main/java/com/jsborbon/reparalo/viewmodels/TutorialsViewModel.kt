@@ -4,18 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.TutorialRepository
+import com.jsborbon.reparalo.data.repository.impl.TutorialRepositoryImpl
 import com.jsborbon.reparalo.models.Tutorial
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class TutorialsViewModel @Inject constructor(
-    private val repository: TutorialRepository,
+class TutorialsViewModel(
+    private val repository: TutorialRepository = TutorialRepositoryImpl()
 ) : ViewModel() {
 
     private val _tutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)
@@ -44,6 +43,10 @@ class TutorialsViewModel @Inject constructor(
 
     private val _isFavorite = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Success(false))
     val isFavorite: StateFlow<ApiResponse<Boolean>> = _isFavorite
+
+    private val _favoriteTutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)
+    val favoriteTutorials: StateFlow<ApiResponse<List<Tutorial>>> = _favoriteTutorials
+
 
     fun loadTutorials() {
         viewModelScope.launch {
@@ -159,6 +162,15 @@ class TutorialsViewModel @Inject constructor(
                         else -> {}
                     }
                 }
+            }
+        }
+    }
+
+
+    fun fetchFavoriteTutorials() {
+        viewModelScope.launch {
+            repository.getFavoriteTutorials().collectLatest { response ->
+                _favoriteTutorials.value = response
             }
         }
     }

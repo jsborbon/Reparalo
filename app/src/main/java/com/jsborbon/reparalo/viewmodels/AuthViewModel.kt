@@ -4,20 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.AuthRepository
-import com.jsborbon.reparalo.data.repository.UserRepository
+import com.jsborbon.reparalo.data.repository.impl.AuthRepositoryImpl
 import com.jsborbon.reparalo.models.User
 import com.jsborbon.reparalo.models.UserType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
+class AuthViewModel(
+    private val authRepository: AuthRepository = AuthRepositoryImpl()
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
@@ -54,7 +49,6 @@ class AuthViewModel @Inject constructor(
         _signUpState.value = ApiResponse.Loading
         viewModelScope.launch {
             val userTypeEnum = UserType.fromId(userType) ?: UserType.CLIENT
-
             val firebaseUser = authRepository.signUp(email, password, name, phone, userTypeEnum)
             if (firebaseUser != null) {
                 val userData = authRepository.getUserData(firebaseUser.uid)
@@ -62,40 +56,17 @@ class AuthViewModel @Inject constructor(
                     _user.value = userData
                     _signUpState.value = ApiResponse.Success(userData)
                 } else {
-                    _signUpState.value = ApiResponse.Failure(
-                        "Registro completo, pero no se pudo" +
-                            " obtener los datos del usuario.",
-                    )
+                    _signUpState.value = ApiResponse.Failure("Registro completo, pero no se pudo obtener los datos del usuario.")
                 }
             } else {
-                _signUpState.value = ApiResponse.Failure(
-                    "Registro fallido. Verifica tu conexión" +
-                        " a Internet o intenta nuevamente.",
-                )
-            }
-        }
-    }
-
-    fun updateUser(name: String, phone: String, availability: String) {
-        viewModelScope.launch {
-            val currentUser = _user.value ?: return@launch
-            val updatedUser = currentUser.copy(
-                name = name,
-                phone = phone,
-                availability = availability,
-            )
-
-            userRepository.updateUser(updatedUser).collectLatest { response ->
-                if (response is ApiResponse.Success) {
-                    _user.value = response.data
-                }
+                _signUpState.value = ApiResponse.Failure("Registro fallido. Verifica tu conexión a Internet o intenta nuevamente.")
             }
         }
     }
 
     fun changePassword(
         newPassword: String,
-        onResult: (ApiResponse<Boolean>) -> Unit,
+        onResult: (ApiResponse<Boolean>) -> Unit
     ) {
         viewModelScope.launch {
             try {

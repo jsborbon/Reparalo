@@ -10,22 +10,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.NavigationBottomBar
 import com.jsborbon.reparalo.data.api.ApiResponse
@@ -35,7 +34,7 @@ import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 @Composable
 fun TechnicianSearchScreen(
     navController: NavController,
-    viewModel: TechnicianListViewModel = hiltViewModel(),
+    viewModel: TechnicianListViewModel = remember { TechnicianListViewModel() }
 ) {
     val techniciansState by viewModel.technicians.collectAsState()
     val selectedSpecialty by viewModel.selectedSpecialty.collectAsState()
@@ -59,7 +58,7 @@ fun TechnicianSearchScreen(
     Scaffold(
         bottomBar = {
             NavigationBottomBar(selectedIndex = 2, navController = navController)
-        },
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -140,6 +139,6 @@ private fun filterTechnicians(list: List<User>, query: String): List<User> {
     if (query.isBlank()) return list
     return list.filter {
         it.name.contains(query, ignoreCase = true) ||
-            it.email.contains(query, ignoreCase = true)
+                it.email.contains(query, ignoreCase = true)
     }
 }

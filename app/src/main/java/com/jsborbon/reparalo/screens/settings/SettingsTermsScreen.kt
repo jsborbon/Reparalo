@@ -15,12 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.viewmodels.TermsViewModel
@@ -29,9 +29,9 @@ import com.jsborbon.reparalo.viewmodels.TermsViewModel
 @Composable
 fun SettingsTermsScreen(
     navController: NavController,
-    termsViewModel: TermsViewModel = hiltViewModel(),
+    viewModel: TermsViewModel = remember { TermsViewModel() }
 ) {
-    val termsState by termsViewModel.terms.collectAsState()
+    val termsState by viewModel.terms.collectAsState()
 
     Scaffold(
         topBar = {
@@ -39,35 +39,37 @@ fun SettingsTermsScreen(
                 title = { Text("Términos y Condiciones") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
-                },
+                }
             )
-        },
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
         ) {
-            when (termsState) {
+            when (val state = termsState) {
                 is ApiResponse.Loading -> {
                     Text("Cargando términos y condiciones...", style = MaterialTheme.typography.bodyMedium)
                 }
+
                 is ApiResponse.Failure -> {
                     Text(
-                        text = "Error: ${(termsState as ApiResponse.Failure).errorMessage}",
+                        text = "Error: ${state.errorMessage}",
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
+
                 is ApiResponse.Success -> {
-                    val terms = (termsState as ApiResponse.Success).data
+                    val terms = state.data
                     Text(
                         text = "Última actualización: ${terms.lastUpdated}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -78,9 +80,8 @@ fun SettingsTermsScreen(
                     }
 
                     Text(
-                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos" +
-                            " términos y condiciones.",
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos términos y condiciones.",
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -95,7 +96,7 @@ fun SectionTitle(title: String) {
         text = title,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 4.dp),
+        modifier = Modifier.padding(bottom = 4.dp)
     )
 }
 
@@ -105,6 +106,6 @@ fun SectionText(text: String) {
         text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(bottom = 8.dp)
     )
 }

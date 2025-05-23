@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,11 +24,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.ServiceHistoryItem
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 
 @Composable
 fun ServiceHistoryScreen(
     navController: NavController,
-    viewModel: HistoryViewModel = viewModel(),
+    viewModel: HistoryViewModel = remember { HistoryViewModel() }
 ) {
     val state by viewModel.historyItems.collectAsState()
 

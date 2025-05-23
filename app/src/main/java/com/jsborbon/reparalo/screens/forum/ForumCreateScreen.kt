@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.ForumTopic
@@ -41,8 +40,8 @@ import java.util.UUID
 @Composable
 fun ForumCreateScreen(
     navController: NavController,
-    forumViewModel: ForumViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
+    forumViewModel: ForumViewModel = remember { ForumViewModel() },
+    authViewModel: AuthViewModel = remember { AuthViewModel() },
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
