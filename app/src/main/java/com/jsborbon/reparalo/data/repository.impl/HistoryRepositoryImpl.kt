@@ -1,47 +1,63 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.HistoryRepository
 import com.jsborbon.reparalo.models.ServiceHistoryItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class HistoryRepositoryImpl : HistoryRepository {
+class HistoryRepositoryImpl(
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+) : HistoryRepository {
 
-    private val db = Firebase.firestore
-    private val TAG = "HistoryRepositoryImpl"
-    private val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    private val TAG = HistoryRepositoryImpl::class.java.simpleName
+    private val collection = firestore.collection("serviceHistory")
 
-    override suspend fun getServiceHistory(userId: String): List<ServiceHistoryItem> {
-        return try {
-            val snapshot = db.collection("users")
-                .document(userId)
-                .collection("serviceHistory")
+    override fun getServiceHistory(userId: String): Flow<ApiResponse<List<ServiceHistoryItem>>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = collection
+                .whereEqualTo("userId", userId)
                 .get()
                 .await()
 
-            snapshot.documents.mapNotNull { it.toObject(ServiceHistoryItem::class.java) }
+            val list = snapshot.documents
+                .mapNotNull { it.toObject(ServiceHistoryItem::class.java) }
+
+            emit(ApiResponse.Success(list))
         } catch (e: Exception) {
-            Log.e(TAG, "getServiceHistory exception: ${e.message}", e)
-            emptyList()
+            Log.e(TAG, "getServiceHistory failed: ${e.message}", e)
+            emit(ApiResponse.Failure("Error al cargar el historial de servicios."))
         }
+    }.catch { e ->
+        Log.e(TAG, "getServiceHistory catch: ${e.message}", e)
+        emit(ApiResponse.Failure("Error inesperado al cargar el historial"))
     }
 
-    override suspend fun fetchServiceById(id: String): ApiResponse<ServiceHistoryItem> {
-        return try {
-            val doc = db.collection("serviceHistory").document(id).get().await()
-            val item = doc.toObject(ServiceHistoryItem::class.java)
+    override fun fetchServiceById(id: String): Flow<ApiResponse<ServiceHistoryItem>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = collection
+                .document(id)
+                .get()
+                .await()
+
+            val item = snapshot.toObject(ServiceHistoryItem::class.java)
             if (item != null) {
-                ApiResponse.Success(item)
+                emit(ApiResponse.Success(item))
             } else {
-                ApiResponse.Failure("Servicio no encontrado")
+                emit(ApiResponse.Failure("Servicio no encontrado"))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "fetchServiceById exception: ${e.message}", e)
-            ApiResponse.Failure("Error al cargar el detalle del servicio")
+            Log.e(TAG, "fetchServiceById failed: ${e.message}", e)
+            emit(ApiResponse.Failure("Error al cargar el detalle del servicio"))
         }
+    }.catch { e ->
+        Log.e(TAG, "fetchServiceById catch: ${e.message}", e)
+        emit(ApiResponse.Failure("Error inesperado al obtener detalle"))
     }
 }

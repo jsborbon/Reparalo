@@ -1,8 +1,7 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import android.util.Log
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.UserRepository
 import com.jsborbon.reparalo.models.User
@@ -11,24 +10,29 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+) : UserRepository {
 
-    private val db = Firebase.firestore
-    private val TAG = "UserRepositoryImpl"
+    private val TAG = UserRepositoryImpl::class.java.simpleName
 
-    override suspend fun getUserData(uid: String): User? {
-        return try {
-            val snapshot = db.collection("users").document(uid).get().await()
-            snapshot.toObject(User::class.java)
-        } catch (e: Exception) {
-            Log.e(TAG, "getUserData exception: ${e.message}", e)
-            null
+    override fun getUserData(uid: String): Flow<ApiResponse<User>> = flow {
+        emit(ApiResponse.Loading)
+        val snapshot = firestore.collection("users").document(uid).get().await()
+        val user = snapshot.toObject(User::class.java)
+        if (user != null) {
+            emit(ApiResponse.Success(user))
+        } else {
+            emit(ApiResponse.Failure("Usuario no encontrado"))
         }
+    }.catch { e ->
+        Log.e(TAG, "getUserData exception: ${e.message}", e)
+        emit(ApiResponse.Failure("Error al obtener los datos del usuario"))
     }
 
     override fun updateUser(user: User): Flow<ApiResponse<User>> = flow {
         emit(ApiResponse.Loading)
-        db.collection("users").document(user.uid).set(user).await()
+        firestore.collection("users").document(user.uid).set(user).await()
         emit(ApiResponse.Success(user))
     }.catch { e ->
         Log.e(TAG, "updateUser exception: ${e.message}", e)

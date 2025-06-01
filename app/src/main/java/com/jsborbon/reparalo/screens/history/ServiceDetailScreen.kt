@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,45 +31,61 @@ import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 fun ServiceDetailScreen(
     navController: NavController,
     serviceId: String,
-    viewModel: HistoryViewModel = remember { HistoryViewModel() }
+    viewModel: HistoryViewModel = remember { HistoryViewModel() },
 ) {
     LaunchedEffect(serviceId) {
         viewModel.loadService(serviceId)
     }
 
+    val result by viewModel.serviceDetail.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del servicio") },
+                title = { Text(text = "Detalle del servicio") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás",
+                        )
                     }
                 },
             )
         },
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(paddingValues)
                 .padding(16.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            val result = viewModel.serviceDetail.value
-
             when (result) {
-                is ApiResponse.Loading -> CircularProgressIndicator()
-                is ApiResponse.Success -> {
-                    val item = result.data
-                    Text(text = item.title, style = MaterialTheme.typography.headlineSmall)
-                    Text(text = formatDate(item.date), style = MaterialTheme.typography.bodySmall)
-                    Text(text = item.description, style = MaterialTheme.typography.bodyLarge)
+                is ApiResponse.Loading -> {
+                    CircularProgressIndicator()
                 }
-                is ApiResponse.Failure -> {
+
+                is ApiResponse.Success -> {
+                    val item = (result as ApiResponse.Success).data
                     Text(
-                        text = "Error: ${result.errorMessage}",
+                        text = item.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Text(
+                        text = formatDate(item.date),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Text(
+                        text = item.description,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+
+                is ApiResponse.Failure -> {
+                    val errorMessage = (result as ApiResponse.Failure).errorMessage
+                    Text(
+                        text = "Error: $errorMessage",
                         color = MaterialTheme.colorScheme.error,
                     )
                 }

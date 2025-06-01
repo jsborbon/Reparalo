@@ -1,26 +1,29 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import android.util.Log
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.HelpRepository
 import com.jsborbon.reparalo.models.HelpItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class HelpRepositoryImpl : HelpRepository {
+class HelpRepositoryImpl(
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+) : HelpRepository {
 
-    private val db = Firebase.firestore
-    private val TAG = "HelpRepositoryImpl"
+    private val TAG = HelpRepositoryImpl::class.java.simpleName
 
-    override suspend fun getHelpItems(): ApiResponse<List<HelpItem>> {
-        return try {
-            val snapshot = db.collection("helpItems").get().await()
-            val items = snapshot.documents.mapNotNull { it.toObject(HelpItem::class.java) }
-            ApiResponse.Success(items)
+    override fun getHelpItems(): Flow<ApiResponse<List<HelpItem>>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = firestore.collection("helpItems").get().await()
+            val helpItems = snapshot.documents.mapNotNull { it.toObject(HelpItem::class.java) }
+            emit(ApiResponse.Success(helpItems))
         } catch (e: Exception) {
-            Log.e(TAG, "getHelpItems exception: ${e.message}", e)
-            ApiResponse.Failure("Error al cargar los elementos de ayuda")
+            Log.e(TAG, "getHelpItems failed", e)
+            emit(ApiResponse.Failure("Error al cargar los elementos de ayuda"))
         }
     }
 }

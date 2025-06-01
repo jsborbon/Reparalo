@@ -37,6 +37,9 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.screens.settings.components.SettingsCategory
+import com.jsborbon.reparalo.screens.settings.components.SettingsClickableItem
+import com.jsborbon.reparalo.screens.settings.components.SettingsSwitchItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

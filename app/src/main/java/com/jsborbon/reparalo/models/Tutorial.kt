@@ -3,15 +3,15 @@ package com.jsborbon.reparalo.models
 import java.util.Date
 
 data class Tutorial(
-    val id: String,
-    val title: String,
-    val description: String,
-    val category: String,
-    val difficultyLevel: String,
-    val estimatedDuration: String,
-    val materials: List<Material>,
-    val videoUrl: String,
-    val author: String,
-    val publicationDate: Date,
-    val averageRating: Float,
+    val id: String = "",
+    val title: String = "",
+    val description: String = "",
+    val category: String = "",
+    val difficultyLevel: String = "",
+    val estimatedDuration: String = "",
+    val materials: List<Material> = emptyList(),
+    val videoUrl: String = "",
+    val author: Author = Author(),
+    val publicationDate: Date = Date(),
+    val averageRating: Float = 0f,
 )

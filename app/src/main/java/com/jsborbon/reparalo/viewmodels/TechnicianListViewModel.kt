@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class TechnicianListViewModel(
-    private val repository: TechnicianRepository = TechnicianRepositoryImpl()
+    private val repository: TechnicianRepository = TechnicianRepositoryImpl(),
 ) : ViewModel() {
 
     private val _technicians = MutableStateFlow<ApiResponse<List<User>>>(ApiResponse.Loading)
@@ -21,18 +21,28 @@ class TechnicianListViewModel(
     val selectedSpecialty: StateFlow<String?> = _selectedSpecialty
 
     fun loadAllTechnicians() {
+        _technicians.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getAllTechnicians().collect { response ->
-                _technicians.value = response
+            try {
+                repository.getAllTechnicians().collect { response ->
+                    _technicians.value = response
+                }
+            } catch (e: Exception) {
+                _technicians.value = ApiResponse.Failure(e.message ?: "Error al cargar los técnicos.")
             }
         }
     }
 
     fun loadTechniciansBySpecialty(specialty: String, page: Int? = null, pageSize: Int? = null) {
         _selectedSpecialty.value = specialty
+        _technicians.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getTechniciansBySpecialty(specialty, page, pageSize).collect {
-                _technicians.value = it
+            try {
+                repository.getTechniciansBySpecialty(specialty, page, pageSize).collect { response ->
+                    _technicians.value = response
+                }
+            } catch (e: Exception) {
+                _technicians.value = ApiResponse.Failure(e.message ?: "Error al filtrar por especialidad.")
             }
         }
     }

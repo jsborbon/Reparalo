@@ -8,20 +8,24 @@ import com.jsborbon.reparalo.data.repository.impl.TechnicianRepositoryImpl
 import com.jsborbon.reparalo.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class TechnicianViewModel(
-    private val repository: TechnicianRepository = TechnicianRepositoryImpl()
+    private val repository: TechnicianRepository = TechnicianRepositoryImpl(),
 ) : ViewModel() {
 
     private val _technician = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
     val technician: StateFlow<ApiResponse<User>> = _technician
 
     fun loadTechnician(uid: String) {
+        _technician.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getTechnicianById(uid).collectLatest { response ->
-                _technician.value = response
+            try {
+                repository.getTechnicianById(uid).collect { response ->
+                    _technician.value = response
+                }
+            } catch (e: Exception) {
+                _technician.value = ApiResponse.Failure(e.message ?: "Error al cargar los datos del técnico.")
             }
         }
     }

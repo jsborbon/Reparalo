@@ -13,31 +13,31 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class UserProfileViewModel(
-    private val repository: UserRepository = UserRepositoryImpl()
+    private val repository: UserRepository = UserRepositoryImpl(),
 ) : ViewModel() {
 
     private val _user = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
     val user: StateFlow<ApiResponse<User>> = _user
-
-    private val currentUid: String? = FirebaseAuth.getInstance().currentUser?.uid
 
     init {
         loadUserData()
     }
 
     fun loadUserData() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid == null) {
+            _user.value = ApiResponse.Failure("Sesión no iniciada.")
+            return
+        }
+
         _user.value = ApiResponse.Loading
         viewModelScope.launch {
-            val uid = currentUid
-            if (uid != null) {
-                val data = repository.getUserData(uid)
-                if (data != null) {
-                    _user.value = ApiResponse.Success(data)
-                } else {
-                    _user.value = ApiResponse.Failure("No se pudo cargar el perfil del usuario.")
+            try {
+                repository.getUserData(uid).collectLatest { response ->
+                    _user.value = response
                 }
-            } else {
-                _user.value = ApiResponse.Failure("Sesión no iniciada.")
+            } catch (e: Exception) {
+                _user.value = ApiResponse.Failure(e.message ?: "Error al cargar los datos del perfil.")
             }
         }
     }
@@ -47,13 +47,17 @@ class UserProfileViewModel(
         val updatedUser = current.copy(
             name = name,
             phone = phone,
-            availability = availability
+            availability = availability,
         )
 
+        _user.value = ApiResponse.Loading
         viewModelScope.launch {
-            _user.value = ApiResponse.Loading
-            repository.updateUser(updatedUser).collectLatest { response ->
-                _user.value = response
+            try {
+                repository.updateUser(updatedUser).collectLatest { response ->
+                    _user.value = response
+                }
+            } catch (e: Exception) {
+                _user.value = ApiResponse.Failure(e.message ?: "Error al actualizar el perfil.")
             }
         }
     }

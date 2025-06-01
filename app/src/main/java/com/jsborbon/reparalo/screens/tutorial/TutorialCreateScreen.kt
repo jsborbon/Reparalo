@@ -28,9 +28,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Author
 import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 import java.util.UUID
 
@@ -39,6 +43,8 @@ import java.util.UUID
 fun TutorialCreateScreen(
     navController: NavController,
     viewModel: TutorialsViewModel = viewModel(),
+    auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) {
     val context = LocalContext.current
     val createState by viewModel.createState.collectAsState()
@@ -48,11 +54,19 @@ fun TutorialCreateScreen(
     var category by remember { mutableStateOf("") }
     var difficulty by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
-    var author by remember { mutableStateOf("") }
+
+    var currentUserId by remember { mutableStateOf("") }
+    var currentUserName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.uiMessage.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+
+        auth.currentUser?.let { user ->
+            currentUserId = user.uid
+            val doc = firestore.collection("users").document(user.uid).get().await()
+            currentUserName = doc.getString("name") ?: ""
         }
     }
 
@@ -99,15 +113,17 @@ fun TutorialCreateScreen(
                 label = { Text("Duración estimada") },
                 modifier = Modifier.fillMaxWidth(),
             )
-            OutlinedTextField(
-                value = author,
-                onValueChange = { author = it },
-                label = { Text("Autor") },
-                modifier = Modifier.fillMaxWidth(),
-            )
 
             Button(
                 onClick = {
+                    if (currentUserId.isBlank() || currentUserName.isBlank()) {
+                        Toast.makeText(
+                            context,
+                            "No se pudo obtener la información del usuario.",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                        return@Button
+                    }
                     val tutorial = Tutorial(
                         id = UUID.randomUUID().toString(),
                         title = title,
@@ -115,7 +131,7 @@ fun TutorialCreateScreen(
                         category = category,
                         difficultyLevel = difficulty,
                         estimatedDuration = duration,
-                        author = author,
+                        author = Author(uid = currentUserId, name = currentUserName),
                         materials = emptyList(),
                         averageRating = 0f,
                         videoUrl = "",
@@ -133,20 +149,17 @@ fun TutorialCreateScreen(
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
-
                 is ApiResponse.Success -> {
                     LaunchedEffect(Unit) {
                         viewModel.resetCreateState()
                         navController.popBackStack()
                     }
                 }
-
                 is ApiResponse.Failure -> {
                     LaunchedEffect((createState as ApiResponse.Failure).errorMessage) {
                         viewModel.resetCreateState()
                     }
                 }
-
                 null -> {}
             }
         }

@@ -1,26 +1,46 @@
 package com.jsborbon.reparalo.screens.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.jsborbon.reparalo.components.InfoCard
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.screens.history.ServiceHistoryCard
-import com.jsborbon.reparalo.screens.technician.TechnicianDetailsCard
-import com.jsborbon.reparalo.screens.technician.TechnicianStatsCard
+import com.jsborbon.reparalo.screens.history.components.ServiceHistoryCard
+import com.jsborbon.reparalo.screens.profile.components.ClientFavoritesCard
+import com.jsborbon.reparalo.screens.profile.components.ContactInfoCard
+import com.jsborbon.reparalo.screens.profile.components.EditableContactInfoCard
+import com.jsborbon.reparalo.screens.profile.components.ProfileHeader
+import com.jsborbon.reparalo.screens.technician.components.TechnicianDetailsCard
+import com.jsborbon.reparalo.screens.technician.components.TechnicianStatsCard
 import com.jsborbon.reparalo.utils.formatDate
 import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
@@ -29,7 +49,7 @@ import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 fun UserProfileScreen(
     navController: NavController,
     isEditMode: Boolean = false,
-    viewModel: UserProfileViewModel = remember { UserProfileViewModel() }
+    viewModel: UserProfileViewModel = remember { UserProfileViewModel() },
 ) {
     val editMode = remember { mutableStateOf(isEditMode) }
     val userState by viewModel.user.collectAsState()
@@ -52,16 +72,17 @@ fun UserProfileScreen(
 
     var userName by remember { mutableStateOf(user.name) }
     var userPhone by remember { mutableStateOf(user.phone) }
+
     val userEmail = user.email
     val userJoinDate = if (user.registrationDate.isNotBlank()) formatDate(user.registrationDate) else "Desconocido"
     val userIsTechnician = user.userType.name == "TECHNICIAN"
     val availability = remember { mutableStateOf(user.availability) }
-
-    val specialties = remember { mutableStateOf(listOf("Electricidad", "Plomería", "Carpintería")) }
-    val completedServices = remember { mutableIntStateOf(24) }
-    val userRating = remember { mutableFloatStateOf(user.rating) }
-    val favoriteCount = remember { mutableIntStateOf(12) }
-    val lastServiceTimestamp = remember { mutableLongStateOf(System.currentTimeMillis() - 86400000L * 3) }
+    val specialties = user.specialty?.split(",")?.map { it.trim() } ?: emptyList()
+    val completedServices = user.completedServices
+    val userRating = user.rating
+    val satisfaction = user.satisfaction
+    val favoriteCount = user.favoriteCount
+    val lastServiceTimestamp = user.lastServiceTimestamp
 
     Scaffold(
         topBar = {
@@ -71,9 +92,9 @@ fun UserProfileScreen(
                     IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
                         Icon(imageVector = Icons.Default.Settings, contentDescription = "Configuración")
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -81,31 +102,27 @@ fun UserProfileScreen(
                 .padding(padding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
+                ProfileHeader(
+                    userName = user.name,
+                    isTechnician = userIsTechnician,
+                    isVerified = userIsTechnician && satisfaction >= 4.0f,
+                    userRating = userRating,
+                    completedServices = completedServices,
+                )
+            }
+
+            item {
                 if (editMode.value) {
-                    InfoCard(title = "Información de contacto") {
-                        OutlinedTextField(
-                            value = userName,
-                            onValueChange = { userName = it },
-                            label = { Text("Nombre") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                        )
-                        OutlinedTextField(
-                            value = userPhone,
-                            onValueChange = { userPhone = it },
-                            label = { Text("Teléfono") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Text(
-                            text = "Miembro desde: $userJoinDate",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 8.dp),
-                        )
-                    }
+                    EditableContactInfoCard(
+                        name = userName,
+                        phone = userPhone,
+                        joinDate = userJoinDate,
+                        onNameChange = { userName = it },
+                        onPhoneChange = { userPhone = it },
+                    )
                 } else {
                     ContactInfoCard(
                         email = userEmail,
@@ -113,26 +130,26 @@ fun UserProfileScreen(
                         joinDate = userJoinDate,
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
             if (userIsTechnician) {
                 item {
                     TechnicianDetailsCard(
-                        specialties = specialties.value,
+                        specialties = specialties,
                         availability = availability.value,
                     )
                 }
                 item {
                     TechnicianStatsCard(
-                        completedServices = completedServices.intValue,
-                        rating = userRating.floatValue,
+                        completedServices = completedServices,
+                        rating = userRating,
+                        satisfaction = satisfaction,
                     )
                 }
             } else {
                 item {
                     ClientFavoritesCard(
-                        favoriteCount = favoriteCount.intValue,
+                        favoriteCount = favoriteCount,
                         onViewFavoritesClick = {
                             navController.navigate(Routes.FAVORITES)
                         },
@@ -141,7 +158,7 @@ fun UserProfileScreen(
                 item {
                     ServiceHistoryCard(
                         title = "Último servicio",
-                        date = lastServiceTimestamp.longValue,
+                        date = lastServiceTimestamp,
                         showButton = true,
                         onButtonClick = {
                             navController.navigate(Routes.SERVICE_HISTORY)

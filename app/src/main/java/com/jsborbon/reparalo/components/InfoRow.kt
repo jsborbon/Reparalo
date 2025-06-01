@@ -13,14 +13,22 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun InfoRow(icon: Painter, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun InfoRow(
+    icon: Painter,
+    text: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Icon(
             painter = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }

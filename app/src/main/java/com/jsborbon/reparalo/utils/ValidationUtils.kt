@@ -9,13 +9,10 @@ object ValidationUtils {
     }
 
     fun isStrongPassword(password: String): Boolean {
-        // At least 6 characters, one number, one uppercase letter
-        val regex = Regex("^(?=.*[A-Z])(?=.*[0-9]).{6,}$")
-        return regex.matches(password)
+        return password.matches(Regex("^(?=.*[A-Z])(?=.*\\d).{6,}$"))
     }
 
     fun isValidPhone(phone: String): Boolean {
-        // Minimum 7 digits, only numbers
         return phone.matches(Regex("^\\d{7,}$"))
     }
 

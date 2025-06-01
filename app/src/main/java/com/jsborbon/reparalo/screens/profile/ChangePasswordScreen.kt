@@ -35,8 +35,8 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun ChangePasswordScreen(
     navController: NavController,
-    viewModel: AuthViewModel = remember { AuthViewModel() }
-){
+    viewModel: AuthViewModel = remember { AuthViewModel() },
+) {
     val context = LocalContext.current
 
     var newPassword by remember { mutableStateOf("") }

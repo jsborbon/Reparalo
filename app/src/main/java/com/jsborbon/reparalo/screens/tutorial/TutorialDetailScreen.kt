@@ -9,7 +9,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -26,20 +28,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.jsborbon.reparalo.components.comment.CommentFormSection
+import com.jsborbon.reparalo.components.comment.CommentListSection
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.screens.tutorial.components.TutorialDetailContent
 import com.jsborbon.reparalo.viewmodels.TutorialDetailViewModel
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 
@@ -48,17 +54,22 @@ import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 fun TutorialDetailScreen(
     navController: NavController,
     tutorialId: String,
-    sharedViewModel: TutorialsViewModel = hiltViewModel(),
+    sharedViewModel: TutorialsViewModel,
+    detailViewModel: TutorialDetailViewModel,
+    auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
-    val detailViewModel: TutorialDetailViewModel = hiltViewModel()
+    val currentUserId = auth.currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
+
+    val context = LocalContext.current
     val tutorialState by detailViewModel.tutorial.collectAsState()
     val commentsState by detailViewModel.comments.collectAsState()
-    val deleteState by sharedViewModel.deleteState.collectAsState()
-    val favoriteState by sharedViewModel.isFavorite.collectAsState()
-    val isFavorite = (favoriteState as? ApiResponse.Success)?.data == true
-    val isLoadingFavorite = favoriteState is ApiResponse.Loading
-    val context = LocalContext.current
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    val deleteState = sharedViewModel.deleteState.collectAsState().value
+    val favoriteIds by sharedViewModel.favoriteIds.collectAsState()
+    val isFavorite = favoriteIds.contains(tutorialId)
+
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val commentText = remember { mutableStateOf("") }
+    val rating = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         detailViewModel.loadTutorial(tutorialId)
@@ -86,14 +97,20 @@ fun TutorialDetailScreen(
                 title = { Text("Detalle del Tutorial") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás",
+                        )
                     }
                 },
                 actions = {
                     IconButton(
                         onClick = {
                             val intent = Intent(Intent.ACTION_SEND).apply {
-                                putExtra(Intent.EXTRA_TEXT, "Mira este tutorial: https://tuapp.com/tutorial/$tutorialId")
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "Mira este tutorial: https://tuapp.com/tutorial/$tutorialId",
+                                )
                                 type = "text/plain"
                             }
                             context.startActivity(Intent.createChooser(intent, "Compartir tutorial"))
@@ -101,15 +118,21 @@ fun TutorialDetailScreen(
                     ) {
                         Icon(Icons.Default.Share, contentDescription = "Compartir")
                     }
-                    IconButton(onClick = { sharedViewModel.toggleFavorite(tutorialId) }, enabled = !isLoadingFavorite) {
+                    IconButton(
+                        onClick = { sharedViewModel.toggleFavorite(tutorialId) },
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
                             tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface,
                         )
                     }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                    IconButton(onClick = { showDeleteDialog.value = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint = MaterialTheme.colorScheme.error,
+                        )
                     }
                 },
             )
@@ -121,38 +144,84 @@ fun TutorialDetailScreen(
             exit = slideOutHorizontally { -it } + fadeOut(),
         ) {
             when (val state = tutorialState) {
-                is ApiResponse.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                is ApiResponse.Failure -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Error al cargar el tutorial")
-                        Text(state.errorMessage, color = MaterialTheme.colorScheme.error)
-                        Button(onClick = { detailViewModel.loadTutorial(tutorialId) }) {
-                            Text("Reintentar")
+                is ApiResponse.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Cargando tutorial...")
                         }
                     }
                 }
-                is ApiResponse.Success -> TutorialDetailContent(
-                    tutorial = state.data,
-                    commentsState = commentsState,
-                    viewModel = detailViewModel,
-                    innerPadding = padding,
-                )
+                is ApiResponse.Failure -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Error al cargar el tutorial")
+                            Text(state.errorMessage, color = MaterialTheme.colorScheme.error)
+                            Button(onClick = { detailViewModel.loadTutorial(tutorialId) }) {
+                                Text("Reintentar")
+                            }
+                        }
+                    }
+                }
+                is ApiResponse.Success -> {
+                    val comments = (commentsState as? ApiResponse.Success)?.data ?: emptyList()
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        TutorialDetailContent(
+                            tutorial = state.data,
+                            commentsState = comments,
+                            innerPadding = padding,
+                            tutorialId = tutorialId,
+                            tutorialsViewModel = sharedViewModel,
+                            userNames = detailViewModel.userNames.collectAsState().value,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CommentFormSection(
+                            commentText = commentText,
+                            rating = rating,
+                            onSubmit = {
+                                detailViewModel.submitComment(
+                                    tutorialId,
+                                    commentText.value,
+                                    rating.intValue,
+                                    currentUserId,
+                                )
+                                commentText.value = ""
+                                rating.intValue = 0
+                            },
+                        )
+                        CommentListSection(
+                            commentsState = commentsState,
+                            viewModel = detailViewModel,
+                            tutorialId = tutorialId,
+                        )
+                    }
+                }
             }
         }
 
-        if (showDeleteDialog) {
+        if (showDeleteDialog.value) {
             AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
+                onDismissRequest = { showDeleteDialog.value = false },
                 title = { Text("Eliminar tutorial") },
-                text = { Text("¿Estás seguro de que deseas eliminar este tutorial? Esta acción no se puede deshacer.") },
+                text = {
+                    Text(
+                        "¿Estás seguro de que deseas eliminar este tutorial? " +
+                            "Esta acción no se puede deshacer.",
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = {
                         sharedViewModel.deleteTutorial(tutorialId)
-                        showDeleteDialog = false
-                    }) { Text("Eliminar") }
+                        showDeleteDialog.value = false
+                    }) {
+                        Text("Eliminar")
+                    }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) { Text("Cancelar") }
+                    TextButton(onClick = { showDeleteDialog.value = false }) {
+                        Text("Cancelar")
+                    }
                 },
             )
         }

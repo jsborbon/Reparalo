@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.dashboard.DashboardScreen
@@ -154,33 +155,33 @@ fun BottomNavHost(
     navController: NavHostController,
     onTabChange: (Int) -> Unit,
 ) {
-    androidx.navigation.compose.NavHost(
+    NavHost(
         navController = navController,
         startDestination = Routes.DASHBOARD,
     ) {
         composable(Routes.DASHBOARD) {
             onTabChange(0)
-            DashboardScreen(navController = navController)
+            DashboardScreen(navController)
         }
         composable(Routes.TUTORIALS) {
             onTabChange(1)
-            TutorialsScreen(navController = navController)
+            TutorialsScreen(navController)
         }
         composable(Routes.MATERIALS_LIST) {
             onTabChange(2)
-            MaterialsListScreen(navController = navController)
+            MaterialsListScreen(navController)
         }
         composable(Routes.FORUM) {
             onTabChange(3)
-            ForumScreen(navController = navController)
+            ForumScreen(navController)
         }
         composable(Routes.SETTINGS) {
             onTabChange(4)
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController)
         }
         composable(Routes.USER_PROFILE) {
             onTabChange(5)
-            UserProfileScreen(navController = navController)
+            UserProfileScreen(navController)
         }
     }
 }

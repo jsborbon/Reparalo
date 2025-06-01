@@ -11,6 +11,7 @@ object Routes {
     const val SETTINGS_SECURITY = "settings_security"
     const val SETTINGS_TERMS = "settings_terms"
     const val SETTINGS_PASSWORD = "settings_password"
+    const val FORGOT_PASSWORD = "forgot_password"
     const val NOTIFICATIONS = "notifications"
     const val FAVORITES = "favorites"
     const val SERVICE_HISTORY = "service_history"

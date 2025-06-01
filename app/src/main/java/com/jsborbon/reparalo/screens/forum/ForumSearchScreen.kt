@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.screens.forum.components.ForumTopicItem
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

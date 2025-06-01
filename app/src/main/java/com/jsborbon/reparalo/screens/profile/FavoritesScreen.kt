@@ -1,93 +1,104 @@
 package com.jsborbon.reparalo.screens.profile
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.jsborbon.reparalo.components.tutorial.TutorialCard
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.screens.tutorial.TutorialCard
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
     navController: NavController,
-    viewModel: TutorialsViewModel = remember { TutorialsViewModel() },
+    viewModel: TutorialsViewModel,
+    auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
-    val state by viewModel.favoriteTutorials.collectAsState()
+    val favoriteIds = viewModel.favoriteIds.collectAsState().value
+    val tutorialsState = viewModel.tutorials.collectAsState().value
+
+    val currentUserId = auth.currentUser?.uid
 
     LaunchedEffect(Unit) {
-        viewModel.fetchFavoriteTutorials()
+        viewModel.loadFavorites()
+        if (tutorialsState !is ApiResponse.Success) {
+            viewModel.loadTutorials()
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        Text(
-            text = "Mis Favoritos",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-
-        when (val result = state) {
-            is ApiResponse.Loading -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 32.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Mis Favoritos") },
+            )
+        },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            when (tutorialsState) {
+                is ApiResponse.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-            }
 
-            is ApiResponse.Success -> {
-                val tutorials = result.data
-                if (tutorials.isEmpty()) {
+                is ApiResponse.Failure -> {
                     Text(
-                        text = "Aún no tienes tutoriales marcados como favoritos.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = "Error al cargar los favoritos: ${tutorialsState.errorMessage}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center),
                     )
-                } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(tutorials) { tutorial ->
-                            TutorialCard(
-                                tutorial = tutorial,
-                                onClick = {
-                                    navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
-                                },
-                            )
+                }
+
+                is ApiResponse.Success -> {
+                    val favorites = tutorialsState.data.filter { it.id in favoriteIds }
+                    if (favorites.isEmpty()) {
+                        Text(
+                            text = "Aún no tienes tutoriales marcados como favoritos.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    } else {
+                        LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(favorites) { tutorial ->
+                                TutorialCard(
+                                    tutorial = tutorial,
+                                    isFavorite = tutorial.id in favoriteIds,
+                                    onFavoriteClick = { viewModel.toggleFavorite(tutorial.id) },
+                                    onDeleteClick = null,
+                                    onItemClick = {
+                                        navController.navigate("${Routes.TUTORIAL_DETAIL}/${tutorial.id}")
+                                    },
+                                    currentUserId = currentUserId,
+                                )
+                            }
                         }
                     }
                 }
-            }
-
-            is ApiResponse.Failure -> {
-                Text(
-                    text = "Error al cargar favoritos: ${result.errorMessage}",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
             }
         }
     }

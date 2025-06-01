@@ -45,8 +45,6 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.coroutines.play.services)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.firebase.firestore.ktx)
     implementation(platform(libs.firebase.bom))

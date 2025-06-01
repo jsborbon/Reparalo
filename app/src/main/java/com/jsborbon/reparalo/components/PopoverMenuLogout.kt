@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
@@ -26,7 +25,7 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun PopoverMenu(
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: AuthViewModel,
 ) {
     val isExpanded = remember { mutableStateOf(false) }
 
@@ -37,7 +36,7 @@ fun PopoverMenu(
     ) {
         Icon(
             imageVector = Icons.Default.AccountCircle,
-            contentDescription = "User menu",
+            contentDescription = "Menú de usuario",
             tint = MaterialTheme.colorScheme.onBackground,
         )
     }
@@ -50,9 +49,7 @@ fun PopoverMenu(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(8.dp),
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 MenuItem(
                     text = "Cerrar sesión",
                     onClick = {

@@ -14,14 +14,9 @@ sealed class ApiResponse<out T> {
     ) : ApiResponse<Nothing>()
 
     companion object {
-
         fun <T> loading(): ApiResponse<T> = Loading as ApiResponse<T>
-
         fun <T> success(data: T): ApiResponse<T> = Success(data)
-
-        fun <T> failure(
-            message: String,
-            code: Int? = null,
-        ): ApiResponse<T> = Failure(message, code)
+        fun <T> failure(message: String, code: Int? = null): ApiResponse<T> =
+            Failure(message, code)
     }
 }

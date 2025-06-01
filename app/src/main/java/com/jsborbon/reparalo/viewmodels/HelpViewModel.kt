@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HelpViewModel(
-    private val repository: HelpRepository = HelpRepositoryImpl()
+    private val repository: HelpRepository = HelpRepositoryImpl(),
 ) : ViewModel() {
 
     private val _helpItems = MutableStateFlow<ApiResponse<List<HelpItem>>>(ApiResponse.Loading)
@@ -22,12 +22,14 @@ class HelpViewModel(
     }
 
     private fun loadHelpItems() {
+        _helpItems.value = ApiResponse.Loading
         viewModelScope.launch {
             try {
-                val response = repository.getHelpItems()
-                _helpItems.value = response
+                repository.getHelpItems().collect { response ->
+                    _helpItems.value = response
+                }
             } catch (e: Exception) {
-                _helpItems.value = ApiResponse.Failure("Error al cargar los elementos de ayuda")
+                _helpItems.value = ApiResponse.Failure(e.message ?: "Error al cargar la ayuda.")
             }
         }
     }

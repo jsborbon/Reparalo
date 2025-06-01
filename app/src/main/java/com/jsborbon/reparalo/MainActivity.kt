@@ -11,12 +11,12 @@ import com.jsborbon.reparalo.navigation.NavigationWrapper
 import com.jsborbon.reparalo.ui.theme.ReparaloTheme
 
 class MainActivity : ComponentActivity() {
+
     private lateinit var navHostController: NavHostController
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
 
         setContent {

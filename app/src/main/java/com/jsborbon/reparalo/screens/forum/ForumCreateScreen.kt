@@ -28,11 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Author
 import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.navigation.Routes
-import com.jsborbon.reparalo.viewmodels.AuthViewModel
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 import java.util.UUID
 
@@ -41,14 +44,24 @@ import java.util.UUID
 fun ForumCreateScreen(
     navController: NavController,
     forumViewModel: ForumViewModel = remember { ForumViewModel() },
-    authViewModel: AuthViewModel = remember { AuthViewModel() },
+    auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
     val createState by forumViewModel.createState.collectAsState()
-    val currentUser by authViewModel.user.collectAsState()
+    var currentUserId by remember { mutableStateOf("") }
+    var currentUserName by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        auth.currentUser?.let { user ->
+            currentUserId = user.uid
+            val doc = firestore.collection("users").document(user.uid).get().await()
+            currentUserName = doc.getString("name") ?: ""
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -108,7 +121,7 @@ fun ForumCreateScreen(
                             title = title,
                             description = description,
                             category = category,
-                            author = currentUser?.name ?: "Anónimo",
+                            author = Author(uid = currentUserId, name = currentUserName),
                             date = Date(),
                             preview = description.take(100),
                             comments = 0,

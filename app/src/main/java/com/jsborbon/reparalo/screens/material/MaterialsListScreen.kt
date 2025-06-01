@@ -36,9 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.jsborbon.reparalo.components.CategoryChip
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.screens.material.components.CategoryChip
+import com.jsborbon.reparalo.screens.material.components.MaterialItem
 import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

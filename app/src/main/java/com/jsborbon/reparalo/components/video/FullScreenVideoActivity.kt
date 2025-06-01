@@ -1,11 +1,11 @@
 package com.jsborbon.reparalo.components.video
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
@@ -13,24 +13,22 @@ import androidx.media3.ui.PlayerView
 
 class FullScreenVideoActivity : ComponentActivity() {
 
-    private lateinit var playerView: PlayerView
-    private lateinit var exoPlayer: ExoPlayer
+    private var playerView: PlayerView? = null
+    private var exoPlayer: ExoPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable immersive fullscreen mode
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.insetsController?.apply {
             hide(WindowInsets.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
         val videoUrl = intent.getStringExtra("video_url") ?: return
 
         exoPlayer = ExoPlayer.Builder(this).build().apply {
-            setMediaItem(MediaItem.fromUri(Uri.parse(videoUrl)))
+            setMediaItem(MediaItem.fromUri(videoUrl.toUri()))
             prepare()
             playWhenReady = true
         }
@@ -49,6 +47,8 @@ class FullScreenVideoActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        exoPlayer.release()
+        exoPlayer?.release()
+        playerView = null
+        exoPlayer = null
     }
 }

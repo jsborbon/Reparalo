@@ -1,20 +1,23 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import android.util.Log
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.CommentRepository
+import com.jsborbon.reparalo.models.Author
 import com.jsborbon.reparalo.models.Comment
+import com.jsborbon.reparalo.models.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class CommentRepositoryImpl : CommentRepository {
+class CommentRepositoryImpl(
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+) : CommentRepository {
 
-    private val TAG = "CommentRepositoryImpl"
-    private val commentsCollection = Firebase.firestore.collection("comments")
+    private val commentsCollection = firestore.collection("comments")
+    private val TAG = CommentRepositoryImpl::class.java.simpleName
 
     override fun getCommentsByTutorial(tutorialId: String): Flow<ApiResponse<List<Comment>>> = flow {
         emit(ApiResponse.Loading)
@@ -31,7 +34,7 @@ class CommentRepositoryImpl : CommentRepository {
             emit(ApiResponse.Failure("Error al obtener los comentarios"))
         }
     }.catch { e ->
-        Log.e(TAG, "Flow catch: ${e.message}", e)
+        Log.e(TAG, "getCommentsByTutorial catch: ${e.message}", e)
         emit(ApiResponse.Failure("Error inesperado al cargar comentarios"))
     }
 
@@ -45,7 +48,27 @@ class CommentRepositoryImpl : CommentRepository {
             emit(ApiResponse.Failure("Error al crear el comentario"))
         }
     }.catch { e ->
-        Log.e(TAG, "Flow catch: ${e.message}", e)
+        Log.e(TAG, "createComment catch: ${e.message}", e)
         emit(ApiResponse.Failure("Error inesperado al guardar el comentario"))
+    }
+
+    override fun getUserById(userId: String): Flow<ApiResponse<Author>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = firestore.collection("users").document(userId).get().await()
+            val user = snapshot.toObject(User::class.java)
+            if (user != null) {
+                val author = Author(name = user.name, uid = user.uid)
+                emit(ApiResponse.Success(author))
+            } else {
+                emit(ApiResponse.Failure("Usuario no encontrado"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getUserById exception: ${e.message}", e)
+            emit(ApiResponse.Failure("Error al obtener usuario"))
+        }
+    }.catch { e ->
+        Log.e(TAG, "getUserById catch: ${e.message}", e)
+        emit(ApiResponse.Failure("Error inesperado al cargar usuario"))
     }
 }

@@ -8,11 +8,10 @@ import com.jsborbon.reparalo.data.repository.impl.MaterialRepositoryImpl
 import com.jsborbon.reparalo.models.Material
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MaterialsViewModel(
-    private val repository: MaterialRepository = MaterialRepositoryImpl()
+    private val repository: MaterialRepository = MaterialRepositoryImpl(),
 ) : ViewModel() {
 
     private val _materials = MutableStateFlow<ApiResponse<List<Material>>>(ApiResponse.Loading)
@@ -26,25 +25,40 @@ class MaterialsViewModel(
     }
 
     fun loadMaterials() {
+        _materials.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getMaterials().collectLatest { response ->
-                _materials.value = response
+            try {
+                repository.getMaterials().collect { response ->
+                    _materials.value = response
+                }
+            } catch (e: Exception) {
+                _materials.value = ApiResponse.Failure(e.message ?: "Error al cargar los materiales.")
             }
         }
     }
 
     fun loadMaterialById(id: String) {
+        _materialDetail.value = ApiResponse.Loading
         viewModelScope.launch {
-            _materialDetail.value = ApiResponse.Loading
-            _materialDetail.value = repository.getMaterialById(id)
+            try {
+                repository.getMaterialById(id).collect { response ->
+                    _materialDetail.value = response
+                }
+            } catch (e: Exception) {
+                _materialDetail.value = ApiResponse.Failure(e.message ?: "Error al cargar el detalle del material.")
+            }
         }
     }
 
     fun updateMaterial(updated: Material) {
+        _materialDetail.value = ApiResponse.Loading
         viewModelScope.launch {
-            _materialDetail.value = ApiResponse.Loading
-            repository.updateMaterial(updated).collectLatest { response ->
-                _materialDetail.value = response
+            try {
+                repository.updateMaterial(updated).collect { response ->
+                    _materialDetail.value = response
+                }
+            } catch (e: Exception) {
+                _materialDetail.value = ApiResponse.Failure(e.message ?: "Error al actualizar el material.")
             }
         }
     }

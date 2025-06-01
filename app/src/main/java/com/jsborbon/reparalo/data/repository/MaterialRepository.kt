@@ -5,7 +5,7 @@ import com.jsborbon.reparalo.models.Material
 import kotlinx.coroutines.flow.Flow
 
 interface MaterialRepository {
-    suspend fun getMaterials(): Flow<ApiResponse<List<Material>>>
-    suspend fun getMaterialById(id: String): ApiResponse<Material>
-    suspend fun updateMaterial(material: Material): Flow<ApiResponse<Material>>
+    fun getMaterials(): Flow<ApiResponse<List<Material>>>
+    fun getMaterialById(id: String): Flow<ApiResponse<Material>>
+    fun updateMaterial(material: Material): Flow<ApiResponse<Material>>
 }

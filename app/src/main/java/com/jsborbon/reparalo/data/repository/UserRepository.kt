@@ -5,6 +5,6 @@ import com.jsborbon.reparalo.models.User
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun getUserData(uid: String): User?
+    fun getUserData(uid: String): Flow<ApiResponse<User>>
     fun updateUser(user: User): Flow<ApiResponse<User>>
 }

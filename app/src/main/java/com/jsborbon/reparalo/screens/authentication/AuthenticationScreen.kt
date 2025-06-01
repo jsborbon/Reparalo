@@ -21,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.jsborbon.reparalo.screens.authentication.components.LoginForm
+import com.jsborbon.reparalo.screens.authentication.components.SignUpForm
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @Composable
 fun AuthenticationScreen(
     navController: NavController,
-    viewModel: AuthViewModel = remember { AuthViewModel() }
+    viewModel: AuthViewModel = remember { AuthViewModel() },
 ) {
     var isLogin by remember { mutableStateOf(true) }
 

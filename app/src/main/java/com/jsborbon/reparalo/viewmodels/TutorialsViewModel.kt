@@ -1,5 +1,6 @@
 package com.jsborbon.reparalo.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
@@ -10,11 +11,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class TutorialsViewModel(
-    private val repository: TutorialRepository = TutorialRepositoryImpl()
+    private val repository: TutorialRepository = TutorialRepositoryImpl(),
 ) : ViewModel() {
 
     private val _tutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)
@@ -41,25 +41,28 @@ class TutorialsViewModel(
     private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
     val favoriteIds: StateFlow<Set<String>> = _favoriteIds
 
-    private val _isFavorite = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Success(false))
-    val isFavorite: StateFlow<ApiResponse<Boolean>> = _isFavorite
-
-    private val _favoriteTutorials = MutableStateFlow<ApiResponse<List<Tutorial>>>(ApiResponse.Loading)
-    val favoriteTutorials: StateFlow<ApiResponse<List<Tutorial>>> = _favoriteTutorials
-
-
     fun loadTutorials() {
+        _tutorials.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getTutorials().collect {
-                _tutorials.value = it
+            try {
+                repository.getTutorials().collect { response ->
+                    _tutorials.value = response
+                }
+            } catch (e: Exception) {
+                _tutorials.value = ApiResponse.Failure(e.message ?: "Error al cargar los tutoriales.")
             }
         }
     }
 
     fun loadTutorialsByCategory(category: String) {
+        _tutorialsByCategory.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.getTutorialsByCategory(category).collect {
-                _tutorialsByCategory.value = it
+            try {
+                repository.getTutorialsByCategory(category).collect { response ->
+                    _tutorialsByCategory.value = response
+                }
+            } catch (e: Exception) {
+                _tutorialsByCategory.value = ApiResponse.Failure(e.message ?: "Error al cargar por categoría.")
             }
         }
     }
@@ -76,18 +79,25 @@ class TutorialsViewModel(
     fun createTutorial(tutorial: Tutorial) {
         _createState.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.createTutorial(tutorial).collect {
-                _createState.value = it
-                when (it) {
-                    is ApiResponse.Success -> {
-                        _uiMessage.emit("Tutorial creado con éxito")
-                        loadTutorials()
+            try {
+                repository.createTutorial(tutorial).collect { response ->
+                    _createState.value = response
+                    when (response) {
+                        is ApiResponse.Success -> {
+                            _uiMessage.emit("Tutorial creado con éxito")
+                            loadTutorials()
+                        }
+                        is ApiResponse.Failure -> {
+                            _uiMessage.emit("Error al crear tutorial: ${response.errorMessage}")
+                        }
+                        ApiResponse.Loading -> {
+                            Log.d("TutorialsViewModel", "Creando tutorial...")
+                            _uiMessage.emit("Creando tutorial...")
+                        }
                     }
-                    is ApiResponse.Failure -> {
-                        _uiMessage.emit("Error al crear tutorial: ${it.errorMessage}")
-                    }
-                    else -> {}
                 }
+            } catch (e: Exception) {
+                _createState.value = ApiResponse.Failure(e.message ?: "Error inesperado al crear tutorial.")
             }
         }
     }
@@ -95,18 +105,25 @@ class TutorialsViewModel(
     fun updateTutorial(id: String, tutorial: Tutorial) {
         _updateState.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.updateTutorial(id, tutorial).collect {
-                _updateState.value = it
-                when (it) {
-                    is ApiResponse.Success -> {
-                        _uiMessage.emit("Tutorial actualizado con éxito")
-                        loadTutorials()
+            try {
+                repository.updateTutorial(id, tutorial).collect { response ->
+                    _updateState.value = response
+                    when (response) {
+                        is ApiResponse.Success -> {
+                            _uiMessage.emit("Tutorial actualizado con éxito")
+                            loadTutorials()
+                        }
+                        is ApiResponse.Failure -> {
+                            _uiMessage.emit("Error al actualizar tutorial: ${response.errorMessage}")
+                        }
+                        ApiResponse.Loading -> {
+                            Log.d("TutorialsViewModel", "Actualizando tutorial...")
+                            _uiMessage.emit("Actualizando tutorial...")
+                        }
                     }
-                    is ApiResponse.Failure -> {
-                        _uiMessage.emit("Error al actualizar tutorial: ${it.errorMessage}")
-                    }
-                    else -> {}
                 }
+            } catch (e: Exception) {
+                _updateState.value = ApiResponse.Failure(e.message ?: "Error inesperado al actualizar.")
             }
         }
     }
@@ -114,63 +131,77 @@ class TutorialsViewModel(
     fun deleteTutorial(id: String) {
         _deleteState.value = ApiResponse.Loading
         viewModelScope.launch {
-            repository.deleteTutorial(id).collect {
-                _deleteState.value = it
-                when (it) {
-                    is ApiResponse.Success -> {
-                        _uiMessage.emit("Tutorial eliminado con éxito")
-                        loadTutorials()
+            try {
+                repository.deleteTutorial(id).collect { response ->
+                    _deleteState.value = response
+                    when (response) {
+                        is ApiResponse.Success -> {
+                            _uiMessage.emit("Tutorial eliminado con éxito")
+                            loadTutorials()
+                        }
+                        is ApiResponse.Failure -> {
+                            _uiMessage.emit("Error al eliminar tutorial: ${response.errorMessage}")
+                        }
+                        ApiResponse.Loading -> {
+                            Log.d("TutorialsViewModel", "Eliminando tutorial...")
+                            _uiMessage.emit("Eliminando tutorial...")
+                        }
                     }
-                    is ApiResponse.Failure -> {
-                        _uiMessage.emit("Error al eliminar tutorial: ${it.errorMessage}")
-                    }
-                    else -> {}
                 }
+            } catch (e: Exception) {
+                _deleteState.value = ApiResponse.Failure(e.message ?: "Error inesperado al eliminar.")
+            }
+        }
+    }
+
+    fun loadFavorites() {
+        viewModelScope.launch {
+            try {
+                repository.getFavoriteTutorialIds().collect { response ->
+                    when (response) {
+                        is ApiResponse.Success -> {
+                            _favoriteIds.value = response.data.toSet()
+                        }
+                        is ApiResponse.Failure -> {
+                            _uiMessage.emit("Error al cargar favoritos: ${response.errorMessage}")
+                        }
+                        ApiResponse.Loading -> {
+                            Log.d("TutorialsViewModel", "Cargando favoritos...")
+                            _uiMessage.emit("Cargando favoritos...")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                _uiMessage.emit("Error inesperado al cargar favoritos: ${e.message}")
             }
         }
     }
 
     fun toggleFavorite(tutorialId: String) {
-        _isFavorite.value = ApiResponse.Loading
         viewModelScope.launch {
-            val current = _favoriteIds.value
-            val isCurrentlyFavorite = current.contains(tutorialId)
-
-            if (isCurrentlyFavorite) {
-                repository.removeFavorite(tutorialId).collect {
-                    when (it) {
+            try {
+                repository.toggleFavorite(tutorialId).collect { response ->
+                    when (response) {
                         is ApiResponse.Success -> {
-                            _favoriteIds.value = current - tutorialId
-                            _isFavorite.value = ApiResponse.Success(false)
+                            val updatedFavorites = _favoriteIds.value.toMutableSet()
+                            if (updatedFavorites.contains(tutorialId)) {
+                                updatedFavorites.remove(tutorialId)
+                            } else {
+                                updatedFavorites.add(tutorialId)
+                            }
+                            _favoriteIds.value = updatedFavorites
                         }
                         is ApiResponse.Failure -> {
-                            _isFavorite.value = ApiResponse.Failure(it.errorMessage)
+                            _uiMessage.emit("Error al actualizar favorito: ${response.errorMessage}")
                         }
-                        else -> {}
+                        ApiResponse.Loading -> {
+                            Log.d("TutorialsViewModel", "Actualizando favoritos...")
+                            _uiMessage.emit("Actualizando favoritos...")
+                        }
                     }
                 }
-            } else {
-                repository.addFavorite(tutorialId).collect {
-                    when (it) {
-                        is ApiResponse.Success -> {
-                            _favoriteIds.value = current + tutorialId
-                            _isFavorite.value = ApiResponse.Success(true)
-                        }
-                        is ApiResponse.Failure -> {
-                            _isFavorite.value = ApiResponse.Failure(it.errorMessage)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
-
-    fun fetchFavoriteTutorials() {
-        viewModelScope.launch {
-            repository.getFavoriteTutorials().collectLatest { response ->
-                _favoriteTutorials.value = response
+            } catch (e: Exception) {
+                _uiMessage.emit("Error inesperado al actualizar favorito: ${e.message}")
             }
         }
     }

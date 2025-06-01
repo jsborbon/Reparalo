@@ -1,5 +1,6 @@
 package com.jsborbon.reparalo.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -18,8 +19,8 @@ private val DarkColorScheme = darkColorScheme(
     primary = Blue80,
     secondary = BlueGrey80,
     tertiary = Teal80,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
+    background = BackgroundDark,
+    surface = SurfaceDark,
     onPrimary = Color.Black,
     onSecondary = Color.Black,
     onTertiary = Color.Black,
@@ -31,8 +32,8 @@ private val LightColorScheme = lightColorScheme(
     primary = Blue40,
     secondary = BlueGrey40,
     tertiary = Teal40,
-    background = Color(0xFFF5F5F5),
-    surface = Color.White,
+    background = BackgroundLight,
+    surface = SurfaceLight,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
@@ -46,12 +47,11 @@ fun ReparaloTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
+    val context = LocalContext.current
     val colorScheme = when {
         dynamicColor -> {
-            val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -70,13 +70,10 @@ fun ReparaloTheme(
     )
 
     val view = LocalView.current
-    val context = view.context
-
-    if (!view.isInEditMode && context is android.app.Activity) {
+    if (!view.isInEditMode && context is Activity) {
         SideEffect {
             val window = context.window
             WindowCompat.setDecorFitsSystemWindows(window, false)
-
             val insetsController = WindowInsetsControllerCompat(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme

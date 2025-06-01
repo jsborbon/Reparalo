@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Author
 import com.jsborbon.reparalo.models.Material
 import com.jsborbon.reparalo.models.Tutorial
 import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
@@ -58,7 +59,7 @@ fun TutorialEditScreen(
     var category by remember { mutableStateOf("") }
     var difficulty by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
-    var author by remember { mutableStateOf("") }
+    var author by remember { mutableStateOf(Author()) }
     var materials by remember { mutableStateOf<List<Material>>(emptyList()) }
     var newMaterial by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
@@ -133,8 +134,8 @@ fun TutorialEditScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
-                value = author,
-                onValueChange = { author = it },
+                value = author.name,
+                onValueChange = { author = author.copy(name = it) },
                 label = { Text("Autor") },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -150,9 +151,7 @@ fun TutorialEditScreen(
                 label = { Text("URL de video") },
                 modifier = Modifier.fillMaxWidth(),
             )
-
             Text("Materiales", style = MaterialTheme.typography.titleMedium)
-
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -172,7 +171,6 @@ fun TutorialEditScreen(
                     }
                 }
             }
-
             OutlinedTextField(
                 value = newMaterial,
                 onValueChange = { newMaterial = it },
@@ -197,7 +195,6 @@ fun TutorialEditScreen(
             ) {
                 Text("Añadir material")
             }
-
             Button(
                 onClick = {
                     val updatedTutorial = Tutorial(
@@ -220,12 +217,10 @@ fun TutorialEditScreen(
             ) {
                 Text("Guardar cambios")
             }
-
             when (updateState) {
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
-
                 is ApiResponse.Success -> {
                     LaunchedEffect(Unit) {
                         snackbarHostState.showSnackbar("Tutorial actualizado con éxito")
@@ -233,7 +228,6 @@ fun TutorialEditScreen(
                         navController.popBackStack()
                     }
                 }
-
                 is ApiResponse.Failure -> {
                     val message = (updateState as ApiResponse.Failure).errorMessage
                     LaunchedEffect(message) {
@@ -241,7 +235,6 @@ fun TutorialEditScreen(
                         viewModel.resetUpdateState()
                     }
                 }
-
                 null -> {}
             }
         }

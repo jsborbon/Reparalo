@@ -118,7 +118,7 @@ fun SplashScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(colors = listOf(PrimaryDark, PrimaryLight))),
+            .background(brush = Brush.verticalGradient(listOf(PrimaryDark, PrimaryLight))),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {

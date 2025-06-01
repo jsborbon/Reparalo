@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.Flow
 fun ForumEditScreen(
     navController: NavController,
     topicId: String,
-    viewModel: ForumViewModel = remember { ForumViewModel() }
+    viewModel: ForumViewModel = remember { ForumViewModel() },
 ) {
     val topicFlow: Flow<ApiResponse<ForumTopic>> = viewModel.getTopicById(topicId)
     val topicState by topicFlow.collectAsState(initial = ApiResponse.Loading)

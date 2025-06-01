@@ -1,6 +1,7 @@
 package com.jsborbon.reparalo.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,6 +10,7 @@ import androidx.navigation.navArgument
 import com.jsborbon.reparalo.screens.MainScreen
 import com.jsborbon.reparalo.screens.SplashScreen
 import com.jsborbon.reparalo.screens.authentication.AuthenticationScreen
+import com.jsborbon.reparalo.screens.authentication.ForgotPasswordScreen
 import com.jsborbon.reparalo.screens.forum.ForumCreateScreen
 import com.jsborbon.reparalo.screens.forum.ForumEditScreen
 import com.jsborbon.reparalo.screens.forum.ForumScreen
@@ -33,6 +35,10 @@ import com.jsborbon.reparalo.screens.technician.TechnicianSearchScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialCreateScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialDetailScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialEditScreen
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
+import com.jsborbon.reparalo.viewmodels.TutorialDetailViewModel
+import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
+import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @Composable
 fun AppNavGraph(
@@ -51,6 +57,14 @@ fun AppNavGraph(
             AuthenticationScreen(navController = navController)
         }
 
+        composable(Routes.FORGOT_PASSWORD) {
+            val authViewModel: AuthViewModel = viewModel()
+            ForgotPasswordScreen(
+                viewModel = authViewModel,
+                onBack = { navController.popBackStack() },
+            )
+        }
+
         composable(Routes.DASHBOARD) {
             MainScreen(navController = navController)
         }
@@ -61,7 +75,15 @@ fun AppNavGraph(
 
         composable("${Routes.TUTORIAL_DETAIL}/{tutorialId}") { backStackEntry ->
             val tutorialId = backStackEntry.arguments?.getString("tutorialId").orEmpty()
-            TutorialDetailScreen(navController = navController, tutorialId = tutorialId)
+            val sharedViewModel: TutorialsViewModel = viewModel()
+            val detailViewModel: TutorialDetailViewModel = viewModel()
+
+            TutorialDetailScreen(
+                navController = navController,
+                tutorialId = tutorialId,
+                sharedViewModel = sharedViewModel,
+                detailViewModel = detailViewModel,
+            )
         }
 
         composable("${Routes.TECHNICIAN_PROFILE}/{technicianId}") { backStackEntry ->
@@ -82,7 +104,7 @@ fun AppNavGraph(
         }
 
         composable("${Routes.FORUM_EDIT}/{topicId}") { backStackEntry ->
-            val topicId = backStackEntry.arguments?.getString("topicId") ?: return@composable
+            val topicId = backStackEntry.arguments?.getString("topicId").orEmpty()
             ForumEditScreen(navController = navController, topicId = topicId)
         }
 
@@ -90,13 +112,23 @@ fun AppNavGraph(
             ServiceHistoryScreen(navController = navController)
         }
 
+        composable("${Routes.SERVICE_DETAIL}/{serviceId}") { backStackEntry ->
+            val serviceId = backStackEntry.arguments?.getString("serviceId").orEmpty()
+            ServiceDetailScreen(navController = navController, serviceId = serviceId)
+        }
+
         composable(
             route = "${Routes.USER_PROFILE}?edit={edit}",
             arguments = listOf(navArgument("edit") { defaultValue = false }),
         ) { backStackEntry ->
             val isEdit = backStackEntry.arguments?.getBoolean("edit") ?: false
+            val profileViewModel: UserProfileViewModel = viewModel()
+
             if (isEdit) {
-                ProfileScreen(navController = navController)
+                ProfileScreen(
+                    navController = navController,
+                    viewModel = profileViewModel,
+                )
             } else {
                 UserProfileScreen(navController = navController)
             }
@@ -111,16 +143,6 @@ fun AppNavGraph(
             TutorialCreateScreen(navController = navController)
         }
 
-        composable("${Routes.SERVICE_DETAIL}/{serviceId}") { backStackEntry ->
-            val serviceId = backStackEntry.arguments?.getString("serviceId").orEmpty()
-            ServiceDetailScreen(navController = navController, serviceId = serviceId)
-        }
-
-        composable("detalle_servicio/{id}") { backStackEntry ->
-            val serviceId = backStackEntry.arguments?.getString("id").orEmpty()
-            ServiceDetailScreen(navController = navController, serviceId = serviceId)
-        }
-
         composable(
             route = "${Routes.TUTORIAL_EDIT}/{tutorialId}",
             arguments = listOf(navArgument("tutorialId") { type = NavType.StringType }),
@@ -130,11 +152,25 @@ fun AppNavGraph(
         }
 
         composable(Routes.FAVORITES) {
-            FavoritesScreen(navController = navController)
+            val sharedViewModel: TutorialsViewModel = viewModel()
+            FavoritesScreen(
+                navController = navController,
+                viewModel = sharedViewModel,
+            )
         }
 
         composable(Routes.MATERIALS_LIST) {
             MaterialsListScreen(navController = navController)
+        }
+
+        composable("${Routes.MATERIAL_DETAIL}/{materialId}") { backStackEntry ->
+            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
+            MaterialDetailScreen(navController = navController, materialId = materialId)
+        }
+
+        composable("${Routes.MATERIAL_EDIT}/{materialId}") { backStackEntry ->
+            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
+            MaterialEditScreen(navController = navController, materialId = materialId)
         }
 
         composable(Routes.PROFESSIONAL_CONNECTION) {
@@ -159,16 +195,6 @@ fun AppNavGraph(
 
         composable(Routes.SETTINGS_PASSWORD) {
             ChangePasswordScreen(navController = navController)
-        }
-
-        composable("${Routes.MATERIAL_DETAIL}/{materialId}") { backStackEntry ->
-            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
-            MaterialDetailScreen(navController = navController, materialId = materialId)
-        }
-
-        composable("${Routes.MATERIAL_EDIT}/{materialId}") { backStackEntry ->
-            val materialId = backStackEntry.arguments?.getString("materialId").orEmpty()
-            MaterialEditScreen(navController = navController, materialId = materialId)
         }
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class TermsViewModel(
-    private val repository: TermsRepository = TermsRepositoryImpl()
+    private val repository: TermsRepository = TermsRepositoryImpl(),
 ) : ViewModel() {
 
     private val _terms = MutableStateFlow<ApiResponse<TermsAndConditions>>(ApiResponse.Loading)
@@ -22,10 +22,15 @@ class TermsViewModel(
     }
 
     fun loadTerms() {
+        _terms.value = ApiResponse.Loading
         viewModelScope.launch {
-            _terms.value = ApiResponse.Loading
-            val result = repository.getTermsAndConditions()
-            _terms.value = result
+            try {
+                repository.getTermsAndConditions().collect { response ->
+                    _terms.value = response
+                }
+            } catch (e: Exception) {
+                _terms.value = ApiResponse.Failure(e.message ?: "Error al cargar los términos y condiciones.")
+            }
         }
     }
 }

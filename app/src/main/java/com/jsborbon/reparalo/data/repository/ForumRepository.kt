@@ -5,8 +5,8 @@ import com.jsborbon.reparalo.models.ForumTopic
 import kotlinx.coroutines.flow.Flow
 
 interface ForumRepository {
-    suspend fun getTopics(): Flow<ApiResponse<List<ForumTopic>>>
-    suspend fun getTopicById(topicId: String): Flow<ApiResponse<ForumTopic>>
-    suspend fun createTopic(topic: ForumTopic): Flow<ApiResponse<Boolean>>
-    suspend fun updateTopic(topic: ForumTopic): Flow<ApiResponse<Boolean>>
+    fun getTopics(): Flow<ApiResponse<List<ForumTopic>>>
+    fun getTopicById(topicId: String): Flow<ApiResponse<ForumTopic>>
+    fun createTopic(topic: ForumTopic): Flow<ApiResponse<Unit>>
+    fun updateTopic(topic: ForumTopic): Flow<ApiResponse<Unit>>
 }

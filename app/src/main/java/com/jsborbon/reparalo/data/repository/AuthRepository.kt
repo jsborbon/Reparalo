@@ -6,8 +6,15 @@ import com.jsborbon.reparalo.models.UserType
 
 interface AuthRepository {
     suspend fun signIn(email: String, password: String): FirebaseUser?
-    suspend fun signUp(email: String, password: String, name: String, phone: String, userType: UserType): FirebaseUser?
+    suspend fun signUp(
+        email: String,
+        password: String,
+        name: String,
+        phone: String,
+        userType: UserType,
+    ): FirebaseUser?
     suspend fun getUserData(uid: String): User?
     suspend fun updatePassword(newPassword: String): Boolean
+    suspend fun resetPassword(email: String)
     fun signOut()
 }

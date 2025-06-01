@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.screens.technician.components.TechnicianCard
 import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -12,10 +12,10 @@ import java.time.Instant
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) : AuthRepository {
 
-    private val TAG = "AuthRepositoryImpl"
+    private val TAG = AuthRepositoryImpl::class.java.simpleName
 
     override suspend fun signIn(email: String, password: String): FirebaseUser? {
         return try {
@@ -32,7 +32,7 @@ class AuthRepositoryImpl(
         password: String,
         name: String,
         phone: String,
-        userType: UserType
+        userType: UserType,
     ): FirebaseUser? {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
@@ -46,9 +46,11 @@ class AuthRepositoryImpl(
                     email = email,
                     phone = phone,
                     userType = userType,
-                    registrationDate = registrationDate
+                    registrationDate = registrationDate,
                 )
                 firestore.collection("users").document(user.uid).set(profile).await()
+                firestore.collection("users").document(user.uid)
+                    .update("favorites", emptyList<String>()).await()
             }
 
             firebaseUser
@@ -76,6 +78,10 @@ class AuthRepositoryImpl(
             Log.e(TAG, "updatePassword failed", e)
             false
         }
+    }
+
+    override suspend fun resetPassword(email: String) {
+        auth.sendPasswordResetEmail(email).await()
     }
 
     override fun signOut() {

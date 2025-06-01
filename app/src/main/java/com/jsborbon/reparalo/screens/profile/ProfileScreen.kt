@@ -31,16 +31,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.NavigationBottomBar
-import com.jsborbon.reparalo.components.UserCard
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.screens.profile.components.UserCard
 import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: UserProfileViewModel = androidx.hilt.navigation.compose.hiltViewModel(),
+    viewModel: UserProfileViewModel,
 ) {
     val state by viewModel.user.collectAsState()
 
@@ -72,112 +72,119 @@ fun ProfileScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (state is ApiResponse.Success) {
-                val user = (state as ApiResponse.Success).data
-                UserCard(user = user, padding = PaddingValues(bottom = 24.dp))
-
-                Text(
-                    text = "Perfil de Usuario",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    label = { Text("Teléfono") },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = availability,
-                    onValueChange = { availability = it },
-                    label = { Text("Disponibilidad") },
-                    placeholder = { Text("Ej: Lunes a Viernes 8:00 a 18:00") },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = user.email,
-                    onValueChange = {},
-                    label = { Text("Correo electrónico") },
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = user.userType.name,
-                    onValueChange = {},
-                    label = { Text("Tipo de Usuario") },
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        viewModel.updateUserData(name, phone, availability)
-                        message = "Cambios guardados correctamente"
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                ) {
-                    Text("Guardar Cambios")
+            when (val result = state) {
+                is ApiResponse.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.padding(top = 48.dp))
                 }
 
-                TextButton(
-                    onClick = { navController.navigate(Routes.SETTINGS_PASSWORD) },
-                ) {
-                    Text("Cambiar contraseña")
+                is ApiResponse.Failure -> {
+                    Text(
+                        text = "Error al cargar el perfil: ${result.errorMessage}",
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                is ApiResponse.Success -> {
+                    val user = result.data
 
-                message?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.primary)
+                    UserCard(user = user, padding = PaddingValues(bottom = 24.dp))
+
+                    Text(
+                        text = "Perfil de Usuario",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Nombre") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Teléfono") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = availability,
+                        onValueChange = { availability = it },
+                        label = { Text("Disponibilidad") },
+                        placeholder = { Text("Ej: Lunes a Viernes 8:00 a 18:00") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = user.email,
+                        onValueChange = {},
+                        label = { Text("Correo electrónico") },
+                        readOnly = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = user.userType.name,
+                        onValueChange = {},
+                        label = { Text("Tipo de Usuario") },
+                        readOnly = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = {
+                            viewModel.updateUserData(name, phone, availability)
+                            message = "Cambios guardados correctamente"
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    ) {
+                        Text("Guardar Cambios")
+                    }
+
+                    TextButton(
+                        onClick = { navController.navigate(Routes.SETTINGS_PASSWORD) },
+                    ) {
+                        Text("Cambiar contraseña")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    message?.let {
+                        Text(text = it, color = MaterialTheme.colorScheme.primary)
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = {
+                            navController.navigate(Routes.AUTHENTICATION) {
+                                popUpTo(Routes.DASHBOARD) { inclusive = true }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Cerrar Sesión")
+                    }
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        navController.navigate(Routes.AUTHENTICATION) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = true }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError,
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Cerrar Sesión")
-                }
-            } else if (state is ApiResponse.Failure) {
-                Text(
-                    text = "Error al cargar el perfil: ${(state as ApiResponse.Failure).errorMessage}",
-                    color = MaterialTheme.colorScheme.error,
-                )
-            } else {
-                CircularProgressIndicator(modifier = Modifier.padding(top = 48.dp))
             }
         }
     }

@@ -5,21 +5,31 @@ import java.util.Date
 import java.util.Locale
 
 fun formatDate(dateString: String): String {
-    return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-        val date = inputFormat.parse(dateString)
-        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        outputFormat.format(date!!)
-    } catch (e: Exception) {
-        "Fecha inválida"
-    }
+    return parseDate(dateString)?.let { formatDate(it) } ?: "Fecha inválida"
 }
 
 fun formatDate(timestamp: Long): String {
     return try {
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        formatter.format(Date(timestamp))
-    } catch (e: Exception) {
+        formatDate(Date(timestamp))
+    } catch (_: Exception) {
         "Fecha inválida"
+    }
+}
+
+fun formatDate(date: Date): String {
+    return try {
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        formatter.format(date)
+    } catch (_: Exception) {
+        "Fecha inválida"
+    }
+}
+
+private fun parseDate(dateString: String): Date? {
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+        inputFormat.parse(dateString)
+    } catch (_: Exception) {
+        null
     }
 }

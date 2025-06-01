@@ -37,8 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Category
 import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.screens.forum.components.ForumTopicItem
+import com.jsborbon.reparalo.viewmodels.CategoryViewModel
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,10 +49,20 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 fun ForumScreen(
     navController: NavController,
     viewModel: ForumViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel(),
 ) {
-    var selectedCategory by remember { mutableStateOf("Todos") }
-    val categories = listOf("Todos", "Electricidad", "Plomería", "Carpintería", "Pintura")
+    val categoriesState by categoryViewModel.categories.collectAsState()
     val topicsState by viewModel.topics.collectAsState()
+
+    val allCategories = when (categoriesState) {
+        is ApiResponse.Success -> {
+            listOf(Category(id = "all", name = "Todos")) +
+                (categoriesState as ApiResponse.Success<List<Category>>).data
+        }
+        else -> listOf(Category(id = "all", name = "Todos"))
+    }
+
+    var selectedCategory by remember { mutableStateOf(allCategories.first()) }
 
     Scaffold(
         topBar = {
@@ -72,19 +85,19 @@ fun ForumScreen(
                 .padding(16.dp),
         ) {
             ScrollableTabRow(
-                selectedTabIndex = categories.indexOf(selectedCategory),
+                selectedTabIndex = allCategories.indexOfFirst { it.name == selectedCategory.name },
                 edgePadding = 0.dp,
                 divider = {},
             ) {
-                categories.forEach { category ->
+                allCategories.forEach { category ->
                     Tab(
-                        selected = selectedCategory == category,
+                        selected = selectedCategory.name == category.name,
                         onClick = { selectedCategory = category },
                     ) {
                         Text(
-                            text = category,
+                            text = category.name,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                            color = if (selectedCategory == category) {
+                            color = if (selectedCategory.name == category.name) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
@@ -125,7 +138,9 @@ fun ForumScreen(
 
                 is ApiResponse.Success -> {
                     val topics = (topicsState as ApiResponse.Success<List<ForumTopic>>).data
-                        .filter { selectedCategory == "Todos" || it.category == selectedCategory }
+                        .filter {
+                            selectedCategory.name == "Todos" || it.category == selectedCategory.name
+                        }
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

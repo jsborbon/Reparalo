@@ -35,10 +35,14 @@ import com.jsborbon.reparalo.screens.dashboard.components.CategorySection
 import com.jsborbon.reparalo.screens.dashboard.components.HighlightedTechnicianCard
 import com.jsborbon.reparalo.screens.dashboard.components.HighlightedTutorialCard
 import com.jsborbon.reparalo.screens.dashboard.components.WelcomeSection
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController) {
+fun DashboardScreen(
+    navController: NavController,
+    viewModel: AuthViewModel = remember { AuthViewModel() },
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,7 +54,7 @@ fun DashboardScreen(navController: NavController) {
                     IconButton(onClick = { navController.navigate(Routes.USER_PROFILE) }) {
                         Icon(Icons.Default.Person, contentDescription = "Perfil")
                     }
-                    PopoverMenu(navController = navController)
+                    PopoverMenu(navController = navController, viewModel = viewModel)
                 },
             )
         },

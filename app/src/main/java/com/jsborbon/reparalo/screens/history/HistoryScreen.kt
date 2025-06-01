@@ -18,18 +18,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.ServiceHistoryItem
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.screens.history.components.ServiceHistoryCard
 import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 
 @Composable
 fun ServiceHistoryScreen(
     navController: NavController,
-    viewModel: HistoryViewModel = remember { HistoryViewModel() }
+    viewModel: HistoryViewModel = remember { HistoryViewModel() },
 ) {
     val state by viewModel.historyItems.collectAsState()
 

@@ -1,19 +1,36 @@
 package com.jsborbon.reparalo.screens.technician
 
 import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.components.NavigationBottomBar
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.screens.profile.ContactInfoCard
+import com.jsborbon.reparalo.screens.profile.components.ContactInfoCard
 import com.jsborbon.reparalo.viewmodels.TechnicianViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +38,7 @@ import com.jsborbon.reparalo.viewmodels.TechnicianViewModel
 fun TechnicianProfileScreen(
     technicianId: String,
     navController: NavController,
-    viewModel: TechnicianViewModel = remember { TechnicianViewModel() }
+    viewModel: TechnicianViewModel = remember { TechnicianViewModel() },
 ) {
     val technicianState by viewModel.technician.collectAsState()
     val context = LocalContext.current
@@ -33,7 +50,7 @@ fun TechnicianProfileScreen(
     Scaffold(
         bottomBar = {
             NavigationBottomBar(selectedIndex = 2, navController = navController)
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -84,7 +101,7 @@ fun TechnicianProfileScreen(
                                 Button(
                                     onClick = {
                                         val phone = technician.phone.trim().replace(" ", "")
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$phone"))
+                                        val intent = Intent(Intent.ACTION_VIEW, "https://wa.me/$phone".toUri())
                                         context.startActivity(intent)
                                     },
                                     modifier = Modifier.padding(top = 16.dp),
@@ -95,7 +112,7 @@ fun TechnicianProfileScreen(
                                 Button(
                                     onClick = {
                                         val phone = technician.phone.trim().replace(" ", "")
-                                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                                        val intent = Intent(Intent.ACTION_DIAL, "tel:$phone".toUri())
                                         context.startActivity(intent)
                                     },
                                     modifier = Modifier.padding(top = 8.dp),
@@ -117,8 +134,6 @@ fun TechnicianProfileScreen(
                 is ApiResponse.Failure -> {
                     Text(text = "Error al cargar el técnico: ${state.errorMessage}")
                 }
-
-                else -> Unit
             }
         }
     }

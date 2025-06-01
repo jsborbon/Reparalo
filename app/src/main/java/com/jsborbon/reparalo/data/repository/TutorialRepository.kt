@@ -11,9 +11,10 @@ interface TutorialRepository {
     fun createTutorial(tutorial: Tutorial): Flow<ApiResponse<Tutorial>>
     fun updateTutorial(id: String, tutorial: Tutorial): Flow<ApiResponse<Tutorial>>
     fun deleteTutorial(id: String): Flow<ApiResponse<Unit>>
-
     fun getFavoriteTutorials(): Flow<ApiResponse<List<Tutorial>>>
     fun isFavorite(tutorialId: String): Flow<ApiResponse<Boolean>>
     fun addFavorite(tutorialId: String): Flow<ApiResponse<Unit>>
     fun removeFavorite(tutorialId: String): Flow<ApiResponse<Unit>>
+    fun getFavoriteTutorialIds(): Flow<ApiResponse<List<String>>>
+    fun toggleFavorite(tutorialId: String): Flow<ApiResponse<Unit>>
 }
