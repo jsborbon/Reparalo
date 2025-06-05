@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface MaterialRepository {
     fun getMaterials(): Flow<ApiResponse<List<Material>>>
-    fun getMaterialById(id: String): Flow<ApiResponse<Material>>
+    fun getMaterialById(materialID: String): Flow<ApiResponse<Material>>
     fun updateMaterial(material: Material): Flow<ApiResponse<Material>>
 }

@@ -19,17 +19,19 @@ class MaterialRepositoryImpl(
     override fun getMaterials(): Flow<ApiResponse<List<Material>>> = flow {
         emit(ApiResponse.Loading)
         val snapshot = firestore.collection("materials").get().await()
-        val materials = snapshot.documents.mapNotNull { it.toObject(Material::class.java) }
+        val materials = snapshot.documents.mapNotNull { doc ->
+            doc.toObject(Material::class.java)?.apply { id = doc.id }
+        }
         emit(ApiResponse.Success(materials))
     }.catch { e ->
         Log.e(TAG, "getMaterials failed", e)
         emit(ApiResponse.Failure("Error al obtener materiales"))
     }
 
-    override fun getMaterialById(id: String): Flow<ApiResponse<Material>> = flow {
+    override fun getMaterialById(materialID: String): Flow<ApiResponse<Material>> = flow {
         emit(ApiResponse.Loading)
-        val document = firestore.collection("materials").document(id).get().await()
-        val material = document.toObject(Material::class.java)
+        val document = firestore.collection("materials").document(materialID).get().await()
+        val material = document.toObject(Material::class.java)?.apply { id = document.id }
         if (material != null) {
             emit(ApiResponse.Success(material))
         } else {

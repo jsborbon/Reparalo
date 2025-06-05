@@ -57,6 +57,13 @@ fun TutorialsScreen(
     var triggerSearch by remember { mutableStateOf(false) }
     var tutorialToDeleteId by remember { mutableStateOf<String?>(null) }
 
+    // ✅ Corrección: cargamos tutoriales y favoritos al iniciar
+    LaunchedEffect(Unit) {
+        viewModel.selectCategory(null)
+        viewModel.loadFavorites()
+    }
+
+    // ✅ Mantenemos escucha de mensajes
     LaunchedEffect(Unit) {
         viewModel.uiMessage.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -112,9 +119,9 @@ fun TutorialsScreen(
                         },
                     )
                 }
-                ApiResponse.Idle -> {
-                }
+                ApiResponse.Idle -> Unit
             }
+
             val tutorialsState = if (selectedCategory != null) tutorialsByCategory else allTutorials
 
             TutorialsListSection(

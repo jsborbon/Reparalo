@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,6 +43,9 @@ fun TutorialDetailContent(
 ) {
     val tutorialsViewModel: TutorialsViewModel = viewModel()
     val context = LocalContext.current
+
+    val favorites by tutorialsViewModel.favoriteIds.collectAsState()
+
     val materials = remember(tutorial.materials) { tutorial.materials }
     val comments = remember(commentsState) { commentsState }
 
@@ -56,7 +60,7 @@ fun TutorialDetailContent(
             TutorialHeaderSection(
                 tutorial = tutorial,
                 tutorialId = tutorialId,
-                favorites = tutorialsViewModel.favoriteIds.collectAsState().value,
+                favorites = favorites,
                 onToggleFavorite = { tutorialsViewModel.toggleFavorite(tutorialId) },
             )
         }
@@ -119,7 +123,7 @@ fun TutorialDetailContent(
 
         items(comments, key = { it.id }) { comment ->
             val authorName = remember(comment.author.uid, userNames) {
-                userNames[comment.author.uid] ?: "Usuario"
+                userNames[comment.author.uid] ?: "Usuario Anónimo"
             }
             CommentCard(comment = comment, userName = authorName)
         }
