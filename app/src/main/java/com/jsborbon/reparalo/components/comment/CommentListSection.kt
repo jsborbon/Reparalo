@@ -32,6 +32,17 @@ fun CommentListSection(
     val userNames = viewModel.userNames.collectAsState().value
 
     when (commentsState) {
+        is ApiResponse.Idle -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = "Cargando comentarios...")
+            }
+        }
+
         is ApiResponse.Loading -> {
             Box(
                 modifier = Modifier

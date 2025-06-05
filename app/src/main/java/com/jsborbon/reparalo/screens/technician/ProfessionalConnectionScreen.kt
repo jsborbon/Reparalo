@@ -27,8 +27,9 @@ import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 @Composable
 fun ProfessionalConnectionScreen(
     navController: NavController,
-    viewModel: TechnicianListViewModel = viewModel(),
 ) {
+    val viewModel: TechnicianListViewModel = viewModel()
+
     val technicianState = viewModel.technicians.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -42,7 +43,14 @@ fun ProfessionalConnectionScreen(
     ) { innerPadding ->
         when (val state = technicianState.value) {
             is ApiResponse.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
             }
 
             is ApiResponse.Success -> {
@@ -74,6 +82,20 @@ fun ProfessionalConnectionScreen(
                     Text(
                         text = "Error al cargar profesionales: ${state.errorMessage}",
                         color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+
+            is ApiResponse.Idle -> {
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = "Esperando datos...",
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }

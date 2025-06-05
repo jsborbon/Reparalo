@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.components.tutorial.TutorialCard
@@ -30,12 +31,12 @@ import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 @Composable
 fun FavoritesScreen(
     navController: NavController,
-    viewModel: TutorialsViewModel,
     auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
+    val viewModel: TutorialsViewModel = viewModel()
+
     val favoriteIds = viewModel.favoriteIds.collectAsState().value
     val tutorialsState = viewModel.tutorials.collectAsState().value
-
     val currentUserId = auth.currentUser?.uid
 
     LaunchedEffect(Unit) {
@@ -57,21 +58,21 @@ fun FavoritesScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            when (tutorialsState) {
+            when (val state = tutorialsState) {
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
 
                 is ApiResponse.Failure -> {
                     Text(
-                        text = "Error al cargar los favoritos: ${tutorialsState.errorMessage}",
+                        text = "Error al cargar los favoritos: ${state.errorMessage}",
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
 
                 is ApiResponse.Success -> {
-                    val favorites = tutorialsState.data.filter { it.id in favoriteIds }
+                    val favorites = state.data.filter { it.id in favoriteIds }
                     if (favorites.isEmpty()) {
                         Text(
                             text = "Aún no tienes tutoriales marcados como favoritos.",
@@ -84,10 +85,10 @@ fun FavoritesScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(favorites) { tutorial ->
+                            items(favorites, key = { it.id }) { tutorial ->
                                 TutorialCard(
                                     tutorial = tutorial,
-                                    isFavorite = tutorial.id in favoriteIds,
+                                    isFavorite = true,
                                     onFavoriteClick = { viewModel.toggleFavorite(tutorial.id) },
                                     onDeleteClick = null,
                                     onItemClick = {
@@ -98,6 +99,14 @@ fun FavoritesScreen(
                             }
                         }
                     }
+                }
+
+                else -> {
+                    Text(
+                        text = "Cargando favoritos...",
+                        modifier = Modifier.align(Alignment.Center),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
             }
         }

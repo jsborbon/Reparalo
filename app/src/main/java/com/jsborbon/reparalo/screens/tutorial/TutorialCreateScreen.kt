@@ -42,10 +42,11 @@ import java.util.UUID
 @Composable
 fun TutorialCreateScreen(
     navController: NavController,
-    viewModel: TutorialsViewModel = viewModel(),
     auth: FirebaseAuth = FirebaseAuth.getInstance(),
     firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) {
+    val viewModel: TutorialsViewModel = viewModel()
+
     val context = LocalContext.current
     val createState by viewModel.createState.collectAsState()
 
@@ -149,18 +150,23 @@ fun TutorialCreateScreen(
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiResponse.Success -> {
                     LaunchedEffect(Unit) {
                         viewModel.resetCreateState()
                         navController.popBackStack()
                     }
                 }
+
                 is ApiResponse.Failure -> {
-                    LaunchedEffect((createState as ApiResponse.Failure).errorMessage) {
+                    val message = (createState as ApiResponse.Failure).errorMessage
+                    LaunchedEffect(message) {
                         viewModel.resetCreateState()
                     }
                 }
-                null -> {}
+
+                is ApiResponse.Idle -> {
+                }
             }
         }
     }

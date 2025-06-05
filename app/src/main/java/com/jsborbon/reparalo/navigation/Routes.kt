@@ -3,7 +3,8 @@ package com.jsborbon.reparalo.navigation
 object Routes {
     const val SPLASH = "splash"
     const val AUTHENTICATION = "authentication"
-    const val DASHBOARD = "dashboard"
+    const val MAIN = "main"
+    const val DASHBOARD = "$MAIN/dashboard"
 
     const val USER_PROFILE = "user_profile"
     const val SETTINGS = "settings"
@@ -20,16 +21,16 @@ object Routes {
     const val TECHNICIAN_PROFILE = "technician_profile"
     const val PROFESSIONAL_CONNECTION = "professional_connection"
 
-    const val TUTORIALS = "tutorials"
+    const val TUTORIALS = "$MAIN/tutorials"
     const val TUTORIAL_DETAIL = "tutorial_detail"
     const val TUTORIAL_CREATE = "tutorial_create"
     const val TUTORIAL_EDIT = "tutorial_edit"
 
-    const val MATERIALS_LIST = "materials_list"
+    const val MATERIALS_LIST = "$MAIN/materials_list"
     const val MATERIAL_DETAIL = "material_detail"
     const val MATERIAL_EDIT = "material_edit"
 
-    const val FORUM = "forum"
+    const val FORUM = "$MAIN/forum"
     const val FORUM_CREATE = "forum_create"
     const val FORUM_SEARCH = "forum_search"
     const val FORUM_TOPIC_DETAIL = "forum_topic_detail"

@@ -22,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @Composable
-fun ForgotPasswordScreen(viewModel: AuthViewModel, onBack: () -> Unit) {
+fun ForgotPasswordScreen(onBack: () -> Unit) {
+    val viewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
     val resetState by viewModel.resetState.collectAsState()
     var email by remember { mutableStateOf("") }
@@ -60,6 +62,7 @@ fun ForgotPasswordScreen(viewModel: AuthViewModel, onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         when (val state = resetState) {
+            is ApiResponse.Idle -> { }
             is ApiResponse.Loading -> CircularProgressIndicator()
             is ApiResponse.Success -> {
                 Toast.makeText(context, "Correo enviado exitosamente", Toast.LENGTH_LONG).show()

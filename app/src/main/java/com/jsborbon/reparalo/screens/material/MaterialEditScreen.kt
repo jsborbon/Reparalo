@@ -40,8 +40,9 @@ import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 fun MaterialEditScreen(
     navController: NavController,
     materialId: String,
-    viewModel: MaterialsViewModel = viewModel(),
 ) {
+    val viewModel: MaterialsViewModel = viewModel()
+
     val materialState = viewModel.materialDetail.collectAsState()
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -50,6 +51,18 @@ fun MaterialEditScreen(
 
     LaunchedEffect(materialId) {
         viewModel.loadMaterialById(materialId)
+    }
+
+    val state = materialState.value
+    val material = (state as? ApiResponse.Success)?.data
+
+    LaunchedEffect(material) {
+        material?.let {
+            name = it.name
+            description = it.description
+            quantity = it.quantity.toString()
+            price = it.price.toString()
+        }
     }
 
     Scaffold(
@@ -64,7 +77,18 @@ fun MaterialEditScreen(
             )
         },
     ) { innerPadding ->
-        when (val state = materialState.value) {
+        when (state) {
+            is ApiResponse.Idle -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(text = "Cargando material...")
+                }
+            }
+
             is ApiResponse.Loading -> {
                 Box(
                     modifier = Modifier
@@ -83,75 +107,64 @@ fun MaterialEditScreen(
                         .padding(innerPadding),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = "Error: ${state.errorMessage}",
-                    )
+                    Text(text = "Error: ${state.errorMessage}")
                 }
             }
 
             is ApiResponse.Success -> {
-                val material = state.data
-
-                LaunchedEffect(Unit) {
-                    name = material.name
-                    description = material.description
-                    quantity = material.quantity.toString()
-                    price = material.price.toString()
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Nombre") },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text("Descripción") },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    OutlinedTextField(
-                        value = quantity,
-                        onValueChange = { quantity = it },
-                        label = { Text("Cantidad") },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    OutlinedTextField(
-                        value = price,
-                        onValueChange = { price = it },
-                        label = { Text("Precio") },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-
-                    Button(
-                        onClick = {
-                            val updated = material.copy(
-                                name = name,
-                                description = description,
-                                quantity = quantity.toIntOrNull() ?: 0,
-                                price = price.toFloatOrNull() ?: 0f,
-                            )
-                            viewModel.updateMaterial(updated)
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier.align(Alignment.End),
+                material?.let {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Icon(imageVector = Icons.Default.Done, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Guardar")
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text("Nombre") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Descripción") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = quantity,
+                            onValueChange = { quantity = it },
+                            label = { Text("Cantidad") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = price,
+                            onValueChange = { price = it },
+                            label = { Text("Precio") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        Button(
+                            onClick = {
+                                val updated = it.copy(
+                                    name = name,
+                                    description = description,
+                                    quantity = quantity.toIntOrNull() ?: 0,
+                                    price = price.toFloatOrNull() ?: 0f,
+                                )
+                                viewModel.updateMaterial(updated)
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier.align(Alignment.End),
+                        ) {
+                            Icon(imageVector = Icons.Default.Done, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Guardar")
+                        }
                     }
                 }
             }
-
-            null -> {}
         }
     }
 }

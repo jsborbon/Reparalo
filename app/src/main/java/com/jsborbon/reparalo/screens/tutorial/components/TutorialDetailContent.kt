@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,10 +17,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jsborbon.reparalo.components.comment.CommentCard
 import com.jsborbon.reparalo.components.video.FullScreenVideoActivity
 import com.jsborbon.reparalo.components.video.VideoPlayer
@@ -36,10 +38,12 @@ fun TutorialDetailContent(
     commentsState: List<Comment>,
     innerPadding: PaddingValues,
     tutorialId: String,
-    tutorialsViewModel: TutorialsViewModel,
     userNames: Map<String, String>,
 ) {
+    val tutorialsViewModel: TutorialsViewModel = viewModel()
     val context = LocalContext.current
+    val materials = remember(tutorial.materials) { tutorial.materials }
+    val comments = remember(commentsState) { commentsState }
 
     LazyColumn(
         modifier = Modifier
@@ -49,47 +53,12 @@ fun TutorialDetailContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(
-                text = tutorial.title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+            TutorialHeaderSection(
+                tutorial = tutorial,
+                tutorialId = tutorialId,
+                favorites = tutorialsViewModel.favoriteIds.collectAsState().value,
+                onToggleFavorite = { tutorialsViewModel.toggleFavorite(tutorialId) },
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Autor: ${tutorial.author.name}",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = tutorial.description,
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                ToggleFavoriteButton(
-                    tutorialId = tutorialId,
-                    favorites = tutorialsViewModel.favoriteIds,
-                    onToggle = { tutorialsViewModel.toggleFavorite(tutorialId) },
-                )
-                Button(
-                    onClick = {
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_SUBJECT, tutorial.title)
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                "¡Mira este tutorial! ${tutorial.title} - ${tutorial.description}",
-                            )
-                        }
-                        context.startActivity(Intent.createChooser(shareIntent, "Compartir vía"))
-                    },
-                ) {
-                    Text("Compartir")
-                }
-            }
         }
 
         if (tutorial.videoUrl.isNotBlank()) {
@@ -101,10 +70,7 @@ fun TutorialDetailContent(
                     )
                     Button(
                         onClick = {
-                            val intent = Intent(
-                                context,
-                                FullScreenVideoActivity::class.java,
-                            ).apply {
+                            val intent = Intent(context, FullScreenVideoActivity::class.java).apply {
                                 putExtra("video_url", tutorial.videoUrl)
                             }
                             context.startActivity(intent)
@@ -117,7 +83,7 @@ fun TutorialDetailContent(
             }
         }
 
-        if (tutorial.materials.isNotEmpty()) {
+        if (materials.isNotEmpty()) {
             item {
                 Text(
                     text = "Materiales necesarios",
@@ -126,7 +92,8 @@ fun TutorialDetailContent(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
-            items(tutorial.materials) { material: Material ->
+
+            items(materials, key = { it.name }) { material: Material ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -150,11 +117,11 @@ fun TutorialDetailContent(
             )
         }
 
-        items(commentsState) { comment: Comment ->
-            CommentCard(
-                comment = comment,
-                userName = userNames[comment.author.uid] ?: "Usuario",
-            )
+        items(comments, key = { it.id }) { comment ->
+            val authorName = remember(comment.author.uid, userNames) {
+                userNames[comment.author.uid] ?: "Usuario"
+            }
+            CommentCard(comment = comment, userName = authorName)
         }
     }
 }

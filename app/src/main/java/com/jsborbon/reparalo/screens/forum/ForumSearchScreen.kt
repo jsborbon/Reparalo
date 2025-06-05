@@ -41,8 +41,9 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumSearchScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel(),
 ) {
+    val viewModel: ForumViewModel = viewModel()
+
     var query by remember { mutableStateOf("") }
     val topicsState by viewModel.topics.collectAsState()
 
@@ -80,6 +81,16 @@ fun ForumSearchScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when (val state = topicsState) {
+                is ApiResponse.Idle -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("Empieza a escribir para buscar temas.")
+                    }
+                }
+
                 is ApiResponse.Loading -> {
                     Column(
                         modifier = Modifier.fillMaxSize(),

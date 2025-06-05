@@ -92,5 +92,8 @@ fun TutorialsListSection(
                 }
             }
         }
+
+        ApiResponse.Idle -> {
+        }
     }
 }

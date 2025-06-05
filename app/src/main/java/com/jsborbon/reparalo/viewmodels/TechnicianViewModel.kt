@@ -18,8 +18,8 @@ class TechnicianViewModel(
     val technician: StateFlow<ApiResponse<User>> = _technician
 
     fun loadTechnician(uid: String) {
-        _technician.value = ApiResponse.Loading
         viewModelScope.launch {
+            _technician.value = ApiResponse.Loading
             try {
                 repository.getTechnicianById(uid).collect { response ->
                     _technician.value = response

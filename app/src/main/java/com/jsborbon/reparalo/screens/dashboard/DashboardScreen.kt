@@ -27,9 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.jsborbon.reparalo.components.PopoverMenu
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.dashboard.components.CategorySection
 import com.jsborbon.reparalo.screens.dashboard.components.HighlightedTechnicianCard
@@ -41,8 +41,9 @@ import com.jsborbon.reparalo.viewmodels.AuthViewModel
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    viewModel: AuthViewModel = remember { AuthViewModel() },
 ) {
+    val viewModel: AuthViewModel = viewModel()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -54,7 +55,6 @@ fun DashboardScreen(
                     IconButton(onClick = { navController.navigate(Routes.USER_PROFILE) }) {
                         Icon(Icons.Default.Person, contentDescription = "Perfil")
                     }
-                    PopoverMenu(navController = navController, viewModel = viewModel)
                 },
             )
         },

@@ -76,6 +76,13 @@ fun ForumTopicDetailScreen(
                 .padding(paddingValues),
         ) {
             when (topicsState) {
+                is ApiResponse.Idle -> {
+                    Text(
+                        text = "Cargando tema...",
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }

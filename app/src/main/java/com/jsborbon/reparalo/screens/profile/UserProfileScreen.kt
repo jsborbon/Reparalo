@@ -30,8 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.history.components.ServiceHistoryCard
@@ -42,6 +42,7 @@ import com.jsborbon.reparalo.screens.profile.components.ProfileHeader
 import com.jsborbon.reparalo.screens.technician.components.TechnicianDetailsCard
 import com.jsborbon.reparalo.screens.technician.components.TechnicianStatsCard
 import com.jsborbon.reparalo.utils.formatDate
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
 import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,174 +50,183 @@ import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 fun UserProfileScreen(
     navController: NavController,
     isEditMode: Boolean = false,
-    viewModel: UserProfileViewModel = remember { UserProfileViewModel() },
 ) {
+    val viewModel: UserProfileViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
+
     val editMode = remember { mutableStateOf(isEditMode) }
     val userState by viewModel.user.collectAsState()
 
-    val user = when (val state = userState) {
-        is ApiResponse.Success -> state.data
+    when (val state = userState) {
         is ApiResponse.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return
         }
+
         is ApiResponse.Failure -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = state.errorMessage)
+                Text(text = "Error: ${state.errorMessage}")
             }
             return
         }
-    }
 
-    var userName by remember { mutableStateOf(user.name) }
-    var userPhone by remember { mutableStateOf(user.phone) }
+        is ApiResponse.Idle -> {}
 
-    val userEmail = user.email
-    val userJoinDate = if (user.registrationDate.isNotBlank()) formatDate(user.registrationDate) else "Desconocido"
-    val userIsTechnician = user.userType.name == "TECHNICIAN"
-    val availability = remember { mutableStateOf(user.availability) }
-    val specialties = user.specialty?.split(",")?.map { it.trim() } ?: emptyList()
-    val completedServices = user.completedServices
-    val userRating = user.rating
-    val satisfaction = user.satisfaction
-    val favoriteCount = user.favoriteCount
-    val lastServiceTimestamp = user.lastServiceTimestamp
+        is ApiResponse.Success -> {
+            val user = state.data
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Mi Perfil") },
-                actions = {
-                    IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Configuración")
-                    }
+            var userName by remember { mutableStateOf(user.name) }
+            var userPhone by remember { mutableStateOf(user.phone) }
+
+            val userEmail = user.email
+            val userJoinDate = formatDate(user.registrationDate)
+            val userIsTechnician = user.userType.name == "TECHNICIAN"
+            val availability = remember { mutableStateOf(user.availability) }
+            val specialties = user.specialty?.split(",")?.map { it.trim() } ?: emptyList()
+            val completedServices = user.completedServices
+            val userRating = user.rating
+            val satisfaction = user.satisfaction
+            val favoriteCount = user.favoriteCount
+            val lastServiceTimestamp = user.lastServiceTimestamp
+
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text("Mi Perfil") },
+                        actions = {
+                            IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
+                                Icon(imageVector = Icons.Default.Settings, contentDescription = "Configuración")
+                            }
+                        },
+                    )
                 },
-            )
-        },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item {
-                ProfileHeader(
-                    userName = user.name,
-                    isTechnician = userIsTechnician,
-                    isVerified = userIsTechnician && satisfaction >= 4.0f,
-                    userRating = userRating,
-                    completedServices = completedServices,
-                )
-            }
+            ) { padding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    item {
+                        ProfileHeader(
+                            userName = user.name,
+                            isTechnician = userIsTechnician,
+                            isVerified = userIsTechnician && satisfaction >= 4.0f,
+                            userRating = userRating,
+                            completedServices = completedServices,
+                        )
+                    }
 
-            item {
-                if (editMode.value) {
-                    EditableContactInfoCard(
-                        name = userName,
-                        phone = userPhone,
-                        joinDate = userJoinDate,
-                        onNameChange = { userName = it },
-                        onPhoneChange = { userPhone = it },
-                    )
-                } else {
-                    ContactInfoCard(
-                        email = userEmail,
-                        phone = userPhone,
-                        joinDate = userJoinDate,
-                    )
-                }
-            }
-
-            if (userIsTechnician) {
-                item {
-                    TechnicianDetailsCard(
-                        specialties = specialties,
-                        availability = availability.value,
-                    )
-                }
-                item {
-                    TechnicianStatsCard(
-                        completedServices = completedServices,
-                        rating = userRating,
-                        satisfaction = satisfaction,
-                    )
-                }
-            } else {
-                item {
-                    ClientFavoritesCard(
-                        favoriteCount = favoriteCount,
-                        onViewFavoritesClick = {
-                            navController.navigate(Routes.FAVORITES)
-                        },
-                    )
-                }
-                item {
-                    ServiceHistoryCard(
-                        title = "Último servicio",
-                        date = lastServiceTimestamp,
-                        showButton = true,
-                        onButtonClick = {
-                            navController.navigate(Routes.SERVICE_HISTORY)
-                        },
-                    )
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (editMode.value) {
-                    Button(
-                        onClick = {
-                            viewModel.updateUserData(
+                    item {
+                        if (editMode.value) {
+                            EditableContactInfoCard(
                                 name = userName,
                                 phone = userPhone,
-                                availability = availability.value,
+                                joinDate = userJoinDate,
+                                onNameChange = { userName = it },
+                                onPhoneChange = { userPhone = it },
                             )
-                            navController.navigate(Routes.userProfileRoute(edit = false))
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("Guardar cambios")
-                    }
-                } else {
-                    Button(
-                        onClick = {
-                            navController.navigate(Routes.userProfileRoute(edit = true))
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar perfil",
-                            modifier = Modifier.padding(end = 8.dp),
-                        )
-                        Text("Editar perfil")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        FirebaseAuth.getInstance().signOut()
-                        navController.navigate(Routes.AUTHENTICATION) {
-                            popUpTo(Routes.DASHBOARD) { inclusive = true }
+                        } else {
+                            ContactInfoCard(
+                                email = userEmail,
+                                phone = userPhone,
+                                joinDate = userJoinDate,
+                            )
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                        contentDescription = "Cerrar sesión",
-                        modifier = Modifier.padding(end = 8.dp),
-                    )
-                    Text("Cerrar sesión")
+                    }
+
+                    if (userIsTechnician) {
+                        item {
+                            TechnicianDetailsCard(
+                                specialties = specialties,
+                                availability = availability.value,
+                                phone = userPhone,
+                            )
+                        }
+                        item {
+                            TechnicianStatsCard(
+                                completedServices = completedServices,
+                                rating = userRating,
+                                satisfaction = satisfaction,
+                            )
+                        }
+                    } else {
+                        item {
+                            ClientFavoritesCard(
+                                favoriteCount = favoriteCount,
+                                onViewFavoritesClick = {
+                                    navController.navigate(Routes.FAVORITES)
+                                },
+                            )
+                        }
+                        item {
+                            ServiceHistoryCard(
+                                title = "Último servicio",
+                                date = lastServiceTimestamp,
+                                showButton = true,
+                                onButtonClick = {
+                                    navController.navigate(Routes.SERVICE_HISTORY)
+                                },
+                            )
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if (editMode.value) {
+                            Button(
+                                onClick = {
+                                    viewModel.updateUserData(
+                                        name = userName,
+                                        phone = userPhone,
+                                        availability = availability.value,
+                                    )
+                                    navController.navigate(Routes.userProfileRoute(edit = false))
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text("Guardar cambios")
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    navController.navigate(Routes.userProfileRoute(edit = true))
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Editar perfil",
+                                    modifier = Modifier.padding(end = 8.dp),
+                                )
+                                Text("Editar perfil")
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        OutlinedButton(
+                            onClick = {
+                                authViewModel.logout()
+                                navController.navigate(Routes.AUTHENTICATION) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Cerrar sesión",
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
+                            Text("Cerrar sesión")
+                        }
+                    }
                 }
             }
         }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -29,6 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -51,24 +56,31 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
 
     val signUpState by viewModel.signUpState.collectAsState()
+    val isLoading = signUpState is ApiResponse.Loading
+
+    val nameFocus = remember { FocusRequester() }
+    val emailFocus = remember { FocusRequester() }
+    val phoneFocus = remember { FocusRequester() }
+    val passwordFocus = remember { FocusRequester() }
+    val confirmFocus = remember { FocusRequester() }
 
     LaunchedEffect(signUpState) {
-        when (val result = signUpState) {
+        when (signUpState) {
             is ApiResponse.Success -> {
                 navController.navigate(Routes.DASHBOARD) {
-                    popUpTo(Routes.AUTHENTICATION) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
+                viewModel.resetSignUpState()
             }
 
             is ApiResponse.Failure -> {
-                error = result.errorMessage
+                error = (signUpState as ApiResponse.Failure).errorMessage
+                viewModel.resetSignUpState()
             }
 
-            else -> Unit
+            ApiResponse.Loading, ApiResponse.Idle -> Unit
         }
     }
-
-    val isLoading = signUpState is ApiResponse.Loading
 
     Column(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -76,7 +88,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { name = it },
             label = { Text("Nombre") },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(nameFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -86,7 +102,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { email = it },
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(emailFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { phoneFocus.requestFocus() }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -96,7 +116,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { phone = it },
             label = { Text("Teléfono") },
             leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(phoneFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { passwordFocus.requestFocus() }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +148,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                     Text(if (passwordVisible) "🙈" else "👁️")
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { confirmFocus.requestFocus() }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -135,7 +163,34 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             label = { Text("Confirmar Contraseña") },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(confirmFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                error = null
+                if (!ValidationUtils.areNotEmpty(name, email, phone, password, confirmPassword)) {
+                    error = "Completa todos los campos"
+                    return@KeyboardActions
+                }
+                if (!ValidationUtils.isValidEmail(email)) {
+                    error = "Email no válido"
+                    return@KeyboardActions
+                }
+                if (!ValidationUtils.isStrongPassword(password)) {
+                    error = "Contraseña débil"
+                    return@KeyboardActions
+                }
+                if (!ValidationUtils.passwordsMatch(password, confirmPassword)) {
+                    error = "Las contraseñas no coinciden"
+                    return@KeyboardActions
+                }
+                if (!ValidationUtils.isValidPhone(phone)) {
+                    error = "Teléfono inválido"
+                    return@KeyboardActions
+                }
+                viewModel.signUp(email, password, name, phone, userType.name)
+            }),
         )
 
         if (error != null) {

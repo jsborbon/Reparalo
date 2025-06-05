@@ -8,7 +8,7 @@ import com.jsborbon.reparalo.data.repository.AuthRepository
 import com.jsborbon.reparalo.models.User
 import com.jsborbon.reparalo.models.UserType
 import kotlinx.coroutines.tasks.await
-import java.time.Instant
+import java.util.Date
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
@@ -19,8 +19,8 @@ class AuthRepositoryImpl(
 
     override suspend fun signIn(email: String, password: String): FirebaseUser? {
         return try {
-            auth.signInWithEmailAndPassword(email, password).await()
-            auth.currentUser
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            result.user ?: auth.currentUser
         } catch (e: Exception) {
             Log.e(TAG, "signIn failed", e)
             null
@@ -35,11 +35,10 @@ class AuthRepositoryImpl(
         userType: UserType,
     ): FirebaseUser? {
         return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
-            val firebaseUser = auth.currentUser
-
-            firebaseUser?.let { user ->
-                val registrationDate = Instant.now().toString()
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user
+            if (user != null) {
+                val registrationDate = Date()
                 val profile = User(
                     uid = user.uid,
                     name = name,
@@ -52,8 +51,7 @@ class AuthRepositoryImpl(
                 firestore.collection("users").document(user.uid)
                     .update("favorites", emptyList<String>()).await()
             }
-
-            firebaseUser
+            user
         } catch (e: Exception) {
             Log.e(TAG, "signUp failed", e)
             null

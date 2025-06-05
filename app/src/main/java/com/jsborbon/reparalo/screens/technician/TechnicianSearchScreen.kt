@@ -26,21 +26,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.jsborbon.reparalo.components.NavigationBottomBar
+import androidx.navigation.NavHostController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.Category
 import com.jsborbon.reparalo.models.User
+import com.jsborbon.reparalo.navigation.components.NavigationBottomBar
 import com.jsborbon.reparalo.screens.technician.components.TechnicianCard
 import com.jsborbon.reparalo.viewmodels.CategoryViewModel
 import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 
 @Composable
 fun TechnicianSearchScreen(
-    navController: NavController,
-    viewModel: TechnicianListViewModel = remember { TechnicianListViewModel() },
-    categoryViewModel: CategoryViewModel = viewModel(),
+    navController: NavHostController,
 ) {
+    val viewModel: TechnicianListViewModel = viewModel()
+    val categoryViewModel: CategoryViewModel = viewModel()
+
     val techniciansState by viewModel.technicians.collectAsState()
     val query = remember { mutableStateOf("") }
     val categoriesState by categoryViewModel.categories.collectAsState()
@@ -60,7 +61,7 @@ fun TechnicianSearchScreen(
 
     Scaffold(
         bottomBar = {
-            NavigationBottomBar(selectedIndex = 2, navController = navController)
+            NavigationBottomBar(selectedIndex = 2, navController = navController, onTabChange = {})
         },
     ) { innerPadding ->
         Column(
@@ -133,6 +134,13 @@ fun TechnicianSearchScreen(
                             }
                         }
                     }
+                }
+
+                is ApiResponse.Idle -> {
+                    Text(
+                        text = "Esperando técnicos...",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
             }
         }

@@ -54,10 +54,11 @@ import com.jsborbon.reparalo.viewmodels.TutorialsViewModel
 fun TutorialDetailScreen(
     navController: NavController,
     tutorialId: String,
-    sharedViewModel: TutorialsViewModel,
-    detailViewModel: TutorialDetailViewModel,
     auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
+    val detailViewModel: TutorialDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val sharedViewModel: TutorialsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+
     val currentUserId = auth.currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
 
     val context = LocalContext.current
@@ -65,14 +66,17 @@ fun TutorialDetailScreen(
     val commentsState by detailViewModel.comments.collectAsState()
     val deleteState = sharedViewModel.deleteState.collectAsState().value
     val favoriteIds by sharedViewModel.favoriteIds.collectAsState()
-    val isFavorite = favoriteIds.contains(tutorialId)
-
+    val isFavorite = remember(favoriteIds, tutorialId) {
+        favoriteIds.contains(tutorialId)
+    }
     val showDeleteDialog = remember { mutableStateOf(false) }
     val commentText = remember { mutableStateOf("") }
     val rating = remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(tutorialId) {
         detailViewModel.loadTutorial(tutorialId)
+    }
+    LaunchedEffect(tutorialId) {
         detailViewModel.loadComments(tutorialId)
     }
 
@@ -90,6 +94,10 @@ fun TutorialDetailScreen(
             else -> {}
         }
     }
+
+    val shouldShowContent = tutorialState is ApiResponse.Success ||
+        tutorialState is ApiResponse.Loading ||
+        tutorialState is ApiResponse.Failure
 
     Scaffold(
         topBar = {
@@ -139,7 +147,7 @@ fun TutorialDetailScreen(
         },
     ) { padding ->
         AnimatedVisibility(
-            visible = true,
+            visible = shouldShowContent,
             enter = slideInHorizontally { it } + fadeIn(),
             exit = slideOutHorizontally { -it } + fadeOut(),
         ) {
@@ -166,14 +174,15 @@ fun TutorialDetailScreen(
                 }
                 is ApiResponse.Success -> {
                     val comments = (commentsState as? ApiResponse.Success)?.data ?: emptyList()
+                    val userNames by detailViewModel.userNames.collectAsState()
+
                     Column(modifier = Modifier.fillMaxSize()) {
                         TutorialDetailContent(
                             tutorial = state.data,
                             commentsState = comments,
                             innerPadding = padding,
                             tutorialId = tutorialId,
-                            tutorialsViewModel = sharedViewModel,
-                            userNames = detailViewModel.userNames.collectAsState().value,
+                            userNames = userNames,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         CommentFormSection(
@@ -197,6 +206,7 @@ fun TutorialDetailScreen(
                         )
                     }
                 }
+                is ApiResponse.Idle -> { }
             }
         }
 

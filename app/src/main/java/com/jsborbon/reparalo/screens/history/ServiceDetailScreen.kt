@@ -18,9 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.utils.formatDate
@@ -31,8 +31,9 @@ import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 fun ServiceDetailScreen(
     navController: NavController,
     serviceId: String,
-    viewModel: HistoryViewModel = remember { HistoryViewModel() },
 ) {
+    val viewModel: HistoryViewModel = viewModel()
+
     LaunchedEffect(serviceId) {
         viewModel.loadService(serviceId)
     }
@@ -61,13 +62,17 @@ fun ServiceDetailScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            when (result) {
+            when (val response = result) {
+                is ApiResponse.Idle -> {
+                    Text(text = "Cargando servicio...", style = MaterialTheme.typography.bodyMedium)
+                }
+
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator()
                 }
 
                 is ApiResponse.Success -> {
-                    val item = (result as ApiResponse.Success).data
+                    val item = response.data
                     Text(
                         text = item.title,
                         style = MaterialTheme.typography.headlineSmall,
@@ -83,7 +88,7 @@ fun ServiceDetailScreen(
                 }
 
                 is ApiResponse.Failure -> {
-                    val errorMessage = (result as ApiResponse.Failure).errorMessage
+                    val errorMessage = response.errorMessage
                     Text(
                         text = "Error: $errorMessage",
                         color = MaterialTheme.colorScheme.error,

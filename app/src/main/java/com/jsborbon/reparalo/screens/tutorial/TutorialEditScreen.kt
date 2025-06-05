@@ -48,8 +48,9 @@ import java.util.Date
 fun TutorialEditScreen(
     navController: NavController,
     tutorialId: String,
-    viewModel: TutorialsViewModel = viewModel(),
 ) {
+    val viewModel: TutorialsViewModel = viewModel()
+
     val updateState by viewModel.updateState.collectAsState()
     val tutorialsState by viewModel.tutorials.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -151,7 +152,9 @@ fun TutorialEditScreen(
                 label = { Text("URL de video") },
                 modifier = Modifier.fillMaxWidth(),
             )
+
             Text("Materiales", style = MaterialTheme.typography.titleMedium)
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -171,12 +174,14 @@ fun TutorialEditScreen(
                     }
                 }
             }
+
             OutlinedTextField(
                 value = newMaterial,
                 onValueChange = { newMaterial = it },
                 label = { Text("Nuevo material") },
                 modifier = Modifier.fillMaxWidth(),
             )
+
             Button(
                 onClick = {
                     if (newMaterial.isNotBlank()) {
@@ -195,6 +200,7 @@ fun TutorialEditScreen(
             ) {
                 Text("Añadir material")
             }
+
             Button(
                 onClick = {
                     val updatedTutorial = Tutorial(
@@ -217,10 +223,12 @@ fun TutorialEditScreen(
             ) {
                 Text("Guardar cambios")
             }
+
             when (updateState) {
                 is ApiResponse.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiResponse.Success -> {
                     LaunchedEffect(Unit) {
                         snackbarHostState.showSnackbar("Tutorial actualizado con éxito")
@@ -228,6 +236,7 @@ fun TutorialEditScreen(
                         navController.popBackStack()
                     }
                 }
+
                 is ApiResponse.Failure -> {
                     val message = (updateState as ApiResponse.Failure).errorMessage
                     LaunchedEffect(message) {
@@ -235,7 +244,9 @@ fun TutorialEditScreen(
                         viewModel.resetUpdateState()
                     }
                 }
-                null -> {}
+
+                ApiResponse.Idle -> {
+                }
             }
         }
     }

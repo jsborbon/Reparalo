@@ -21,10 +21,10 @@ class TutorialDetailViewModel(
     private val commentRepository: CommentRepository = CommentRepositoryImpl(),
 ) : ViewModel() {
 
-    private val _tutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Loading)
+    private val _tutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Idle)
     val tutorial: StateFlow<ApiResponse<Tutorial>> = _tutorial
 
-    private val _comments = MutableStateFlow<ApiResponse<List<Comment>>>(ApiResponse.Loading)
+    private val _comments = MutableStateFlow<ApiResponse<List<Comment>>>(ApiResponse.Idle)
     val comments: StateFlow<ApiResponse<List<Comment>>> = _comments
 
     private val _userNames = MutableStateFlow<Map<String, String>>(emptyMap())
@@ -99,6 +99,7 @@ class TutorialDetailViewModel(
                             "Error al enviar comentario: ${response.errorMessage}",
                         )
                         ApiResponse.Loading -> Log.i("TutorialDetailVM", "Enviando comentario...")
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {

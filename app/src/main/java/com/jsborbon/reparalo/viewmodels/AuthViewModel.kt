@@ -15,13 +15,13 @@ class AuthViewModel(
     private val authRepository: AuthRepository = AuthRepositoryImpl(),
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
+    private val _loginState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Idle)
     val loginState: StateFlow<ApiResponse<User>> = _loginState
 
-    private val _signUpState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Loading)
+    private val _signUpState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Idle)
     val signUpState: StateFlow<ApiResponse<User>> = _signUpState
 
-    private val _resetState = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Loading)
+    private val _resetState = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Idle)
     val resetState: StateFlow<ApiResponse<Boolean>> = _resetState
 
     private val _user = MutableStateFlow<User?>(null)
@@ -110,5 +110,13 @@ class AuthViewModel(
         _user.value = null
         _loginState.value = ApiResponse.Loading
         _signUpState.value = ApiResponse.Loading
+    }
+
+    fun resetSignUpState() {
+        _signUpState.value = ApiResponse.Idle
+    }
+
+    fun resetLoginState() {
+        _loginState.value = ApiResponse.Idle
     }
 }

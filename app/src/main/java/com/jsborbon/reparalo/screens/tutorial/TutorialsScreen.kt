@@ -40,9 +40,10 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun TutorialsScreen(
     navController: NavController,
-    viewModel: TutorialsViewModel = viewModel(),
-    categoryViewModel: CategoryViewModel = viewModel(),
 ) {
+    val viewModel: TutorialsViewModel = viewModel()
+    val categoryViewModel: CategoryViewModel = viewModel()
+
     val allTutorials by viewModel.tutorials.collectAsState()
     val tutorialsByCategory by viewModel.tutorialsByCategory.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
@@ -111,8 +112,9 @@ fun TutorialsScreen(
                         },
                     )
                 }
+                ApiResponse.Idle -> {
+                }
             }
-
             val tutorialsState = if (selectedCategory != null) tutorialsByCategory else allTutorials
 
             TutorialsListSection(

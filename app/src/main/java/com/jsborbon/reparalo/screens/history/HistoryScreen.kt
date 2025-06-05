@@ -14,10 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.data.api.ApiResponse
@@ -29,8 +29,9 @@ import com.jsborbon.reparalo.viewmodels.HistoryViewModel
 @Composable
 fun ServiceHistoryScreen(
     navController: NavController,
-    viewModel: HistoryViewModel = remember { HistoryViewModel() },
 ) {
+    val viewModel: HistoryViewModel = viewModel()
+
     val state by viewModel.historyItems.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -50,6 +51,15 @@ fun ServiceHistoryScreen(
         )
 
         when (state) {
+            is ApiResponse.Idle -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Esperando carga del historial...")
+                }
+            }
+
             is ApiResponse.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -60,7 +70,9 @@ fun ServiceHistoryScreen(
             }
 
             is ApiResponse.Success -> {
-                val historyItems = (state as ApiResponse.Success<List<ServiceHistoryItem>>).data
+                val successState = state as ApiResponse.Success<List<ServiceHistoryItem>>
+                val historyItems = successState.data
+
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -79,7 +91,8 @@ fun ServiceHistoryScreen(
             }
 
             is ApiResponse.Failure -> {
-                val errorMessage = (state as ApiResponse.Failure).errorMessage
+                val failure = state as ApiResponse.Failure
+                val errorMessage = failure.errorMessage
                 Text(
                     text = "Error al cargar el historial: $errorMessage",
                     color = MaterialTheme.colorScheme.error,

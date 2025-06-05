@@ -29,19 +29,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.jsborbon.reparalo.components.NavigationBottomBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.Routes
+import com.jsborbon.reparalo.navigation.components.NavigationBottomBar
 import com.jsborbon.reparalo.screens.profile.components.UserCard
 import com.jsborbon.reparalo.viewmodels.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    navController: NavController,
-    viewModel: UserProfileViewModel,
+    navController: NavHostController,
 ) {
+    val viewModel: UserProfileViewModel = viewModel()
+
     val state by viewModel.user.collectAsState()
 
     var name by remember { mutableStateOf("") }
@@ -61,7 +63,11 @@ fun ProfileScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBottomBar(selectedIndex = 4, navController = navController)
+            NavigationBottomBar(
+                selectedIndex = 5,
+                navController = navController,
+                onTabChange = {},
+            )
         },
     ) { innerPadding ->
         Column(
@@ -184,6 +190,14 @@ fun ProfileScreen(
                     ) {
                         Text("Cerrar Sesión")
                     }
+                }
+
+                else -> {
+                    Text(
+                        text = "Cargando perfil...",
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
             }
         }

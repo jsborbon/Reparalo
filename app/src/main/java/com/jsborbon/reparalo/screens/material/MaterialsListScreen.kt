@@ -150,6 +150,12 @@ fun MaterialsListScreen(navController: NavController) {
                     }
                 }
             }
+
+            is ApiResponse.Idle -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "Esperando datos...")
+                }
+            }
         }
     }
 }

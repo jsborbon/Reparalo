@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.ForumTopic
@@ -40,8 +41,9 @@ import kotlinx.coroutines.flow.Flow
 fun ForumEditScreen(
     navController: NavController,
     topicId: String,
-    viewModel: ForumViewModel = remember { ForumViewModel() },
 ) {
+    val viewModel: ForumViewModel = viewModel()
+
     val topicFlow: Flow<ApiResponse<ForumTopic>> = viewModel.getTopicById(topicId)
     val topicState by topicFlow.collectAsState(initial = ApiResponse.Loading)
     val editState by viewModel.editState.collectAsState()

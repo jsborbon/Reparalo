@@ -1,5 +1,6 @@
 package com.jsborbon.reparalo.screens.forum
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,9 +49,10 @@ import com.jsborbon.reparalo.viewmodels.ForumViewModel
 @Composable
 fun ForumScreen(
     navController: NavController,
-    viewModel: ForumViewModel = viewModel(),
-    categoryViewModel: CategoryViewModel = viewModel(),
 ) {
+    val viewModel: ForumViewModel = viewModel()
+    val categoryViewModel: CategoryViewModel = viewModel()
+
     val categoriesState by categoryViewModel.categories.collectAsState()
     val topicsState by viewModel.topics.collectAsState()
 
@@ -121,6 +123,16 @@ fun ForumScreen(
             }
 
             when (topicsState) {
+                is ApiResponse.Idle -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("Empieza a escribir para buscar temas.")
+                    }
+                }
+
                 is ApiResponse.Loading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()

@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,10 +44,11 @@ import java.util.UUID
 @Composable
 fun ForumCreateScreen(
     navController: NavController,
-    forumViewModel: ForumViewModel = remember { ForumViewModel() },
     auth: FirebaseAuth = FirebaseAuth.getInstance(),
     firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) {
+    val forumViewModel: ForumViewModel = viewModel()
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }

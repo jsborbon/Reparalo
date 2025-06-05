@@ -2,24 +2,17 @@ package com.jsborbon.reparalo.screens.notifications
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -32,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
-import com.jsborbon.reparalo.models.NotificationItem
+import com.jsborbon.reparalo.screens.notifications.components.NotificationCard
 import com.jsborbon.reparalo.viewmodels.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,26 +88,23 @@ fun NotificationScreen(navController: NavController) {
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(notifications) { notification ->
+                        items(notifications, key = { it.id }) { notification ->
                             NotificationCard(notification = notification)
                         }
                     }
                 }
             }
-        }
-    }
-}
 
-@Composable
-fun NotificationCard(notification: NotificationItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = notification.title, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = notification.message, style = MaterialTheme.typography.bodyMedium)
+            is ApiResponse.Idle -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Cargando notificaciones...")
+                }
+            }
         }
     }
 }

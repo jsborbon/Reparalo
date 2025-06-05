@@ -33,19 +33,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.settings.components.SettingsCategory
 import com.jsborbon.reparalo.screens.settings.components.SettingsClickableItem
 import com.jsborbon.reparalo.screens.settings.components.SettingsSwitchItem
+import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
 ) {
+    val authViewModel: AuthViewModel = viewModel()
     var isDarkTheme by remember { mutableStateOf(false) }
     var isNotificationsEnabled by remember { mutableStateOf(true) }
     var isLocationEnabled by remember { mutableStateOf(false) }
@@ -148,7 +150,7 @@ fun SettingsScreen(
 
                 Button(
                     onClick = {
-                        FirebaseAuth.getInstance().signOut()
+                        authViewModel.logout()
                         navController.navigate(Routes.AUTHENTICATION) {
                             popUpTo(0) { inclusive = true }
                         }

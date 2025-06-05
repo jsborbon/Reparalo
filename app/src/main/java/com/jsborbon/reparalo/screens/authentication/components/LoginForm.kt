@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -25,6 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -44,24 +49,27 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
 
     val loginState by viewModel.loginState.collectAsState()
+    val isLoading = loginState is ApiResponse.Loading
+
+    val passwordFocus = remember { FocusRequester() }
 
     LaunchedEffect(loginState) {
         when (val result = loginState) {
             is ApiResponse.Success -> {
                 navController.navigate(Routes.DASHBOARD) {
-                    popUpTo(Routes.AUTHENTICATION) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
+                viewModel.resetLoginState()
             }
 
             is ApiResponse.Failure -> {
                 error = result.errorMessage
+                viewModel.resetLoginState()
             }
 
             else -> Unit
         }
     }
-
-    val isLoading = loginState is ApiResponse.Loading
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -72,7 +80,11 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { email = it },
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocus),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { passwordFocus.requestFocus() }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -89,6 +101,25 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    error = null
+                    if (!areNotEmpty(email, password)) {
+                        error = "Completa todos los campos"
+                        return@KeyboardActions
+                    }
+                    if (!isValidEmail(email)) {
+                        error = "Email no válido"
+                        return@KeyboardActions
+                    }
+                    if (!isStrongPassword(password)) {
+                        error = "Contraseña muy débil"
+                        return@KeyboardActions
+                    }
+                    viewModel.login(email, password)
+                },
+            ),
         )
 
         if (error != null) {
@@ -126,6 +157,7 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
                 Text("Iniciar Sesión")
             }
         }
+
         TextButton(
             onClick = { navController.navigate(Routes.FORGOT_PASSWORD) },
             modifier = Modifier.align(Alignment.End),

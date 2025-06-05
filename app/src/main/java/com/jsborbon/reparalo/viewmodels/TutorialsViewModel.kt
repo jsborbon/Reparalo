@@ -26,14 +26,14 @@ class TutorialsViewModel(
     private val _selectedCategory = MutableStateFlow<String?>(null)
     val selectedCategory: StateFlow<String?> = _selectedCategory
 
-    private val _createState = MutableStateFlow<ApiResponse<Tutorial>?>(null)
-    val createState: StateFlow<ApiResponse<Tutorial>?> = _createState
+    private val _createState = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Idle)
+    val createState: StateFlow<ApiResponse<Tutorial>> = _createState
 
-    private val _updateState = MutableStateFlow<ApiResponse<Tutorial>?>(null)
-    val updateState: StateFlow<ApiResponse<Tutorial>?> = _updateState
+    private val _updateState = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Idle)
+    val updateState: StateFlow<ApiResponse<Tutorial>> = _updateState
 
-    private val _deleteState = MutableStateFlow<ApiResponse<Unit>?>(null)
-    val deleteState: StateFlow<ApiResponse<Unit>?> = _deleteState
+    private val _deleteState = MutableStateFlow<ApiResponse<Unit>>(ApiResponse.Idle)
+    val deleteState: StateFlow<ApiResponse<Unit>> = _deleteState
 
     private val _uiMessage = MutableSharedFlow<String>()
     val uiMessage = _uiMessage.asSharedFlow()
@@ -94,6 +94,7 @@ class TutorialsViewModel(
                             Log.d("TutorialsViewModel", "Creando tutorial...")
                             _uiMessage.emit("Creando tutorial...")
                         }
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {
@@ -120,6 +121,7 @@ class TutorialsViewModel(
                             Log.d("TutorialsViewModel", "Actualizando tutorial...")
                             _uiMessage.emit("Actualizando tutorial...")
                         }
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {
@@ -146,6 +148,7 @@ class TutorialsViewModel(
                             Log.d("TutorialsViewModel", "Eliminando tutorial...")
                             _uiMessage.emit("Eliminando tutorial...")
                         }
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {
@@ -169,6 +172,7 @@ class TutorialsViewModel(
                             Log.d("TutorialsViewModel", "Cargando favoritos...")
                             _uiMessage.emit("Cargando favoritos...")
                         }
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {
@@ -198,6 +202,7 @@ class TutorialsViewModel(
                             Log.d("TutorialsViewModel", "Actualizando favoritos...")
                             _uiMessage.emit("Actualizando favoritos...")
                         }
+                        ApiResponse.Idle -> Unit
                     }
                 }
             } catch (e: Exception) {
@@ -207,14 +212,14 @@ class TutorialsViewModel(
     }
 
     fun resetCreateState() {
-        _createState.value = null
+        _createState.value = ApiResponse.Idle
     }
 
     fun resetUpdateState() {
-        _updateState.value = null
+        _updateState.value = ApiResponse.Idle
     }
 
     fun resetDeleteState() {
-        _deleteState.value = null
+        _deleteState.value = ApiResponse.Idle
     }
 }

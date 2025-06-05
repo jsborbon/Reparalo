@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -100,15 +101,9 @@ fun TechnicianCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             InfoCard(title = "Información de contacto") {
-                InfoRow(
-                    icon = painterResource(id = R.drawable.baseline_email),
-                    text = technician.email,
-                )
+                InfoRow(icon = painterResource(id = R.drawable.baseline_email), text = technician.email)
                 if (technician.phone.isNotBlank()) {
-                    InfoRow(
-                        icon = painterResource(id = R.drawable.baseline_phone),
-                        text = technician.phone,
-                    )
+                    InfoRow(icon = painterResource(id = R.drawable.baseline_phone), text = technician.phone)
                 }
                 InfoRow(
                     icon = painterResource(id = R.drawable.baseline_date_range),
@@ -116,11 +111,39 @@ fun TechnicianCard(
                 )
             }
 
+            if (technician.phone.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Button(
+                        onClick = {
+                            val phone = technician.phone.trim().replace(" ", "")
+                            val intent = Intent(Intent.ACTION_VIEW, "https://wa.me/$phone".toUri())
+                            context.startActivity(intent)
+                        },
+                    ) {
+                        Text("WhatsApp")
+                    }
+                    Button(
+                        onClick = {
+                            val phone = technician.phone.trim().replace(" ", "")
+                            val intent = Intent(Intent.ACTION_DIAL, "tel:$phone".toUri())
+                            context.startActivity(intent)
+                        },
+                    ) {
+                        Text("Llamar")
+                    }
+                }
+            }
+
             if (technician.email.isNotBlank()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     IconButton(onClick = {

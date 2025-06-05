@@ -67,7 +67,7 @@ fun ForumTopicItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Publicado por ${topic.author} el ${formatDate(topic.date.time)}",
+                text = "Publicado por ${topic.author.name} el ${formatDate(topic.date.time)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.Gray,
             )

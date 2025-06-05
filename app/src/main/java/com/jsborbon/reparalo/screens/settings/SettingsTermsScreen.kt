@@ -18,9 +18,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.viewmodels.TermsViewModel
@@ -29,8 +29,9 @@ import com.jsborbon.reparalo.viewmodels.TermsViewModel
 @Composable
 fun SettingsTermsScreen(
     navController: NavController,
-    viewModel: TermsViewModel = remember { TermsViewModel() },
 ) {
+    val viewModel: TermsViewModel = viewModel()
+
     val termsState by viewModel.terms.collectAsState()
 
     Scaffold(
@@ -80,11 +81,14 @@ fun SettingsTermsScreen(
                     }
 
                     Text(
-                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos " +
-                            "términos y condiciones.",
+                        text = "Al continuar usando esta aplicación, aceptas y te comprometes a cumplir estos términos y condiciones.",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                is ApiResponse.Idle -> {
+                    Text("Cargando términos y condiciones...", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }

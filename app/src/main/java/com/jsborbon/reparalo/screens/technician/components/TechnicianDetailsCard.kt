@@ -10,6 +10,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,8 +23,11 @@ import com.jsborbon.reparalo.components.InfoRow
 fun TechnicianDetailsCard(
     specialties: List<String>,
     availability: String,
+    phone: String,
     onSpecialtyClick: ((String) -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+
     InfoCard(title = "Especialidades") {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(specialties) { specialty ->
@@ -47,5 +51,9 @@ fun TechnicianDetailsCard(
             icon = painterResource(id = R.drawable.baseline_schedule),
             text = availability,
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ContactButtons(phone = phone, context = context)
     }
 }

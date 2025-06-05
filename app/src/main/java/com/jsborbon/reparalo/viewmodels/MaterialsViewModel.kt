@@ -17,8 +17,8 @@ class MaterialsViewModel(
     private val _materials = MutableStateFlow<ApiResponse<List<Material>>>(ApiResponse.Loading)
     val materials: StateFlow<ApiResponse<List<Material>>> = _materials
 
-    private val _materialDetail = MutableStateFlow<ApiResponse<Material>?>(null)
-    val materialDetail: StateFlow<ApiResponse<Material>?> = _materialDetail
+    private val _materialDetail = MutableStateFlow<ApiResponse<Material>>(ApiResponse.Idle)
+    val materialDetail: StateFlow<ApiResponse<Material>> = _materialDetail
 
     init {
         loadMaterials()
@@ -61,5 +61,9 @@ class MaterialsViewModel(
                 _materialDetail.value = ApiResponse.Failure(e.message ?: "Error al actualizar el material.")
             }
         }
+    }
+
+    fun resetMaterialDetail() {
+        _materialDetail.value = ApiResponse.Idle
     }
 }

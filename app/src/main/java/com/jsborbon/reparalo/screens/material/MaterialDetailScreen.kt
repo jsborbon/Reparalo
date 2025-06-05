@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -35,12 +36,19 @@ import com.jsborbon.reparalo.viewmodels.MaterialsViewModel
 fun MaterialDetailScreen(
     navController: NavController,
     materialId: String,
-    viewModel: MaterialsViewModel = viewModel(),
 ) {
+    val viewModel: MaterialsViewModel = viewModel()
+
     val materialState = viewModel.materialDetail.collectAsState()
 
     LaunchedEffect(materialId) {
         viewModel.loadMaterialById(materialId)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.resetMaterialDetail()
+        }
     }
 
     Scaffold(
@@ -56,6 +64,17 @@ fun MaterialDetailScreen(
         },
     ) { innerPadding ->
         when (val state = materialState.value) {
+            is ApiResponse.Idle -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(text = "Cargando material...")
+                }
+            }
+
             is ApiResponse.Loading -> {
                 Box(
                     modifier = Modifier
@@ -121,8 +140,6 @@ fun MaterialDetailScreen(
                     }
                 }
             }
-
-            null -> {}
         }
     }
 }

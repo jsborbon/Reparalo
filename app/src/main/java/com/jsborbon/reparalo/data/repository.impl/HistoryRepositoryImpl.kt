@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
 class HistoryRepositoryImpl(
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) : HistoryRepository {
 
     private val TAG = HistoryRepositoryImpl::class.java.simpleName

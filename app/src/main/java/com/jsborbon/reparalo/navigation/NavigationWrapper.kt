@@ -3,6 +3,7 @@ package com.jsborbon.reparalo.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import com.jsborbon.reparalo.screens.MainScreenWrapper
 
 @Composable
 fun NavigationWrapper(
@@ -16,8 +17,10 @@ fun NavigationWrapper(
         Routes.SPLASH
     }
 
-    AppNavGraph(
-        navController = navController,
-        startDestination = startDestination,
-    )
+    MainScreenWrapper(navController = navController) {
+        AppNavGraph(
+            navController = navController,
+            startDestination = startDestination,
+        )
+    }
 }

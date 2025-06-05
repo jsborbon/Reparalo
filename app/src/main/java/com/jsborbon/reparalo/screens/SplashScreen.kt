@@ -65,7 +65,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     val startAnimation = remember { mutableStateOf(false) }
-    val currentUser = FirebaseAuth.getInstance().currentUser
+    val hasNavigated = remember { mutableStateOf(false) }
+    val currentUser = remember { FirebaseAuth.getInstance().currentUser }
     val targetRoute = if (currentUser != null) Routes.DASHBOARD else Routes.AUTHENTICATION
 
     val logoAlpha by animateFloatAsState(
@@ -108,10 +109,13 @@ fun SplashScreen(navController: NavController) {
     )
 
     LaunchedEffect(Unit) {
-        startAnimation.value = true
-        delay(3000)
-        navController.navigate(targetRoute) {
-            popUpTo(Routes.SPLASH) { inclusive = true }
+        if (!hasNavigated.value) {
+            hasNavigated.value = true
+            startAnimation.value = true
+            delay(3000)
+            navController.navigate(targetRoute) {
+                popUpTo(0) { inclusive = true }
+            }
         }
     }
 
