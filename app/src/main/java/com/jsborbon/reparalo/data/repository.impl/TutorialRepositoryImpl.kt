@@ -21,27 +21,13 @@ class TutorialRepositoryImpl(
     override fun getTutorials(): Flow<ApiResponse<List<Tutorial>>> = flow {
         emit(ApiResponse.Loading)
         val snapshot = firestore.collection("tutorials").get().await()
-        val tutorials = snapshot.documents.mapNotNull { it.toObject(Tutorial::class.java) }
+        val tutorials = snapshot.documents.mapNotNull {
+            it.toObject(Tutorial::class.java)?.apply { id = it.id }
+        }
         emit(ApiResponse.Success(tutorials))
     }.catch { e ->
         Log.e(TAG, "getTutorials exception: ${e.message}", e)
         emit(ApiResponse.Failure("Error al cargar los tutoriales"))
-    }
-
-    override fun getFavoriteTutorialIds(): Flow<ApiResponse<List<String>>> = flow {
-        emit(ApiResponse.Loading)
-
-        val snapshot = firestore.collection("users")
-            .document(userId)
-            .collection("favorites")
-            .get()
-            .await()
-
-        val ids = snapshot.documents.map { it.id }
-        emit(ApiResponse.Success(ids))
-    }.catch { e ->
-        Log.e(TAG, "getFavoriteTutorialIds exception: ${e.message}", e)
-        emit(ApiResponse.Failure("Error al obtener IDs de favoritos"))
     }
 
     override fun getTutorialsByCategory(category: String): Flow<ApiResponse<List<Tutorial>>> = flow {
@@ -50,7 +36,9 @@ class TutorialRepositoryImpl(
             .whereEqualTo("category", category)
             .get()
             .await()
-        val tutorials = snapshot.documents.mapNotNull { it.toObject(Tutorial::class.java) }
+        val tutorials = snapshot.documents.mapNotNull {
+            it.toObject(Tutorial::class.java)?.apply { id = it.id }
+        }
         emit(ApiResponse.Success(tutorials))
     }.catch { e ->
         Log.e(TAG, "getTutorialsByCategory exception: ${e.message}", e)
@@ -60,7 +48,7 @@ class TutorialRepositoryImpl(
     override fun getTutorial(id: String): Flow<ApiResponse<Tutorial>> = flow {
         emit(ApiResponse.Loading)
         val snapshot = firestore.collection("tutorials").document(id).get().await()
-        val tutorial = snapshot.toObject(Tutorial::class.java)
+        val tutorial = snapshot.toObject(Tutorial::class.java)?.apply { this.id = snapshot.id }
         if (tutorial != null) {
             emit(ApiResponse.Success(tutorial))
         } else {
@@ -74,7 +62,7 @@ class TutorialRepositoryImpl(
     override fun createTutorial(tutorial: Tutorial): Flow<ApiResponse<Tutorial>> = flow {
         emit(ApiResponse.Loading)
         val docRef = firestore.collection("tutorials").add(tutorial).await()
-        val created = docRef.get().await().toObject(Tutorial::class.java)
+        val created = docRef.get().await().toObject(Tutorial::class.java)?.apply { id = docRef.id }
         if (created != null) {
             emit(ApiResponse.Success(created))
         } else {
@@ -103,13 +91,27 @@ class TutorialRepositoryImpl(
         emit(ApiResponse.Failure("Error al eliminar el tutorial"))
     }
 
-    override fun getFavoriteTutorials(): Flow<ApiResponse<List<Tutorial>>> = flow {
+    override fun getFavoriteTutorialIds(): Flow<ApiResponse<List<String>>> = flow {
         emit(ApiResponse.Loading)
-        val favoritesSnapshot = firestore.collection("users").document(userId)
+        val snapshot = firestore.collection("users")
+            .document(userId)
             .collection("favorites")
             .get()
             .await()
+        val ids = snapshot.documents.map { it.id }
+        emit(ApiResponse.Success(ids))
+    }.catch { e ->
+        Log.e(TAG, "getFavoriteTutorialIds exception: ${e.message}", e)
+        emit(ApiResponse.Failure("Error al obtener IDs de favoritos"))
+    }
 
+    override fun getFavoriteTutorials(): Flow<ApiResponse<List<Tutorial>>> = flow {
+        emit(ApiResponse.Loading)
+        val favoritesSnapshot = firestore.collection("users")
+            .document(userId)
+            .collection("favorites")
+            .get()
+            .await()
         val favoriteIds = favoritesSnapshot.documents.map { it.id }
 
         if (favoriteIds.isEmpty()) {
@@ -121,8 +123,9 @@ class TutorialRepositoryImpl(
             .whereIn("id", favoriteIds)
             .get()
             .await()
-
-        val favoriteTutorials = tutorialsSnapshot.documents.mapNotNull { it.toObject(Tutorial::class.java) }
+        val favoriteTutorials = tutorialsSnapshot.documents.mapNotNull {
+            it.toObject(Tutorial::class.java)?.apply { id = it.id }
+        }
         emit(ApiResponse.Success(favoriteTutorials))
     }.catch { e ->
         Log.e(TAG, "getFavoriteTutorials exception: ${e.message}", e)
@@ -131,7 +134,6 @@ class TutorialRepositoryImpl(
 
     override fun toggleFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
         emit(ApiResponse.Loading)
-
         val favoriteRef = firestore.collection("users")
             .document(userId)
             .collection("favorites")
@@ -153,8 +155,12 @@ class TutorialRepositoryImpl(
 
     override fun isFavorite(tutorialId: String): Flow<ApiResponse<Boolean>> = flow {
         emit(ApiResponse.Loading)
-        val doc = firestore.collection("users").document(userId)
-            .collection("favorites").document(tutorialId).get().await()
+        val doc = firestore.collection("users")
+            .document(userId)
+            .collection("favorites")
+            .document(tutorialId)
+            .get()
+            .await()
         emit(ApiResponse.Success(doc.exists()))
     }.catch { e ->
         Log.e(TAG, "isFavorite exception: ${e.message}", e)
@@ -163,9 +169,12 @@ class TutorialRepositoryImpl(
 
     override fun addFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
         emit(ApiResponse.Loading)
-        firestore.collection("users").document(userId)
-            .collection("favorites").document(tutorialId)
-            .set(mapOf("timestamp" to System.currentTimeMillis())).await()
+        firestore.collection("users")
+            .document(userId)
+            .collection("favorites")
+            .document(tutorialId)
+            .set(mapOf("timestamp" to System.currentTimeMillis()))
+            .await()
         emit(ApiResponse.Success(Unit))
     }.catch { e ->
         Log.e(TAG, "addFavorite exception: ${e.message}", e)
@@ -174,8 +183,12 @@ class TutorialRepositoryImpl(
 
     override fun removeFavorite(tutorialId: String): Flow<ApiResponse<Unit>> = flow {
         emit(ApiResponse.Loading)
-        firestore.collection("users").document(userId)
-            .collection("favorites").document(tutorialId).delete().await()
+        firestore.collection("users")
+            .document(userId)
+            .collection("favorites")
+            .document(tutorialId)
+            .delete()
+            .await()
         emit(ApiResponse.Success(Unit))
     }.catch { e ->
         Log.e(TAG, "removeFavorite exception: ${e.message}", e)

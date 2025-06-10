@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val authRepository: AuthRepository = AuthRepositoryImpl(),
+    private val authRepository: AuthRepository = AuthRepositoryImpl()
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<ApiResponse<User>>(ApiResponse.Idle)
@@ -44,7 +44,9 @@ class AuthViewModel(
                     _loginState.value = ApiResponse.Failure("Credenciales incorrectas o error de red.")
                 }
             } catch (e: Exception) {
-                _loginState.value = ApiResponse.Failure(e.message ?: "Error desconocido al iniciar sesión.")
+                _loginState.value = ApiResponse.Failure(
+                    e.message ?: "Error desconocido al iniciar sesión."
+                )
             }
         }
     }
@@ -54,7 +56,7 @@ class AuthViewModel(
         password: String,
         name: String,
         phone: String,
-        userType: String,
+        userType: String
     ) {
         _signUpState.value = ApiResponse.Loading
         viewModelScope.launch {
@@ -68,16 +70,18 @@ class AuthViewModel(
                         _signUpState.value = ApiResponse.Success(userData)
                     } else {
                         _signUpState.value = ApiResponse.Failure(
-                            "Registro completo, pero no se pudo obtener los datos del usuario.",
+                            "Registro completo, pero no se pudo obtener los datos del usuario."
                         )
                     }
                 } else {
                     _signUpState.value = ApiResponse.Failure(
-                        "Registro fallido. Verifica tu conexión a Internet o intenta nuevamente.",
+                        "Registro fallido. Verifica tu conexión a Internet o intenta nuevamente."
                     )
                 }
             } catch (e: Exception) {
-                _signUpState.value = ApiResponse.Failure(e.message ?: "Error desconocido al registrar.")
+                _signUpState.value = ApiResponse.Failure(
+                    e.message ?: "Error desconocido al registrar."
+                )
             }
         }
     }
@@ -88,7 +92,9 @@ class AuthViewModel(
                 authRepository.updatePassword(newPassword)
                 onResult(ApiResponse.Success(true))
             } catch (e: Exception) {
-                onResult(ApiResponse.Failure(e.message ?: "Error al cambiar la contraseña."))
+                onResult(ApiResponse.Failure(
+                    e.message ?: "Error al cambiar la contraseña."
+                ))
             }
         }
     }
@@ -100,7 +106,24 @@ class AuthViewModel(
                 authRepository.resetPassword(email)
                 _resetState.value = ApiResponse.Success(true)
             } catch (e: Exception) {
-                _resetState.value = ApiResponse.Failure(e.message ?: "Error al enviar el correo de recuperación.")
+                _resetState.value = ApiResponse.Failure(
+                    e.message ?: "Error al enviar el correo de recuperación."
+                )
+            }
+        }
+    }
+
+    fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        onResult: (ApiResponse<Boolean>) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                authRepository.reauthenticateAndChangePassword(currentPassword, newPassword)
+                onResult(ApiResponse.Success(true))
+            } catch (e: Exception) {
+                onResult(ApiResponse.Failure(e.message ?: "Error al cambiar la contraseña."))
             }
         }
     }
@@ -118,5 +141,9 @@ class AuthViewModel(
 
     fun resetLoginState() {
         _loginState.value = ApiResponse.Idle
+    }
+
+    fun resetPasswordState() {
+        _resetState.value = ApiResponse.Idle
     }
 }

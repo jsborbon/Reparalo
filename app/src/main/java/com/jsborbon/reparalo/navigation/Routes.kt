@@ -5,6 +5,8 @@ object Routes {
     const val AUTHENTICATION = "authentication"
     const val MAIN = "main"
     const val DASHBOARD = "$MAIN/dashboard"
+    const val SIGNUP = "signup"
+    const val LOGIN = "login"
 
     const val USER_PROFILE = "user_profile"
     const val SETTINGS = "settings"

@@ -33,4 +33,22 @@ class NotificationViewModel(
             }
         }
     }
+
+    fun markAsRead(notificationId: String) {
+        val currentState = _notifications.value
+        if (currentState is ApiResponse.Success) {
+            val updated = currentState.data.map {
+                if (it.id == notificationId) it.copy(isRead = true) else it
+            }
+            _notifications.value = ApiResponse.Success(updated)
+        }
+    }
+
+    fun dismissNotification(notificationId: String) {
+        val currentState = _notifications.value
+        if (currentState is ApiResponse.Success) {
+            val updated = currentState.data.filterNot { it.id == notificationId }
+            _notifications.value = ApiResponse.Success(updated)
+        }
+    }
 }

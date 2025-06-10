@@ -19,15 +19,21 @@ class TechnicianRepositoryImpl(
 
     override fun getAllTechnicians(): Flow<ApiResponse<List<User>>> = flow {
         emit(ApiResponse.Loading)
-        val snapshot = firestore.collection("users")
-            .whereEqualTo("userType", "TECHNICIAN")
-            .get()
-            .await()
-        val technicians = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
-        emit(ApiResponse.Success(technicians))
-    }.catch { e ->
-        Log.e(TAG, "getAllTechnicians failed", e)
-        emit(ApiResponse.Failure("Error al cargar los técnicos: ${e.localizedMessage}"))
+        try {
+            val snapshot = firestore.collection("users")
+                .whereEqualTo("userType", "TECHNICIAN")
+                .get()
+                .await()
+
+            val technicians = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(User::class.java)?.copy(uid = doc.id)
+            }
+
+            emit(ApiResponse.Success(technicians))
+        } catch (e: Exception) {
+            Log.e(TAG, "getAllTechnicians failed", e)
+            emit(ApiResponse.Failure("No se pudieron cargar los técnicos"))
+        }
     }
 
     override fun getTechniciansBySpecialty(
@@ -36,33 +42,41 @@ class TechnicianRepositoryImpl(
         pageSize: Int?,
     ): Flow<ApiResponse<List<User>>> = flow {
         emit(ApiResponse.Loading)
-        var query = firestore.collection("users")
-            .whereEqualTo("userType", "TECHNICIAN")
-            .whereEqualTo("specialty", specialty)
+        try {
+            var query = firestore.collection("users")
+                .whereEqualTo("userType", "TECHNICIAN")
+                .whereEqualTo("specialty", specialty)
 
-        if (page != null && pageSize != null) {
-            query = query.limit((page * pageSize).toLong())
+            if (page != null && pageSize != null) {
+                query = query.limit((page * pageSize).toLong())
+            }
+
+            val snapshot = query.get().await()
+            val technicians = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(User::class.java)?.copy(uid = doc.id)
+            }
+
+            emit(ApiResponse.Success(technicians))
+        } catch (e: Exception) {
+            Log.e(TAG, "getTechniciansBySpecialty failed", e)
+            emit(ApiResponse.Failure("Error al filtrar técnicos: ${e.localizedMessage}"))
         }
-
-        val snapshot = query.get().await()
-        val technicians = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
-        emit(ApiResponse.Success(technicians))
-    }.catch { e ->
-        Log.e(TAG, "getTechniciansBySpecialty failed", e)
-        emit(ApiResponse.Failure("Error al filtrar técnicos: ${e.localizedMessage}"))
     }
 
     override fun getTechnicianById(uid: String): Flow<ApiResponse<User>> = flow {
         emit(ApiResponse.Loading)
-        val snapshot = firestore.collection("users").document(uid).get().await()
-        val user = snapshot.toObject(User::class.java)
-        if (user != null && user.userType == UserType.TECHNICIAN) {
-            emit(ApiResponse.Success(user))
-        } else {
-            emit(ApiResponse.Failure("El usuario no es un técnico válido"))
+        try {
+            val snapshot = firestore.collection("users").document(uid).get().await()
+            val user = snapshot.toObject(User::class.java)?.copy(uid = uid)
+
+            if (user != null && user.userType == UserType.TECHNICIAN) {
+                emit(ApiResponse.Success(user))
+            } else {
+                emit(ApiResponse.Failure("El usuario no es un técnico válido"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getTechnicianById failed", e)
+            emit(ApiResponse.Failure("Error al obtener el técnico: ${e.localizedMessage}"))
         }
-    }.catch { e ->
-        Log.e(TAG, "getTechnicianById failed", e)
-        emit(ApiResponse.Failure("Error al obtener el técnico: ${e.localizedMessage}"))
     }
 }

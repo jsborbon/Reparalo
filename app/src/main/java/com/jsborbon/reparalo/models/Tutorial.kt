@@ -3,13 +3,13 @@ package com.jsborbon.reparalo.models
 import java.util.Date
 
 data class Tutorial(
-    val id: String = "",
+    var id: String = "",
     val title: String = "",
     val description: String = "",
     val category: String = "",
     val difficultyLevel: String = "",
     val estimatedDuration: String = "",
-    val materials: List<Material> = emptyList(),
+    val materials: List<String> = emptyList(),
     val videoUrl: String = "",
     val author: Author = Author(),
     val publicationDate: Date = Date(),

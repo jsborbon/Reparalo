@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.jsborbon.reparalo.screens.SplashScreen
 import com.jsborbon.reparalo.screens.authentication.AuthenticationScreen
 import com.jsborbon.reparalo.screens.authentication.ForgotPasswordScreen
 import com.jsborbon.reparalo.screens.dashboard.DashboardScreen
@@ -21,16 +20,13 @@ import com.jsborbon.reparalo.screens.material.MaterialDetailScreen
 import com.jsborbon.reparalo.screens.material.MaterialEditScreen
 import com.jsborbon.reparalo.screens.material.MaterialsListScreen
 import com.jsborbon.reparalo.screens.notifications.NotificationScreen
-import com.jsborbon.reparalo.screens.profile.ChangePasswordScreen
 import com.jsborbon.reparalo.screens.profile.FavoritesScreen
-import com.jsborbon.reparalo.screens.profile.ProfileScreen
-import com.jsborbon.reparalo.screens.profile.UserProfileScreen
-import com.jsborbon.reparalo.screens.settings.SettingsHelpScreen
 import com.jsborbon.reparalo.screens.settings.SettingsScreen
-import com.jsborbon.reparalo.screens.settings.SettingsTermsScreen
+import com.jsborbon.reparalo.screens.settings.terms.SettingsTermsScreen
+import com.jsborbon.reparalo.screens.splashScreen.SplashScreen
 import com.jsborbon.reparalo.screens.technician.ProfessionalConnectionScreen
-import com.jsborbon.reparalo.screens.technician.TechnicianProfileScreen
-import com.jsborbon.reparalo.screens.technician.TechnicianSearchScreen
+import com.jsborbon.reparalo.screens.technician.profile.TechnicianProfileScreen
+import com.jsborbon.reparalo.screens.technician.searching.TechnicianSearchScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialCreateScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialDetailScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialEditScreen
@@ -79,19 +75,6 @@ fun AppNavGraph(
             SettingsScreen(navController = navController)
         }
 
-        composable(
-            route = "${Routes.USER_PROFILE}?edit={edit}",
-            arguments = listOf(navArgument("edit") { defaultValue = false }),
-        ) { backStackEntry ->
-            val isEdit = backStackEntry.arguments?.getBoolean("edit") == true
-            if (isEdit) {
-                ProfileScreen(
-                    navController = navController,
-                )
-            } else {
-                UserProfileScreen(navController = navController)
-            }
-        }
 
         composable(Routes.TECHNICIAN_SEARCH) {
             TechnicianSearchScreen(navController = navController)
@@ -173,16 +156,10 @@ fun AppNavGraph(
             NotificationScreen(navController = navController)
         }
 
-        composable(Routes.SETTINGS_HELP) {
-            SettingsHelpScreen(navController = navController)
-        }
 
         composable(Routes.SETTINGS_TERMS) {
             SettingsTermsScreen(navController = navController)
         }
 
-        composable(Routes.SETTINGS_PASSWORD) {
-            ChangePasswordScreen(navController = navController)
-        }
     }
 }

@@ -7,6 +7,8 @@ import kotlinx.coroutines.tasks.await
 suspend fun seedData() {
     val db = FirebaseFirestore.getInstance()
 
+    val sampleDate = Timestamp.now()
+
     val clients = listOf(
         mapOf(
             "uid" to "UID_CLIENT_001",
@@ -14,8 +16,15 @@ suspend fun seedData() {
             "email" to "laura@example.com",
             "phone" to "600111222",
             "userType" to "CLIENT",
-            "availability" to false,
-            "registrationDate" to Timestamp.now(),
+            "availability" to emptyList<Map<String, String>>(),
+            "registrationDate" to sampleDate,
+            "specialty" to null,
+            "rating" to 0.0,
+            "satisfaction" to 0.0,
+            "completedServices" to 0,
+            "favoriteCount" to 0,
+            "lastServiceTimestamp" to 0L,
+            "favorites" to emptyList<String>()
         ),
         mapOf(
             "uid" to "UID_CLIENT_002",
@@ -23,9 +32,16 @@ suspend fun seedData() {
             "email" to "carlos@example.com",
             "phone" to "600222333",
             "userType" to "CLIENT",
-            "availability" to false,
-            "registrationDate" to Timestamp.now(),
-        ),
+            "availability" to emptyList<Map<String, String>>(),
+            "registrationDate" to sampleDate,
+            "specialty" to null,
+            "rating" to 0.0,
+            "satisfaction" to 0.0,
+            "completedServices" to 0,
+            "favoriteCount" to 0,
+            "lastServiceTimestamp" to 0L,
+            "favorites" to emptyList<String>()
+        )
     )
 
     val technicians = listOf(
@@ -35,10 +51,18 @@ suspend fun seedData() {
             "email" to "pedro@example.com",
             "phone" to "611111111",
             "userType" to "TECHNICIAN",
-            "availability" to true,
-            "registrationDate" to Timestamp.now(),
+            "availability" to listOf(
+                mapOf("day" to "Lunes", "startTime" to "09:00", "endTime" to "12:00"),
+                mapOf("day" to "Miércoles", "startTime" to "14:00", "endTime" to "18:00")
+            ),
+            "registrationDate" to sampleDate,
             "specialty" to "Electricidad",
             "rating" to 4.7,
+            "satisfaction" to 0.0,
+            "completedServices" to 0,
+            "favoriteCount" to 0,
+            "lastServiceTimestamp" to 0L,
+            "favorites" to emptyList<String>()
         ),
         mapOf(
             "uid" to "UID_TECH_002",
@@ -46,11 +70,19 @@ suspend fun seedData() {
             "email" to "ana@example.com",
             "phone" to "611222333",
             "userType" to "TECHNICIAN",
-            "availability" to true,
-            "registrationDate" to Timestamp.now(),
+            "availability" to listOf(
+                mapOf("day" to "Martes", "startTime" to "10:00", "endTime" to "13:00"),
+                mapOf("day" to "Jueves", "startTime" to "15:00", "endTime" to "19:00")
+            ),
+            "registrationDate" to sampleDate,
             "specialty" to "Fontanería",
             "rating" to 4.8,
-        ),
+            "satisfaction" to 0.0,
+            "completedServices" to 0,
+            "favoriteCount" to 0,
+            "lastServiceTimestamp" to 0L,
+            "favorites" to emptyList<String>()
+        )
     )
 
     val tutorials = listOf(

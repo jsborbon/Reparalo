@@ -21,7 +21,7 @@ class HelpViewModel(
         loadHelpItems()
     }
 
-    private fun loadHelpItems() {
+     fun loadHelpItems() {
         _helpItems.value = ApiResponse.Loading
         viewModelScope.launch {
             try {

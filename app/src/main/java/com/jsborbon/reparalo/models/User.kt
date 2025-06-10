@@ -8,7 +8,7 @@ data class User(
     val email: String = "",
     val phone: String = "",
     val userType: UserType = UserType.CLIENT,
-    val availability: String = "",
+    val availability: List<AvailabilitySlot> = emptyList(),
     val registrationDate: Date = Date(),
     val specialty: String? = null,
     val rating: Float = 0f,

@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary colors -->
+    <!-- Primary palette -->
     <color name="primary_dark">#0D47A1</color>
     <color name="primary_light">#1976D2</color>
     <color name="secondary">#FF6F00</color>
     <color name="accent">#00ACC1</color>
     <color name="repair_yellow">#FFC107</color>
 
-    <!-- Dark theme colors -->
-    <color name="blue_80">#90CAF9</color>
-    <color name="blue_grey_80">#B0BEC5</color>
-    <color name="teal_80">#80DEEA</color>
+    <!-- Status colors -->
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
 
-    <!-- Light theme colors -->
+    <!-- Light theme -->
     <color name="blue_40">#1976D2</color>
     <color name="blue_grey_40">#546E7A</color>
     <color name="teal_40">#00ACC1</color>
-
-    <!-- Status colors -->
-    <color name="success">#4CAF50</color>
-    <color name="warning">#FFC107</color>
-    <color name="error">#F44336</color>
-    <color name="info">#2196F3</color>
-
-    <!-- Background and surface -->
     <color name="background_light">#F5F5F5</color>
-    <color name="background_dark">#121212</color>
     <color name="surface_light">#FFFFFF</color>
-    <color name="surface_dark">#1E1E1E</color>
 
-    <!-- Legacy fallback colors (optional) -->
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
+    <!-- Dark theme -->
+    <color name="blue_80">#90CAF9</color>
+    <color name="blue_grey_80">#B0BEC5</color>
+    <color name="teal_80">#80DEEA</color>
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
 </resources>

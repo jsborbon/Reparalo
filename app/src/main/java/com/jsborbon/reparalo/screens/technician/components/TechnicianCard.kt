@@ -1,163 +1,80 @@
 package com.jsborbon.reparalo.screens.technician.components
 
-import android.content.Intent
-import androidx.compose.foundation.clickable
+import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
-import com.jsborbon.reparalo.R
-import com.jsborbon.reparalo.components.InfoCard
-import com.jsborbon.reparalo.components.InfoRow
 import com.jsborbon.reparalo.models.User
-import com.jsborbon.reparalo.ui.theme.RepairYellow
-import com.jsborbon.reparalo.utils.formatDate
-import java.util.Locale
+import com.jsborbon.reparalo.screens.technician.components.cardComponents.ContactButtons
 
 @Composable
 fun TechnicianCard(
-    technician: User,
+    modifier: Modifier = Modifier,
+        technician: User,
     onClick: (() -> Unit)? = null,
     padding: PaddingValues = PaddingValues(0.dp),
 ) {
-    val context = LocalContext.current
+    val context: Context = LocalContext.current
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(padding)
-            .clickable(enabled = onClick != null) { onClick?.invoke() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            .semantics {
+                contentDescription = "Perfil de ${technician.name}, especialista en ${technician.specialty ?: "servicios generales"}"
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = { onClick?.invoke() }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = technician.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            technician.specialty?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically { it / 2 }
             ) {
-                Text(
-                    text = technician.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                ContactButtons(
+                    phone = technician.phone,
+                    context = context,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = RepairYellow,
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = String.format(Locale.getDefault(), "%.1f", technician.rating),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                }
-            }
-
-            technician.specialty?.takeIf { it.isNotBlank() }?.let {
-                Text(
-                    text = "Especialidad: $it",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-            }
-
-            if (technician.availability.isNotBlank()) {
-                Text(
-                    text = "Disponibilidad: ${technician.availability}",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            InfoCard(title = "Información de contacto") {
-                InfoRow(icon = painterResource(id = R.drawable.baseline_email), text = technician.email)
-                if (technician.phone.isNotBlank()) {
-                    InfoRow(icon = painterResource(id = R.drawable.baseline_phone), text = technician.phone)
-                }
-                InfoRow(
-                    icon = painterResource(id = R.drawable.baseline_date_range),
-                    text = "Miembro desde: ${formatDate(technician.registrationDate)}",
-                )
-            }
-
-            if (technician.phone.isNotBlank()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Button(
-                        onClick = {
-                            val phone = technician.phone.trim().replace(" ", "")
-                            val intent = Intent(Intent.ACTION_VIEW, "https://wa.me/$phone".toUri())
-                            context.startActivity(intent)
-                        },
-                    ) {
-                        Text("WhatsApp")
-                    }
-                    Button(
-                        onClick = {
-                            val phone = technician.phone.trim().replace(" ", "")
-                            val intent = Intent(Intent.ACTION_DIAL, "tel:$phone".toUri())
-                            context.startActivity(intent)
-                        },
-                    ) {
-                        Text("Llamar")
-                    }
-                }
-            }
-
-            if (technician.email.isNotBlank()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    IconButton(onClick = {
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = "mailto:${technician.email}".toUri()
-                        }
-                        context.startActivity(intent)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Email,
-                            contentDescription = "Contactar",
-                        )
-                    }
-                }
             }
         }
     }

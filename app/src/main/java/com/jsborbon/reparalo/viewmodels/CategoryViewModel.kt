@@ -21,7 +21,7 @@ class CategoryViewModel(
         loadCategories()
     }
 
-    private fun loadCategories() {
+     fun loadCategories() {
         viewModelScope.launch {
             categoryRepository.getCategories().collect {
                 _categories.value = it

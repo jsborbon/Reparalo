@@ -1,6 +1,7 @@
 package com.jsborbon.reparalo.data.repository.impl
 
 import android.util.Log
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,7 +13,7 @@ import java.util.Date
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : AuthRepository {
 
     private val TAG = AuthRepositoryImpl::class.java.simpleName
@@ -32,26 +33,26 @@ class AuthRepositoryImpl(
         password: String,
         name: String,
         phone: String,
-        userType: UserType,
+        userType: UserType
     ): FirebaseUser? {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
-            val user = result.user
-            if (user != null) {
+            val firebaseUser = result.user
+            if (firebaseUser != null) {
                 val registrationDate = Date()
-                val profile = User(
-                    uid = user.uid,
+                val newUser = User(
+                    uid = firebaseUser.uid,
                     name = name,
                     email = email,
                     phone = phone,
                     userType = userType,
-                    registrationDate = registrationDate,
+                    registrationDate = registrationDate
                 )
-                firestore.collection("users").document(user.uid).set(profile).await()
-                firestore.collection("users").document(user.uid)
-                    .update("favorites", emptyList<String>()).await()
+                val userRef = firestore.collection("users").document(firebaseUser.uid)
+                userRef.set(newUser).await()
+                userRef.update("favorites", emptyList<String>()).await()
             }
-            user
+            firebaseUser
         } catch (e: Exception) {
             Log.e(TAG, "signUp failed", e)
             null
@@ -78,8 +79,35 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun reauthenticateAndChangePassword(
+        currentPassword: String,
+        newPassword: String
+    ) {
+        try {
+            val user = auth.currentUser
+                ?: throw Exception("Usuario no autenticado.")
+
+            val email = user.email
+                ?: throw Exception("Correo electrónico no disponible.")
+
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+
+            user.reauthenticate(credential).await()
+            user.updatePassword(newPassword).await()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "reauthenticateAndChangePassword failed", e)
+            throw e
+        }
+    }
+
     override suspend fun resetPassword(email: String) {
-        auth.sendPasswordResetEmail(email).await()
+        try {
+            auth.sendPasswordResetEmail(email).await()
+        } catch (e: Exception) {
+            Log.e(TAG, "resetPassword failed", e)
+            throw e
+        }
     }
 
     override fun signOut() {
