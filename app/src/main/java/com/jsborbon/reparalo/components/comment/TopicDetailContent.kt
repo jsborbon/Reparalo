@@ -173,7 +173,7 @@ fun TopicDetailContent(
                     ForumStatItem(
                         iconPainter = painterResource(id = R.drawable.baseline_comment),
                         label = "Comentarios",
-                        value = topic.comments,
+                        value = comments.size,
                         color = PrimaryLight
                     )
                 }

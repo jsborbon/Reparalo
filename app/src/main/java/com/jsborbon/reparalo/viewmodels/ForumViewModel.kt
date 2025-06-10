@@ -23,7 +23,7 @@ class ForumViewModel(
     private val _topics = MutableStateFlow<ApiResponse<List<ForumTopic>>>(ApiResponse.Loading)
     val topics: StateFlow<ApiResponse<List<ForumTopic>>> = _topics
 
-    private val _createState = MutableStateFlow<ApiResponse<Unit>>(ApiResponse.Loading)
+    private val _createState = MutableStateFlow<ApiResponse<Unit>>(ApiResponse.Idle)
     val createState: StateFlow<ApiResponse<Unit>> = _createState
 
     private val _editState = MutableStateFlow<ApiResponse<Unit>?>(null)
@@ -104,10 +104,14 @@ class ForumViewModel(
                 commentRepository.getCommentsByForumTopic(forumTopicId).collect { response ->
                     _comments.value = response
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _comments.value = ApiResponse.Failure("Error al cargar comentarios del foro")
             }
         }
+    }
+
+    fun resetCreateState() {
+        _createState.value = ApiResponse.Idle
     }
 
     fun resetEditState() {

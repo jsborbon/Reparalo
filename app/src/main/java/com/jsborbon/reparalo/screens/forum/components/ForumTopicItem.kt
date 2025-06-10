@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,12 +42,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jsborbon.reparalo.R
+import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.ui.theme.PrimaryLight
 import com.jsborbon.reparalo.ui.theme.RepairYellow
 import com.jsborbon.reparalo.ui.theme.Success
 import com.jsborbon.reparalo.utils.formatDate
+import com.jsborbon.reparalo.viewmodels.ForumViewModel
 
 @Composable
 fun ForumTopicItem(
@@ -55,6 +60,9 @@ fun ForumTopicItem(
     onClick: (() -> Unit)? = null,
     isSelected: Boolean = false
 ) {
+    val viewModel: ForumViewModel = viewModel()
+    val commentsState by viewModel.comments.collectAsState()
+
     val animatedScale by animateFloatAsState(
         targetValue = if (isSelected || onClick != null) 1.02f else 1.0f,
         animationSpec = tween(durationMillis = 200),
@@ -81,6 +89,12 @@ fun ForumTopicItem(
         Modifier
     }
 
+    val commentsCount = if (commentsState is ApiResponse.Success) {
+        (commentsState as ApiResponse.Success<List<Comment>>).data.size
+    } else {
+        topic.comments
+    }
+
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -99,7 +113,6 @@ fun ForumTopicItem(
             },
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Enhanced header with author info
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -109,7 +122,6 @@ fun ForumTopicItem(
                     modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Author avatar placeholder
                     Box(
                         modifier = Modifier
                             .size(32.dp)
@@ -150,7 +162,6 @@ fun ForumTopicItem(
                     }
                 }
 
-                // Category badge
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = RepairYellow.copy(alpha = 0.2f)
@@ -169,7 +180,6 @@ fun ForumTopicItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Description
             Text(
                 text = topic.description,
                 style = MaterialTheme.typography.bodyMedium,
@@ -189,13 +199,12 @@ fun ForumTopicItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Stats row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 ForumStat(
-                    iconPainter = painterResource(id=R.drawable.baseline_visibility),
+                    iconPainter = painterResource(id = R.drawable.baseline_visibility),
                     value = topic.views.toString(),
                     label = "vistas",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -207,8 +216,8 @@ fun ForumTopicItem(
                     color = Success
                 )
                 ForumStat(
-                    iconPainter = painterResource(id=R.drawable.baseline_comment),
-                    value = topic.comments.toString(),
+                    iconPainter = painterResource(id = R.drawable.baseline_comment),
+                    value = commentsCount.toString(),
                     label = "comentarios",
                     color = PrimaryLight
                 )
@@ -216,6 +225,7 @@ fun ForumTopicItem(
         }
     }
 }
+
 @Composable
 private fun ForumStat(
     icon: ImageVector? = null,
