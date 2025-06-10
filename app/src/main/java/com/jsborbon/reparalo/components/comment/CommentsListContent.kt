@@ -113,7 +113,7 @@ fun CommentsListContent(
                             )
                         }
 
-                        val averageRating = comments.mapNotNull { it.rating.takeIf { r -> r > 0 } }.average()
+                        val averageRating = comments.mapNotNull { it.rating?.takeIf { r -> r > 0 } }.average()
                         if (!averageRating.isNaN() && averageRating > 0) {
                             AnimatedVisibility(visible = true, enter = scaleIn() + fadeIn()) {
                                 Surface(

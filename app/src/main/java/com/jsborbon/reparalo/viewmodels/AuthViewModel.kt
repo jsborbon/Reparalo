@@ -2,6 +2,9 @@ package com.jsborbon.reparalo.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.AuthRepository
 import com.jsborbon.reparalo.data.repository.impl.AuthRepositoryImpl
@@ -10,6 +13,7 @@ import com.jsborbon.reparalo.models.UserType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel(
     private val authRepository: AuthRepository = AuthRepositoryImpl()
@@ -78,6 +82,8 @@ class AuthViewModel(
                         "Registro fallido. Verifica tu conexión a Internet o intenta nuevamente."
                     )
                 }
+            } catch (e: FirebaseAuthUserCollisionException) {
+                _signUpState.value = ApiResponse.Failure("El correo electrónico ya está registrado.")
             } catch (e: Exception) {
                 _signUpState.value = ApiResponse.Failure(
                     e.message ?: "Error desconocido al registrar."
@@ -86,16 +92,26 @@ class AuthViewModel(
         }
     }
 
-    fun changePassword(newPassword: String, onResult: (ApiResponse<Boolean>) -> Unit) {
-        viewModelScope.launch {
-            try {
-                authRepository.updatePassword(newPassword)
-                onResult(ApiResponse.Success(true))
-            } catch (e: Exception) {
-                onResult(ApiResponse.Failure(
-                    e.message ?: "Error al cambiar la contraseña."
-                ))
+    fun changePassword(currentPassword: String, newPassword: String) {
+        _resetState.value = ApiResponse.Loading
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email
+        if (user != null && email != null) {
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+            viewModelScope.launch {
+                try {
+                    user.reauthenticate(credential).await()
+                    user.updatePassword(newPassword).await()
+                    _resetState.value = ApiResponse.Success(true)
+                } catch (e: Exception) {
+                    _resetState.value = ApiResponse.Failure(
+                        e.message ?: "Error al cambiar la contraseña."
+                    )
+                }
             }
+        } else {
+            _resetState.value = ApiResponse.Failure("Usuario no autenticado.")
         }
     }
 

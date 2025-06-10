@@ -18,7 +18,6 @@ import androidx.navigation.NavHostController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.navigation.components.NavigationBottomBar
 import com.jsborbon.reparalo.screens.technician.profile.components.TechnicianProfileContent
-import com.jsborbon.reparalo.screens.technician.profile.components.TechnicianProfileTopBar
 import com.jsborbon.reparalo.viewmodels.TechnicianViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,15 +40,7 @@ fun TechnicianProfileScreen(
         isContentVisible = technicianState is ApiResponse.Success
     }
 
-    Scaffold(
-        topBar = {
-            TechnicianProfileTopBar(
-                onNavigateBack = { navController.navigateUp() },
-                onRefresh = { retryCount++ },
-                isLoading = technicianState is ApiResponse.Loading
-            )
-        },
-        bottomBar = {
+    Scaffold( bottomBar = {
             NavigationBottomBar(
                 selectedIndex = 2,
                 navController = navController,

@@ -3,6 +3,7 @@ package com.jsborbon.reparalo.data.repository.impl
 import android.util.Log
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.repository.AuthRepository
@@ -53,6 +54,12 @@ class AuthRepositoryImpl(
                 userRef.update("favorites", emptyList<String>()).await()
             }
             firebaseUser
+        } catch (e: FirebaseAuthUserCollisionException) {
+            Log.e(TAG, "El correo ya está en uso", e)
+            throw FirebaseAuthUserCollisionException(
+                e.errorCode,
+                "El correo electrónico ya está registrado."
+            )
         } catch (e: Exception) {
             Log.e(TAG, "signUp failed", e)
             null
@@ -91,10 +98,8 @@ class AuthRepositoryImpl(
                 ?: throw Exception("Correo electrónico no disponible.")
 
             val credential = EmailAuthProvider.getCredential(email, currentPassword)
-
             user.reauthenticate(credential).await()
             user.updatePassword(newPassword).await()
-
         } catch (e: Exception) {
             Log.e(TAG, "reauthenticateAndChangePassword failed", e)
             throw e

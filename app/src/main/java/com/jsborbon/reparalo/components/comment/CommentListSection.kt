@@ -16,21 +16,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jsborbon.reparalo.components.states.EmptyState
 import com.jsborbon.reparalo.components.states.ErrorState
 import com.jsborbon.reparalo.components.states.LoadingState
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.models.Comment
-import com.jsborbon.reparalo.viewmodels.TutorialDetailViewModel
 
 @Composable
 fun CommentListSection(
     commentsState: ApiResponse<List<Comment>>,
-    viewModel: TutorialDetailViewModel,
-    tutorialId: String,
+    userNamesMap: Map<String, String> = emptyMap(),
+    onRetry: (() -> Unit)? = null,
 ) {
-    val userNames by viewModel.userNames.collectAsState()
     val listState = rememberLazyListState()
 
     val showHeaderElevation by remember {
@@ -57,27 +56,46 @@ fun CommentListSection(
         }
     ) { currentState ->
         when (currentState) {
-            is ApiResponse.Idle -> LoadingState(message = "Preparando comentarios...")
-            is ApiResponse.Loading -> LoadingState(message = "Cargando comentarios del tutorial...")
-            is ApiResponse.Failure -> ErrorState(
-                message = currentState.errorMessage,
-                onRetry = { viewModel.loadComments(tutorialId) }
-            )
+            is ApiResponse.Idle, is ApiResponse.Loading -> {
+                LoadingState(message = "Cargando comentarios...")
+            }
+
+            is ApiResponse.Failure -> {
+                ErrorState(
+                    message = currentState.errorMessage,
+                    onRetry = onRetry
+                )
+            }
+
             is ApiResponse.Success -> {
                 val comments = currentState.data
                 if (comments.isEmpty()) {
-                    EmptyState(
-                        isSearching = false
-                    )
+                    EmptyState(isSearching = false)
                 } else {
                     CommentsListContent(
                         comments = comments,
-                        userNames = userNames,
+                        userNames = userNamesMap,
                         listState = listState,
                         headerElevation = headerElevation.dp
                     )
                 }
             }
         }
+    }
+}
+@Composable
+fun CommentListSection(
+    comments: List<Comment>,
+    modifier: Modifier = Modifier
+) {
+    if (comments.isEmpty()) {
+        EmptyState(isSearching = false)
+    } else {
+        CommentsListContent(
+            comments = comments,
+            userNames = emptyMap(),
+            listState = rememberLazyListState(),
+            headerElevation = 2.dp
+        )
     }
 }

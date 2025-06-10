@@ -5,16 +5,12 @@ object Routes {
     const val AUTHENTICATION = "authentication"
     const val MAIN = "main"
     const val DASHBOARD = "$MAIN/dashboard"
-    const val SIGNUP = "signup"
     const val LOGIN = "login"
 
     const val USER_PROFILE = "user_profile"
     const val SETTINGS = "settings"
-    const val SETTINGS_HELP = "settings_help"
-    const val SETTINGS_SECURITY = "settings_security"
-    const val SETTINGS_TERMS = "settings_terms"
-    const val SETTINGS_PASSWORD = "settings_password"
-    const val FORGOT_PASSWORD = "forgot_password"
+     const val SETTINGS_TERMS = "settings_terms"
+     const val FORGOT_PASSWORD = "forgot_password"
     const val NOTIFICATIONS = "notifications"
     const val FAVORITES = "favorites"
     const val SERVICE_HISTORY = "service_history"
@@ -39,6 +35,7 @@ object Routes {
     const val FORUM_EDIT = "forum_edit"
     const val SERVICE_DETAIL = "detalle_servicio"
 
+    const val CHANGE_PASSWORD = "change_password"
+
     fun serviceDetailWithId(serviceId: String): String = "$SERVICE_DETAIL/$serviceId"
-    fun userProfileRoute(edit: Boolean = false): String = "$USER_PROFILE?edit=$edit"
 }

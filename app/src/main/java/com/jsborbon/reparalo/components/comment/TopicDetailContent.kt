@@ -1,27 +1,13 @@
 package com.jsborbon.reparalo.components.comment
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,15 +15,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jsborbon.reparalo.R
+import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.ui.theme.PrimaryLight
 import com.jsborbon.reparalo.ui.theme.RepairYellow
 import com.jsborbon.reparalo.ui.theme.Success
 import com.jsborbon.reparalo.utils.formatDate
 
-
 @Composable
-fun TopicDetailContent(topic: ForumTopic) {
+fun TopicDetailContent(
+    topic: ForumTopic,
+    comments: List<Comment>,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,9 +41,7 @@ fun TopicDetailContent(topic: ForumTopic) {
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 // Category badge
                 Card(
                     colors = CardDefaults.cardColors(
@@ -122,7 +109,7 @@ fun TopicDetailContent(topic: ForumTopic) {
             }
         }
 
-        // Content card
+        // Description card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -130,9 +117,7 @@ fun TopicDetailContent(topic: ForumTopic) {
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     text = "Descripción",
                     style = MaterialTheme.typography.titleMedium,
@@ -151,7 +136,7 @@ fun TopicDetailContent(topic: ForumTopic) {
             }
         }
 
-        // Enhanced stats card
+        // Stats card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -159,9 +144,7 @@ fun TopicDetailContent(topic: ForumTopic) {
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     text = "Estadísticas del tema",
                     style = MaterialTheme.typography.titleMedium,
@@ -196,5 +179,11 @@ fun TopicDetailContent(topic: ForumTopic) {
                 }
             }
         }
+
+        // Comments section
+        CommentListSection(
+            comments = comments,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

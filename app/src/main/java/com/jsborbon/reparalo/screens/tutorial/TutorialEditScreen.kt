@@ -9,6 +9,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -38,8 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -78,7 +73,6 @@ fun TutorialEditScreen(
     val updateState by viewModel.updateState.collectAsState()
     val tutorialsState by viewModel.tutorials.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollState = rememberScrollState()
 
     var tutorialTitle by remember { mutableStateOf("") }
     var tutorialDescription by remember { mutableStateOf("") }
@@ -122,354 +116,326 @@ fun TutorialEditScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Editar Tutorial",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Volver sin guardar cambios" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
                 .fillMaxSize()
-                .verticalScroll(scrollState),
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // Basic Information Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                // Basic Information Section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Text(
-                        text = "Información básica",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = PrimaryLight
-                    )
-
-                    EnhancedTextField(
-                        value = tutorialTitle,
-                        onValueChange = { tutorialTitle = it },
-                        label = "Título del tutorial",
-                        placeholder = "Ej: Reparar grifo que gotea"
-                    )
-
-                    EnhancedTextField(
-                        value = tutorialDescription,
-                        onValueChange = { tutorialDescription = it },
-                        label = "Descripción",
-                        placeholder = "Describe paso a paso el proceso de reparación",
-                        maxLines = 4
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        EnhancedTextField(
-                            value = tutorialCategory,
-                            onValueChange = { tutorialCategory = it },
-                            label = "Categoría",
-                            placeholder = "Fontanería",
-                            modifier = Modifier.weight(1f)
+                        Text(
+                            text = "Información básica",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = PrimaryLight
                         )
 
                         EnhancedTextField(
-                            value = difficultyLevel,
-                            onValueChange = { difficultyLevel = it },
-                            label = "Dificultad",
-                            placeholder = "Fácil",
-                            modifier = Modifier.weight(1f)
+                            value = tutorialTitle,
+                            onValueChange = { tutorialTitle = it },
+                            label = "Título del tutorial",
+                            placeholder = "Ej: Reparar grifo que gotea"
+                        )
+
+                        EnhancedTextField(
+                            value = tutorialDescription,
+                            onValueChange = { tutorialDescription = it },
+                            label = "Descripción",
+                            placeholder = "Describe paso a paso el proceso de reparación",
+                            maxLines = 4
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            EnhancedTextField(
+                                value = tutorialCategory,
+                                onValueChange = { tutorialCategory = it },
+                                label = "Categoría",
+                                placeholder = "Fontanería",
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            EnhancedTextField(
+                                value = difficultyLevel,
+                                onValueChange = { difficultyLevel = it },
+                                label = "Dificultad",
+                                placeholder = "Fácil",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        EnhancedTextField(
+                            value = estimatedDuration,
+                            onValueChange = { estimatedDuration = it },
+                            label = "Duración estimada",
+                            placeholder = "30 minutos"
+                        )
+
+                        EnhancedTextField(
+                            value = tutorialAuthor.name,
+                            onValueChange = { tutorialAuthor = tutorialAuthor.copy(name = it) },
+                            label = "Nombre del autor",
+                            placeholder = "Tu nombre completo"
                         )
                     }
-
-                    EnhancedTextField(
-                        value = estimatedDuration,
-                        onValueChange = { estimatedDuration = it },
-                        label = "Duración estimada",
-                        placeholder = "30 minutos"
-                    )
-
-                    EnhancedTextField(
-                        value = tutorialAuthor.name,
-                        onValueChange = { tutorialAuthor = tutorialAuthor.copy(name = it) },
-                        label = "Nombre del autor",
-                        placeholder = "Tu nombre completo"
-                    )
                 }
             }
 
-            // Media Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+            item {
+                // Media Section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Text(
-                        text = "Multimedia",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = PrimaryLight
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Multimedia",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = PrimaryLight
+                        )
 
-                    EnhancedTextField(
-                        value = thumbnailUrl,
-                        onValueChange = { thumbnailUrl = it },
-                        label = "URL de imagen miniatura",
-                        placeholder = "https://ejemplo.com/imagen.jpg"
-                    )
+                        EnhancedTextField(
+                            value = thumbnailUrl,
+                            onValueChange = { thumbnailUrl = it },
+                            label = "URL de imagen miniatura",
+                            placeholder = "https://ejemplo.com/imagen.jpg"
+                        )
 
-                    EnhancedTextField(
-                        value = tutorialVideoUrl,
-                        onValueChange = { tutorialVideoUrl = it },
-                        label = "URL del video tutorial",
-                        placeholder = "https://youtube.com/watch?v=..."
-                    )
+                        EnhancedTextField(
+                            value = tutorialVideoUrl,
+                            onValueChange = { tutorialVideoUrl = it },
+                            label = "URL del video tutorial",
+                            placeholder = "https://youtube.com/watch?v=..."
+                        )
+                    }
                 }
             }
 
-            // Materials Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+            item {
+                // Materials Section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Text(
-                        text = "Materiales necesarios",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = PrimaryLight
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Materiales necesarios",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = PrimaryLight
+                        )
 
-                    // Materials list with enhanced UI
-                    if (materialsList.isNotEmpty()) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items(materialsList) { material ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    ),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(12.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
+                        if (materialsList.isNotEmpty()) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                materialsList.forEach { material ->
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surface
+                                        ),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                                     ) {
-                                        Text(
-                                            text = material.name,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        IconButton(
-                                            onClick = {
-                                                materialsList = materialsList.filterNot { it.id == material.id }
-                                            },
-                                            modifier = Modifier.semantics {
-                                                contentDescription = "Eliminar material ${material.name}"
-                                            }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(12.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically,
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = "Eliminar material",
-                                                tint = Error
+                                            Text(
+                                                text = material.name,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                modifier = Modifier.weight(1f)
                                             )
+                                            IconButton(
+                                                onClick = {
+                                                    materialsList =
+                                                        materialsList.filterNot { it.id == material.id }
+                                                },
+                                                modifier = Modifier.semantics {
+                                                    contentDescription =
+                                                        "Eliminar material ${material.name}"
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Eliminar material",
+                                                    tint = Error
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
 
-                    // Add new material section
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        EnhancedTextField(
-                            value = newMaterialName,
-                            onValueChange = { newMaterialName = it },
-                            label = "Nuevo material",
-                            placeholder = "Ej: Llave inglesa",
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        FilledTonalButton(
-                            onClick = {
-                                if (newMaterialName.isNotBlank()) {
-                                    val newMaterial = Material(
-                                        id = System.currentTimeMillis().toString(),
-                                        name = newMaterialName.trim(),
-                                        quantity = 1,
-                                        description = "",
-                                        price = 0f,
-                                    )
-                                    materialsList = materialsList + newMaterial
-                                    newMaterialName = ""
-                                }
-                            },
-                            enabled = newMaterialName.isNotBlank(),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = PrimaryLight.copy(alpha = 0.2f),
-                                contentColor = PrimaryLight
-                            ),
-                            modifier = Modifier.semantics {
-                                contentDescription = "Añadir nuevo material a la lista"
-                            }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.Bottom
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                            EnhancedTextField(
+                                value = newMaterialName,
+                                onValueChange = { newMaterialName = it },
+                                label = "Nuevo material",
+                                placeholder = "Ej: Llave inglesa",
+                                modifier = Modifier.weight(1f)
                             )
-                            Spacer(modifier = Modifier.size(4.dp))
-                            Text("Añadir")
+
+                            FilledTonalButton(
+                                onClick = {
+                                    if (newMaterialName.isNotBlank()) {
+                                        val newMaterial = Material(
+                                            id = System.currentTimeMillis().toString(),
+                                            name = newMaterialName.trim(),
+                                            quantity = 1,
+                                            description = "",
+                                            price = 0f,
+                                        )
+                                        materialsList = materialsList + newMaterial
+                                        newMaterialName = ""
+                                    }
+                                },
+                                enabled = newMaterialName.isNotBlank(),
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = PrimaryLight.copy(alpha = 0.2f),
+                                    contentColor = PrimaryLight
+                                ),
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Añadir nuevo material a la lista"
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.size(4.dp))
+                                Text("Añadir")
+                            }
                         }
                     }
                 }
             }
 
-            // Save button with enhanced styling and loading state
-            AnimatedVisibility(
-                visible = updateState !is ApiResponse.Loading,
-                enter = scaleIn(animationSpec = tween(200)),
-                exit = scaleOut(animationSpec = tween(200))
-            ) {
-                Button(
-                    onClick = {
-                        val updatedTutorial = Tutorial(
-                            id = tutorialId,
-                            title = tutorialTitle,
-                            description = tutorialDescription,
-                            category = tutorialCategory,
-                            difficultyLevel = difficultyLevel,
-                            estimatedDuration = estimatedDuration,
-                            author = tutorialAuthor,
-                            materials = materialsList.map { it.id },
-                            videoUrl = tutorialVideoUrl,
-                            publicationDate = Date(),
-                            averageRating = 0f,
+            item {
+                AnimatedVisibility(
+                    visible = updateState !is ApiResponse.Loading,
+                    enter = scaleIn(animationSpec = tween(200)),
+                    exit = scaleOut(animationSpec = tween(200))
+                ) {
+                    Button(
+                        onClick = {
+                            val updatedTutorial = Tutorial(
+                                id = tutorialId,
+                                title = tutorialTitle,
+                                description = tutorialDescription,
+                                category = tutorialCategory,
+                                difficultyLevel = difficultyLevel,
+                                estimatedDuration = estimatedDuration,
+                                author = tutorialAuthor,
+                                materials = materialsList.map { it.id },
+                                videoUrl = tutorialVideoUrl,
+                                publicationDate = Date(),
+                                averageRating = 0f,
+                            )
+                            viewModel.updateTutorial(tutorialId, updatedTutorial)
+                        },
+                        enabled = tutorialTitle.isNotBlank() && tutorialDescription.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Success,
+                            contentColor = Color.White,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .semantics { contentDescription = "Guardar cambios del tutorial" }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
                         )
-                        viewModel.updateTutorial(tutorialId, updatedTutorial)
-                    },
-                    enabled = tutorialTitle.isNotBlank() && tutorialDescription.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Success,
-                        contentColor = Color.White,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { contentDescription = "Guardar cambios del tutorial" }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = "Guardar cambios",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            // Loading state with unified component
-            AnimatedVisibility(
-                visible = updateState is ApiResponse.Loading,
-                enter = fadeIn(animationSpec = tween(300)),
-                exit = fadeOut(animationSpec = tween(200))
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LoadingIndicator()
-                }
-            }
-
-            // Handle update state responses
-            when (updateState) {
-                is ApiResponse.Success -> {
-                    LaunchedEffect(Unit) {
-                        snackbarHostState.showSnackbar("Tutorial actualizado exitosamente")
-                        viewModel.resetUpdateState()
-                        navController.popBackStack()
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(
+                            text = "Guardar cambios",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
-
-                is ApiResponse.Failure -> {
-                    val errorMessage = (updateState as ApiResponse.Failure).errorMessage
-                    LaunchedEffect(errorMessage) {
-                        snackbarHostState.showSnackbar("Error: $errorMessage")
-                        viewModel.resetUpdateState()
-                    }
-                }
-
-                else -> {}
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            item {
+                AnimatedVisibility(
+                    visible = updateState is ApiResponse.Loading,
+                    enter = fadeIn(animationSpec = tween(300)),
+                    exit = fadeOut(animationSpec = tween(200))
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingIndicator()
+                    }
+                }
+            }
+        }
+
+        when (updateState) {
+            is ApiResponse.Success -> {
+                LaunchedEffect(Unit) {
+                    snackbarHostState.showSnackbar("Tutorial actualizado exitosamente")
+                    viewModel.resetUpdateState()
+                    navController.popBackStack()
+                }
+            }
+
+            is ApiResponse.Failure -> {
+                val errorMessage = (updateState as ApiResponse.Failure).errorMessage
+                LaunchedEffect(errorMessage) {
+                    snackbarHostState.showSnackbar("Error: $errorMessage")
+                    viewModel.resetUpdateState()
+                }
+            }
+
+            else -> {}
         }
     }
 }

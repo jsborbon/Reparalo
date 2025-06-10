@@ -53,7 +53,7 @@ fun WhatsAppButton(
         )
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.baseline_phone), // Using placeholder icon
+            painter = painterResource(id = R.drawable.glyph_black_whatsapp),
             contentDescription = null,
             modifier = Modifier.size(18.dp)
         )

@@ -114,6 +114,21 @@ suspend fun seedData() {
         ),
     )
 
+    val categories = listOf(
+        mapOf(
+            "id" to "Electricidad",
+            "name" to "Electricidad"
+        ),
+        mapOf(
+            "id" to "Fontanería",
+            "name" to "Fontanería"
+        ),
+        mapOf(
+            "id" to "Carpintería",
+            "name" to "Carpintería"
+        )
+    )
+
     val materials = listOf(
         mapOf(
             "id" to "material_1",
@@ -234,6 +249,10 @@ suspend fun seedData() {
 
         comments.forEach { comment ->
             db.collection("comments").document(comment["id"] as String).set(comment).await()
+        }
+
+        categories.forEach { category ->
+            db.collection("categories").document(category["id"] as String).set(category).await()
         }
 
         println("Firestore seeded")

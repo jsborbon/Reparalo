@@ -138,7 +138,7 @@ fun AuthenticationScreen(
             // Responsive top spacing
             Spacer(modifier = Modifier.height(if (isCompactScreen) 24.dp else 48.dp))
 
-            // Enhanced animated logo with better visual hierarchy
+            // Animated logo with better visual hierarchy
             AnimatedContent(
                 targetState = logoAnimationTriggered,
                 label = "logoAnimationContent",

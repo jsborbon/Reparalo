@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.data.repository.TutorialRepository
+import com.jsborbon.reparalo.models.Author
 import com.jsborbon.reparalo.models.Tutorial
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,8 +22,13 @@ class TutorialRepositoryImpl(
     override fun getTutorials(): Flow<ApiResponse<List<Tutorial>>> = flow {
         emit(ApiResponse.Loading)
         val snapshot = firestore.collection("tutorials").get().await()
-        val tutorials = snapshot.documents.mapNotNull {
-            it.toObject(Tutorial::class.java)?.apply { id = it.id }
+        val tutorials = snapshot.documents.mapNotNull { doc ->
+            try {
+                doc.toObject(Tutorial::class.java)?.apply { id = doc.id }
+            } catch (e: Exception) {
+                Log.w(TAG, "Documento ignorado por error de deserialización: ${doc.id} -> ${e.message}")
+                null
+            }
         }
         emit(ApiResponse.Success(tutorials))
     }.catch { e ->
@@ -36,8 +42,13 @@ class TutorialRepositoryImpl(
             .whereEqualTo("category", category)
             .get()
             .await()
-        val tutorials = snapshot.documents.mapNotNull {
-            it.toObject(Tutorial::class.java)?.apply { id = it.id }
+        val tutorials = snapshot.documents.mapNotNull { doc ->
+            try {
+                doc.toObject(Tutorial::class.java)?.apply { id = doc.id }
+            } catch (e: Exception) {
+                Log.w(TAG, "Documento ignorado por error de deserialización: ${doc.id} -> ${e.message}")
+                null
+            }
         }
         emit(ApiResponse.Success(tutorials))
     }.catch { e ->
@@ -61,7 +72,15 @@ class TutorialRepositoryImpl(
 
     override fun createTutorial(tutorial: Tutorial): Flow<ApiResponse<Tutorial>> = flow {
         emit(ApiResponse.Loading)
-        val docRef = firestore.collection("tutorials").add(tutorial).await()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val tutorialWithAuthor = tutorial.copy(
+            author = Author(
+                name = currentUser?.displayName ?: "",
+                uid = currentUser?.uid ?: "",
+                email = currentUser?.email ?: ""
+            )
+        )
+        val docRef = firestore.collection("tutorials").add(tutorialWithAuthor).await()
         val created = docRef.get().await().toObject(Tutorial::class.java)?.apply { id = docRef.id }
         if (created != null) {
             emit(ApiResponse.Success(created))
@@ -193,5 +212,31 @@ class TutorialRepositoryImpl(
     }.catch { e ->
         Log.e(TAG, "removeFavorite exception: ${e.message}", e)
         emit(ApiResponse.Failure("Error al eliminar de favoritos"))
+    }
+
+    override fun getHighlightedTutorial(): Flow<ApiResponse<Tutorial>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = firestore.collection("tutorials").get().await()
+
+            val tutorials = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Tutorial::class.java)?.apply { id = doc.id }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Documento ignorado por error de deserialización: ${doc.id} -> ${e.message}")
+                    null
+                }
+            }
+
+            if (tutorials.isEmpty()) {
+                emit(ApiResponse.Failure("No se encontraron tutoriales disponibles."))
+            } else {
+                val bestRated = tutorials.maxByOrNull { it.averageRating } ?: tutorials.first()
+                emit(ApiResponse.Success(bestRated))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getHighlightedTutorial exception: ${e.message}", e)
+            emit(ApiResponse.Failure("Error al obtener el tutorial destacado"))
+        }
     }
 }

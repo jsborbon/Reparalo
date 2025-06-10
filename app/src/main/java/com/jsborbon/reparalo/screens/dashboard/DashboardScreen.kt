@@ -1,4 +1,3 @@
-
 package com.jsborbon.reparalo.screens.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
@@ -12,97 +11,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.dashboard.components.CategorySection
 import com.jsborbon.reparalo.screens.dashboard.components.HighlightedTechnicianCard
 import com.jsborbon.reparalo.screens.dashboard.components.HighlightedTutorialCard
 import com.jsborbon.reparalo.screens.dashboard.components.WelcomeSection
-import com.jsborbon.reparalo.ui.theme.PrimaryLight
-import com.jsborbon.reparalo.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     navController: NavController,
 ) {
-    val viewModel: AuthViewModel = viewModel()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Reparalo",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryLight
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Ver notificaciones" }
-                    ) {
-                        Icon(
-                            Icons.Default.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = PrimaryLight
-                        )
-                    }
-                    IconButton(
-                        onClick = { navController.navigate(Routes.USER_PROFILE) },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Ver perfil de usuario" }
-                    ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = PrimaryLight
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                )
-            )
-        },
-    ) { innerPadding ->
-        EnhancedDashboardContent(innerPadding = innerPadding, navController = navController)
+    Scaffold { innerPadding ->
+        DashboardContent(innerPadding = innerPadding, navController = navController)
     }
 }
 
 @Composable
-fun EnhancedDashboardContent(innerPadding: PaddingValues, navController: NavController) {
+fun DashboardContent(innerPadding: PaddingValues, navController: NavController) {
     val screenKey = navController.currentBackStackEntryAsState().value?.destination?.route
 
     key(screenKey) {

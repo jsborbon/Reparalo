@@ -10,20 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -76,7 +67,7 @@ fun TutorialsScreen(navController: NavController) {
     var tutorialToDeleteId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        tutorialsViewModel.selectCategory(null)
+        tutorialsViewModel.loadTutorials()
         tutorialsViewModel.loadFavorites()
         categoryViewModel.loadCategories()
     }
@@ -111,35 +102,6 @@ fun TutorialsScreen(navController: NavController) {
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Tutoriales de Reparación",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.navigateUp() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Volver al menú principal" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -227,10 +189,12 @@ fun TutorialsScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val currentTutorialsState = if (selectedCategoryName != null) {
-                tutorialsByCategoryState
-            } else {
-                allTutorialsState
+            val currentTutorialsState = when {
+                selectedCategoryName != null -> tutorialsByCategoryState
+                allTutorialsState is ApiResponse.Success ||
+                    allTutorialsState is ApiResponse.Loading ||
+                    allTutorialsState is ApiResponse.Failure -> allTutorialsState
+                else -> ApiResponse.Loading
             }
 
             TutorialsListSection(

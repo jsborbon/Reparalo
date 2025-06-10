@@ -41,6 +41,13 @@ class TutorialsViewModel(
     private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
     val favoriteIds: StateFlow<Set<String>> = _favoriteIds
 
+    private val _highlightedTutorial = MutableStateFlow<ApiResponse<Tutorial>>(ApiResponse.Loading)
+    val highlightedTutorial: StateFlow<ApiResponse<Tutorial>> = _highlightedTutorial
+
+    init {
+        loadHighlightedTutorial()
+    }
+
     fun loadTutorials() {
         _tutorials.value = ApiResponse.Loading
         viewModelScope.launch {
@@ -68,11 +75,13 @@ class TutorialsViewModel(
     }
 
     fun selectCategory(category: String?) {
-        _selectedCategory.value = category
-        if (category != null) {
-            loadTutorialsByCategory(category)
-        } else {
-            loadTutorials()
+        if (_selectedCategory.value != category) {
+            _selectedCategory.value = category
+            if (category != null) {
+                loadTutorialsByCategory(category)
+            } else {
+                loadTutorials()
+            }
         }
     }
 
@@ -177,6 +186,19 @@ class TutorialsViewModel(
                 }
             } catch (e: Exception) {
                 _uiMessage.emit("Error inesperado al cargar favoritos: ${e.message}")
+            }
+        }
+    }
+
+    fun loadHighlightedTutorial() {
+        _highlightedTutorial.value = ApiResponse.Loading
+        viewModelScope.launch {
+            try {
+                repository.getHighlightedTutorial().collect { response ->
+                    _highlightedTutorial.value = response
+                }
+            } catch (e: Exception) {
+                _highlightedTutorial.value = ApiResponse.Failure(e.message ?: "Error al cargar tutorial destacado.")
             }
         }
     }

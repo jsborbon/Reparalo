@@ -17,6 +17,7 @@ class CommentRepositoryImpl(
 ) : CommentRepository {
 
     private val commentsCollection = firestore.collection("comments")
+    private val usersCollection = firestore.collection("users")
     private val TAG = CommentRepositoryImpl::class.java.simpleName
 
     override fun getCommentsByTutorial(tutorialId: String): Flow<ApiResponse<List<Comment>>> = flow {
@@ -31,15 +32,41 @@ class CommentRepositoryImpl(
             emit(ApiResponse.Success(comments))
         } catch (e: Exception) {
             Log.e(TAG, "getCommentsByTutorial exception: ${e.message}", e)
-            emit(ApiResponse.Failure("Error al obtener los comentarios"))
+            emit(ApiResponse.Failure("Error al obtener los comentarios del tutorial"))
         }
     }.catch { e ->
         Log.e(TAG, "getCommentsByTutorial catch: ${e.message}", e)
-        emit(ApiResponse.Failure("Error inesperado al cargar comentarios"))
+        emit(ApiResponse.Failure("Error inesperado al cargar comentarios del tutorial"))
+    }
+
+    override fun getCommentsByForumTopic(forumTopicId: String): Flow<ApiResponse<List<Comment>>> = flow {
+        emit(ApiResponse.Loading)
+        try {
+            val snapshot = commentsCollection
+                .whereEqualTo("forumTopicId", forumTopicId)
+                .get()
+                .await()
+
+            val comments = snapshot.documents.mapNotNull { it.toObject(Comment::class.java) }
+            emit(ApiResponse.Success(comments))
+        } catch (e: Exception) {
+            Log.e(TAG, "getCommentsByForumTopic exception: ${e.message}", e)
+            emit(ApiResponse.Failure("Error al obtener los comentarios del foro"))
+        }
+    }.catch { e ->
+        Log.e(TAG, "getCommentsByForumTopic catch: ${e.message}", e)
+        emit(ApiResponse.Failure("Error inesperado al cargar comentarios del foro"))
     }
 
     override fun createComment(comment: Comment): Flow<ApiResponse<Comment>> = flow {
         emit(ApiResponse.Loading)
+
+        if (comment.tutorialId.isNullOrBlank() && comment.forumTopicId.isNullOrBlank()) {
+            Log.e(TAG, "createComment error: tutorialId and forumTopicId are both null or blank")
+            emit(ApiResponse.Failure("El comentario debe estar asociado a un tutorial o a un tema del foro"))
+            return@flow
+        }
+
         try {
             commentsCollection.add(comment).await()
             emit(ApiResponse.Success(comment))
@@ -54,13 +81,22 @@ class CommentRepositoryImpl(
 
     override fun getUserById(userId: String): Flow<ApiResponse<Author>> = flow {
         emit(ApiResponse.Loading)
+
+        if (userId.isBlank()) {
+            Log.e(TAG, "getUserById error: userId is blank or invalid")
+            emit(ApiResponse.Failure("ID de usuario inválido"))
+            return@flow
+        }
+
         try {
-            val snapshot = firestore.collection("users").document(userId).get().await()
+            val snapshot = usersCollection.document(userId).get().await()
             val user = snapshot.toObject(User::class.java)
+
             if (user != null) {
                 val author = Author(name = user.name, uid = user.uid)
                 emit(ApiResponse.Success(author))
             } else {
+                Log.w(TAG, "getUserById warning: Usuario no encontrado para id=$userId")
                 emit(ApiResponse.Failure("Usuario no encontrado"))
             }
         } catch (e: Exception) {

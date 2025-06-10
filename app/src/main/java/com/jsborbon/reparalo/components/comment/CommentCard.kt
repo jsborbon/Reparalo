@@ -167,13 +167,15 @@ fun CommentCard(
                         }
                     ) {
                         repeat(5) { index ->
+                            val rating = comment.rating ?: 0
+
                             Icon(
-                                imageVector = if (index < comment.rating)
+                                imageVector = if (index < rating)
                                     Icons.Filled.Star
                                 else
                                     Icons.Outlined.Star,
                                 contentDescription = null,
-                                tint = if (index < comment.rating)
+                                tint = if (index < rating)
                                     RepairYellow
                                 else
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),

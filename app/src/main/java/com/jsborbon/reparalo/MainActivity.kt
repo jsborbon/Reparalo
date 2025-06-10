@@ -1,7 +1,6 @@
 package com.jsborbon.reparalo
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +10,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalView
@@ -19,6 +20,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.navigation.NavigationWrapper
+import com.jsborbon.reparalo.screens.settings.SettingsManager
+import com.jsborbon.reparalo.screens.settings.ThemeManager
 import com.jsborbon.reparalo.ui.theme.ReparaloTheme
 
 /**
@@ -32,14 +35,21 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        // Prevent screenshots in sensitive areas (security best practice)
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+        val settingsManager = SettingsManager.getInstance(this)
 
         setContent {
-            ReparaloTheme {
+            // Collect user settings state
+            val settings by settingsManager.settings.collectAsState()
+
+            // Synchronize ThemeManager with saved settings on first composition
+            LaunchedEffect(settings.isDarkTheme) {
+                ThemeManager.setDarkTheme(settings.isDarkTheme)
+            }
+
+            ReparaloTheme(
+                darkTheme = settings.isDarkTheme,
+                dynamicColor = false // Set to true if you want dynamic colors
+            ) {
                 ConfigureSystemBars()
 
                 Surface(
@@ -58,12 +68,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun MainActivityContent() {
         val navController: NavHostController = rememberNavController()
-        val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
-        // Listen for Firebase Auth state changes if needed
-        LaunchedEffect(firebaseAuth) {
-            // FirebaseAuth.addAuthStateListener can be placed here
-        }
+        val firebaseAuth = FirebaseAuth.getInstance()
 
         NavigationWrapper(
             navController = navController,
@@ -83,10 +88,8 @@ class MainActivity : ComponentActivity() {
         SideEffect {
             val window = activity.window
 
-            // Enable drawing behind system bars
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
-            // Adjust bar icon appearance based on luminance
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !isDarkTheme
             insetsController.isAppearanceLightNavigationBars = !isDarkTheme

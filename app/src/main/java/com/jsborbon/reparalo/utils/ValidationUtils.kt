@@ -2,15 +2,9 @@ package com.jsborbon.reparalo.utils
 
 import android.util.Patterns
 import com.jsborbon.reparalo.screens.profile.components.ValidationResult
-import java.text.NumberFormat
-import java.util.Locale
+
 
 object ValidationUtils {
-
-    fun formatPrice(price: Float): String {
-        val formatter = NumberFormat.getCurrencyInstance(Locale("es", "ES"))
-        return formatter.format(price)
-    }
 
     fun validateTitle(title: String): String? {
         return when {

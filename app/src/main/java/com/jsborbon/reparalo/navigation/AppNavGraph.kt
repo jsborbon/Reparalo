@@ -14,18 +14,19 @@ import com.jsborbon.reparalo.screens.forum.ForumEditScreen
 import com.jsborbon.reparalo.screens.forum.ForumScreen
 import com.jsborbon.reparalo.screens.forum.ForumSearchScreen
 import com.jsborbon.reparalo.screens.forum.ForumTopicDetailScreen
-import com.jsborbon.reparalo.screens.history.ServiceDetailScreen
 import com.jsborbon.reparalo.screens.history.ServiceHistoryScreen
 import com.jsborbon.reparalo.screens.material.MaterialDetailScreen
 import com.jsborbon.reparalo.screens.material.MaterialEditScreen
 import com.jsborbon.reparalo.screens.material.MaterialsListScreen
 import com.jsborbon.reparalo.screens.notifications.NotificationScreen
+import com.jsborbon.reparalo.screens.profile.ChangePasswordScreen
 import com.jsborbon.reparalo.screens.profile.FavoritesScreen
 import com.jsborbon.reparalo.screens.settings.SettingsScreen
 import com.jsborbon.reparalo.screens.settings.terms.SettingsTermsScreen
 import com.jsborbon.reparalo.screens.splashScreen.SplashScreen
 import com.jsborbon.reparalo.screens.technician.ProfessionalConnectionScreen
 import com.jsborbon.reparalo.screens.technician.profile.TechnicianProfileScreen
+import com.jsborbon.reparalo.screens.profile.UserProfileScreen
 import com.jsborbon.reparalo.screens.technician.searching.TechnicianSearchScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialCreateScreen
 import com.jsborbon.reparalo.screens.tutorial.TutorialDetailScreen
@@ -110,14 +111,16 @@ fun AppNavGraph(
             ServiceHistoryScreen(navController = navController)
         }
 
-        composable("${Routes.SERVICE_DETAIL}/{serviceId}") { backStackEntry ->
-            val serviceId = backStackEntry.arguments?.getString("serviceId").orEmpty()
-            ServiceDetailScreen(navController = navController, serviceId = serviceId)
+        composable(Routes.USER_PROFILE) {
+            UserProfileScreen(navController = navController)
         }
 
-        composable("${Routes.FORUM_TOPIC_DETAIL}/{topicId}") { backStackEntry ->
-            val topicId = backStackEntry.arguments?.getString("topicId").orEmpty()
-            ForumTopicDetailScreen(navController = navController, topicId = topicId)
+        composable(Routes.NOTIFICATIONS) {
+            NotificationScreen(navController)
+        }
+
+        composable(Routes.CHANGE_PASSWORD) {
+            ChangePasswordScreen(navController)
         }
 
         composable(Routes.TUTORIAL_CREATE) {
@@ -152,13 +155,21 @@ fun AppNavGraph(
             ProfessionalConnectionScreen(navController = navController)
         }
 
-        composable(Routes.NOTIFICATIONS) {
-            NotificationScreen(navController = navController)
-        }
-
-
         composable(Routes.SETTINGS_TERMS) {
             SettingsTermsScreen(navController = navController)
+        }
+
+        composable(
+            route = "${Routes.FORUM_TOPIC_DETAIL}/{topicId}",
+            arguments = listOf(navArgument("topicId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val topicId = backStackEntry.arguments?.getString("topicId").orEmpty()
+            ForumTopicDetailScreen(navController = navController, topicId = topicId)
+        }
+
+        composable("${Routes.FORUM_TOPIC_DETAIL}/{topicId}") { backStackEntry ->
+            val topicId = backStackEntry.arguments?.getString("topicId").orEmpty()
+            ForumTopicDetailScreen(navController = navController, topicId = topicId)
         }
 
     }

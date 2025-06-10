@@ -3,8 +3,11 @@ package com.jsborbon.reparalo.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jsborbon.reparalo.data.api.ApiResponse
+import com.jsborbon.reparalo.data.repository.CommentRepository
 import com.jsborbon.reparalo.data.repository.ForumRepository
+import com.jsborbon.reparalo.data.repository.impl.CommentRepositoryImpl
 import com.jsborbon.reparalo.data.repository.impl.ForumRepositoryImpl
+import com.jsborbon.reparalo.models.Comment
 import com.jsborbon.reparalo.models.ForumTopic
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +16,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class ForumViewModel(
-    private val repository: ForumRepository = ForumRepositoryImpl(),
+    private val forumRepository: ForumRepository = ForumRepositoryImpl(),
+    private val commentRepository: CommentRepository = CommentRepositoryImpl()
 ) : ViewModel() {
 
     private val _topics = MutableStateFlow<ApiResponse<List<ForumTopic>>>(ApiResponse.Loading)
@@ -25,6 +29,9 @@ class ForumViewModel(
     private val _editState = MutableStateFlow<ApiResponse<Unit>?>(null)
     val editState: StateFlow<ApiResponse<Unit>?> = _editState
 
+    private val _comments = MutableStateFlow<ApiResponse<List<Comment>>>(ApiResponse.Idle)
+    val comments: StateFlow<ApiResponse<List<Comment>>> = _comments
+
     init {
         loadTopics()
     }
@@ -33,7 +40,7 @@ class ForumViewModel(
         _topics.value = ApiResponse.Loading
         viewModelScope.launch {
             try {
-                repository.getTopics().collect { response ->
+                forumRepository.getTopics().collect { response ->
                     _topics.value = response
                 }
             } catch (e: Exception) {
@@ -62,7 +69,7 @@ class ForumViewModel(
         _createState.value = ApiResponse.Loading
         viewModelScope.launch {
             try {
-                repository.createTopic(topic).collect { response ->
+                forumRepository.createTopic(topic).collect { response ->
                     _createState.value = response
                     if (response is ApiResponse.Success) {
                         loadTopics()
@@ -78,7 +85,7 @@ class ForumViewModel(
         _editState.value = ApiResponse.Loading
         viewModelScope.launch {
             try {
-                repository.updateTopic(topic).collect { response ->
+                forumRepository.updateTopic(topic).collect { response ->
                     _editState.value = response
                     if (response is ApiResponse.Success) {
                         loadTopics()
@@ -86,6 +93,19 @@ class ForumViewModel(
                 }
             } catch (e: Exception) {
                 _editState.value = ApiResponse.Failure(e.message ?: "Error al editar el tema.")
+            }
+        }
+    }
+
+    fun loadCommentsForForumTopic(forumTopicId: String) {
+        _comments.value = ApiResponse.Loading
+        viewModelScope.launch {
+            try {
+                commentRepository.getCommentsByForumTopic(forumTopicId).collect { response ->
+                    _comments.value = response
+                }
+            } catch (e: Exception) {
+                _comments.value = ApiResponse.Failure("Error al cargar comentarios del foro")
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.jsborbon.reparalo.screens.history.components
 
-import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background

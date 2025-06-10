@@ -6,11 +6,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,8 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +28,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,45 +42,35 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.jsborbon.reparalo.R
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.settings.components.InfoDialog
-import com.jsborbon.reparalo.screens.settings.components.LogoutConfirmationDialog
 import com.jsborbon.reparalo.screens.settings.components.NotificationTypesDialog
 import com.jsborbon.reparalo.screens.settings.components.ResetSettingsDialog
-import com.jsborbon.reparalo.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val authViewModel: AuthViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
-    var isDarkTheme by remember { mutableStateOf(false) }
-    var isNotificationsEnabled by remember { mutableStateOf(true) }
-    var isLocationEnabled by remember { mutableStateOf(false) }
-    var isBiometricEnabled by remember { mutableStateOf(false) }
-    var isAutoSyncEnabled by remember { mutableStateOf(true) }
+    val settingsManager = remember { SettingsManager.getInstance(context) }
+    val settings by settingsManager.settings.collectAsState()
 
-    var showLogoutDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var showNotificationTypesDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
-
-    var selectedNotificationTypes by remember {
-        mutableStateOf(setOf("Promociones", "Novedades"))
-    }
 
     val showScrollToTop by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 2 }
@@ -85,29 +78,8 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Configuración",
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver atrás"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = { }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
@@ -116,9 +88,119 @@ fun SettingsScreen(
                     .padding(innerPadding),
                 state = listState,
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // ... contenido omitido por brevedad
+                item {
+                    SettingSwitch(
+                        title = "Tema oscuro",
+                        description = "Activar o desactivar modo oscuro",
+                        checked = settings.isDarkTheme,
+                        onCheckedChange = {
+                            settingsManager.updateDarkTheme(it)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if (it) "Tema oscuro activado" else "Tema claro activado",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    SettingSwitch(
+                        title = "Notificaciones",
+                        description = "Recibir notificaciones de la app",
+                        checked = settings.isNotificationsEnabled,
+                        onCheckedChange = {
+                            settingsManager.updateNotifications(it)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if (it) "Notificaciones activadas" else "Notificaciones desactivadas",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    SettingSwitch(
+                        title = "Ubicación",
+                        description = "Permitir uso de ubicación",
+                        checked = settings.isLocationEnabled,
+                        onCheckedChange = {
+                            settingsManager.updateLocation(it, context)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if (it) "Ubicación activada" else "Ubicación desactivada",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    SettingSwitch(
+                        title = "Autenticación biométrica",
+                        description = "Usar huella o reconocimiento facial",
+                        checked = settings.isBiometricEnabled,
+                        onCheckedChange = {
+                            settingsManager.updateBiometric(it, context)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if (it) "Autenticación biométrica activada" else "Autenticación biométrica desactivada",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    SettingSwitch(
+                        title = "Sincronización automática",
+                        description = "Sincronizar datos en segundo plano",
+                        checked = settings.isAutoSyncEnabled,
+                        onCheckedChange = {
+                            settingsManager.updateAutoSync(it)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = if (it) "Sincronización automática activada" else "Sincronización automática desactivada",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    )
+                }
+                item {
+                    HorizontalDivider()
+                }
+                item {
+                    SettingButton(
+                        title = "Tipos de notificación",
+                        description = settings.selectedNotificationTypes.joinToString(", "),
+                        onClick = { showNotificationTypesDialog = true }
+                    )
+                }
+                item {
+                    SettingButton(
+                        title = "Restablecer configuración",
+                        description = "Restaurar valores predeterminados",
+                        onClick = { showResetDialog = true }
+                    )
+                }
+                item {
+                    SettingButton(
+                        title = "Términos y condiciones",
+                        description = "Ver términos de uso y políticas",
+                        onClick = { navController.navigate(Routes.SETTINGS_TERMS) }
+                    )
+                }
+                item {
+                    SettingButton(
+                        title = "Información de la aplicación",
+                        description = "Versión, créditos y más",
+                        onClick = { showInfoDialog = true }
+                    )
+                }
             }
 
             AnimatedVisibility(
@@ -128,6 +210,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
+                    .semantics { contentDescription = "Botón para ir arriba" }
             ) {
                 IconButton(
                     onClick = {
@@ -138,12 +221,12 @@ fun SettingsScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            MaterialTheme.colorScheme.primaryContainer,
-                            CircleShape
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = CircleShape
                         )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.outline_expand_circle_up),
+                        imageVector = Icons.Filled.KeyboardArrowUp,
                         contentDescription = "Ir arriba",
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -152,32 +235,16 @@ fun SettingsScreen(
         }
     }
 
-    if (showLogoutDialog) {
-        LogoutConfirmationDialog(
-            onConfirm = {
-                authViewModel.logout()
-                navController.navigate(Routes.AUTHENTICATION) {
-                    popUpTo(0) { inclusive = true }
-                }
-                showLogoutDialog = false
-            },
-            onDismiss = { showLogoutDialog = false }
-        )
-    }
-
+    // Diálogos
     if (showInfoDialog) {
         InfoDialog(onDismiss = { showInfoDialog = false })
     }
 
     if (showNotificationTypesDialog) {
         NotificationTypesDialog(
-            selectedTypes = selectedNotificationTypes,
+            selectedTypes = settings.selectedNotificationTypes,
             onToggleType = { type ->
-                selectedNotificationTypes = if (selectedNotificationTypes.contains(type)) {
-                    selectedNotificationTypes - type
-                } else {
-                    selectedNotificationTypes + type
-                }
+                settingsManager.toggleNotificationType(type)
             },
             onDismiss = { showNotificationTypesDialog = false }
         )
@@ -186,12 +253,7 @@ fun SettingsScreen(
     if (showResetDialog) {
         ResetSettingsDialog(
             onConfirm = {
-                isDarkTheme = false
-                isNotificationsEnabled = true
-                isLocationEnabled = false
-                isBiometricEnabled = false
-                isAutoSyncEnabled = true
-                selectedNotificationTypes = setOf("Promociones", "Novedades")
+                settingsManager.resetSettings()
                 showResetDialog = false
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -202,5 +264,87 @@ fun SettingsScreen(
             },
             onDismiss = { showResetDialog = false }
         )
+    }
+}
+
+@Composable
+private fun SettingSwitch(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                    )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = checked,
+                    onCheckedChange = onCheckedChange,
+                    modifier = Modifier.semantics {
+                        contentDescription = "$title switch"
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingButton(
+    title: String,
+    description: String,
+    onClick: () -> Unit,
+    titleColor: Color = MaterialTheme.colorScheme.onSurface,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        TextButton(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .semantics {
+                    contentDescription = "$title button"
+                }
+        ) {
+            Column(horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = titleColor
+                    )
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }

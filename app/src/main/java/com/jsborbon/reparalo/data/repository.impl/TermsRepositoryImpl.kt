@@ -18,7 +18,7 @@ class TermsRepositoryImpl(
     override fun getTermsAndConditions(): Flow<ApiResponse<TermsAndConditions>> = flow {
         emit(ApiResponse.Loading)
         try {
-            val snapshot = firestore.collection("terms").document("actual").get().await()
+            val snapshot = firestore.collection("terms").document("termsAndConditions").get().await()
             val terms = snapshot.toObject(TermsAndConditions::class.java)
             if (terms != null) {
                 emit(ApiResponse.Success(terms))

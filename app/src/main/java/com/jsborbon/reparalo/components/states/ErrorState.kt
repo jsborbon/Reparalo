@@ -43,7 +43,7 @@ fun ErrorState(
     modifier: Modifier = Modifier,
     title: String = "Error al cargar datos",
     message: String,
-    onRetry: () -> Unit,
+    onRetry: (() -> Unit)? = null,
     semanticDescription: String = "Se produjo un error"
 ) {
     Card(
@@ -89,16 +89,17 @@ fun ErrorState(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(onClick = onRetry) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Reintentar")
+            if (onRetry != null) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(onClick = onRetry) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reintentar")
+                }
             }
         }
     }

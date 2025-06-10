@@ -61,7 +61,9 @@ import com.jsborbon.reparalo.viewmodels.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(navController: NavController) {
+fun NotificationScreen(
+    navController: NavController
+) {
     val viewModel: NotificationViewModel = remember { NotificationViewModel() }
     val notificationState by viewModel.notifications.collectAsState()
 
@@ -71,64 +73,63 @@ fun NotificationScreen(navController: NavController) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Notificaciones",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        if (unreadCount > 0) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = Error)
-                            ) {
-                                Text(
-                                    text = unreadCount.toString(),
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
+    Scaffold(topBar = {
+        TopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Notificaciones",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    if (unreadCount > 0) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Error)
+                        ) {
+                            Text(
+                                text = unreadCount.toString(),
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
                         }
                     }
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Volver a la pantalla anterior" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.loadNotifications() },
-                        modifier = Modifier.semantics { contentDescription = "Actualizar notificaciones" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            tint = PrimaryLight
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                )
+                }
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .semantics { contentDescription = "Volver a la pantalla anterior" }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            actions = {
+                IconButton(
+                    onClick = { viewModel.loadNotifications() },
+                    modifier = Modifier.semantics { contentDescription = "Actualizar notificaciones" }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        tint = PrimaryLight
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
             )
-        },
+        )
+    },
     ) { padding ->
         when (val state = notificationState) {
             is ApiResponse.Loading,

@@ -1,6 +1,5 @@
 package com.jsborbon.reparalo.screens.settings.help.components
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues

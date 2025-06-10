@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,7 +67,7 @@ fun SettingsTermsScreen(
     val listState = rememberLazyListState()
 
     // Reading preferences
-    var textSize by remember { mutableStateOf(16f) }
+    var textSize by remember { mutableFloatStateOf(16f) }
     var showReadingProgress by remember { mutableStateOf(true) }
     var isExpanded by remember { mutableStateOf(false) }
 

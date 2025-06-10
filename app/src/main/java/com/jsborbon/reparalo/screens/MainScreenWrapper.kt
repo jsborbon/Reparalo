@@ -1,13 +1,13 @@
 package com.jsborbon.reparalo.screens
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.navigation.components.NavigationBottomBar
+import com.jsborbon.reparalo.ui.theme.PrimaryLight
 
 private val bottomNavRoutes = listOf(
     Routes.DASHBOARD,
@@ -32,7 +33,6 @@ private val bottomNavRoutes = listOf(
     Routes.FORUM,
     Routes.SETTINGS,
 )
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +59,10 @@ fun MainScreenWrapper(
         currentRoute in bottomNavRoutes || currentRoute?.contains(Routes.USER_PROFILE) == true
     }
 
+    val showTopBar = remember(currentRoute) {
+        currentRoute != Routes.DASHBOARD && showBottomNav
+    }
+
     val screenTitle = remember(selectedIndex) {
         when (selectedIndex) {
             0 -> "Inicio"
@@ -73,40 +77,75 @@ fun MainScreenWrapper(
 
     if (showBottomNav) {
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        AnimatedContent(
-                            targetState = screenTitle,
-                            transitionSpec = {
-                                fadeIn(animationSpec = tween(200)) togetherWith
-                                    fadeOut(animationSpec = tween(150))
-                            },
-                            label = "topBarTitle"
-                        ) { title ->
+            topBar = if (showTopBar) {
+                {
+                    TopAppBar(
+                        title = {
                             Text(
-                                text = title,
+                                text = screenTitle,
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.SemiBold
                                 ),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.semantics {
-                                    contentDescription = "Pantalla actual: $title"
+                                    contentDescription = "Pantalla actual: $screenTitle"
                                 }
                             )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            titleContentColor = MaterialTheme.colorScheme.onSurface
+                        )
                     )
-                )
+                }
+            } else {
+                {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Reparalo",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryLight
+                            )
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = { navController.navigate(Routes.NOTIFICATIONS) },
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Ver notificaciones"
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Notifications,
+                                    contentDescription = "Notificaciones",
+                                    tint = PrimaryLight
+                                )
+                            }
+                            IconButton(
+                                onClick = { navController.navigate(Routes.USER_PROFILE) },
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Ver perfil de usuario"
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = "Perfil",
+                                    tint = PrimaryLight
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                }
             },
             bottomBar = {
                 NavigationBottomBar(
                     selectedIndex = selectedIndex,
                     navController = navController,
-                    onTabChange = { /* Navigation handled by NavController */ },
+                    onTabChange = {},
                 )
             },
             containerColor = MaterialTheme.colorScheme.background,

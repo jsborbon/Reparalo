@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,20 +27,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,10 +54,10 @@ import com.jsborbon.reparalo.models.ForumTopic
 import com.jsborbon.reparalo.navigation.Routes
 import com.jsborbon.reparalo.screens.forum.components.ForumTopicItem
 import com.jsborbon.reparalo.ui.components.LoadingIndicator
+import com.jsborbon.reparalo.ui.theme.Error
 import com.jsborbon.reparalo.ui.theme.PrimaryLight
 import com.jsborbon.reparalo.ui.theme.RepairYellow
 import com.jsborbon.reparalo.ui.theme.Success
-import com.jsborbon.reparalo.ui.theme.Error
 import com.jsborbon.reparalo.viewmodels.CategoryViewModel
 import com.jsborbon.reparalo.viewmodels.ForumViewModel
 
@@ -86,36 +82,7 @@ fun ForumScreen(
 
     var selectedCategory by remember { mutableStateOf(allCategories.first()) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Foro",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = { navController.navigate(Routes.FORUM_SEARCH) },
-                        modifier = Modifier.semantics {
-                            contentDescription = "Buscar temas en el foro"
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Buscar en el foro",
-                            tint = PrimaryLight
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                )
-            )
-        },
-    ) { padding ->
+    Scaffold{ padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -321,7 +288,7 @@ fun ForumScreen(
                                     ForumTopicItem(
                                         topic = topic,
                                         onClick = {
-                                            Routes.FORUM_TOPIC_DETAIL.replace("{topicId}", topic.id)
+                                            navController.navigate("${Routes.FORUM_TOPIC_DETAIL}/${topic.id}")
                                         }
                                     )
                                 }

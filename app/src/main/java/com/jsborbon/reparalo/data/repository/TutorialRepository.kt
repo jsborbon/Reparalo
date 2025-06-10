@@ -17,4 +17,5 @@ interface TutorialRepository {
     fun removeFavorite(tutorialId: String): Flow<ApiResponse<Unit>>
     fun getFavoriteTutorialIds(): Flow<ApiResponse<List<String>>>
     fun toggleFavorite(tutorialId: String): Flow<ApiResponse<Unit>>
+    fun getHighlightedTutorial(): Flow<ApiResponse<Tutorial>>
 }

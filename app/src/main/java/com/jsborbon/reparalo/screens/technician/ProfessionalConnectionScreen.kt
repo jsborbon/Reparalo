@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.twotone.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,7 +29,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jsborbon.reparalo.data.api.ApiResponse
 import com.jsborbon.reparalo.screens.technician.components.ProfessionalConnectionContent
-import com.jsborbon.reparalo.screens.technician.components.ProfessionalConnectionTopBar
 import com.jsborbon.reparalo.viewmodels.TechnicianListViewModel
 import kotlinx.coroutines.launch
 
@@ -62,13 +61,7 @@ fun ProfessionalConnectionScreen(
     }
 
     Scaffold(
-        topBar = {
-            ProfessionalConnectionTopBar(
-                onNavigateBack = { navController.navigateUp() },
-                onRefresh = { retryCount++ },
-                isLoading = technicianState is ApiResponse.Loading
-            )
-        },
+
         floatingActionButton = {
             AnimatedVisibility(
                 visible = showFab,
@@ -86,7 +79,7 @@ fun ProfessionalConnectionScreen(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Star,
+                        imageVector = Icons.TwoTone.KeyboardArrowUp,
                         contentDescription = "Ir arriba"
                     )
                 }

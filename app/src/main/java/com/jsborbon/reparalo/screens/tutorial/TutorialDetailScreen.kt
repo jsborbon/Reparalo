@@ -1,31 +1,24 @@
 package com.jsborbon.reparalo.screens.tutorial
 
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -34,13 +27,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,6 +47,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jsborbon.reparalo.components.comment.CommentFormSection
@@ -76,9 +67,9 @@ fun TutorialDetailScreen(
     navController: NavController,
     tutorialId: String,
 ) {
-    val detailViewModel: TutorialDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-    val sharedViewModel: TutorialsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-    val auth: FirebaseAuth = remember { FirebaseAuth.getInstance() }
+    val detailViewModel: TutorialDetailViewModel = viewModel()
+    val sharedViewModel: TutorialsViewModel = viewModel()
+    val auth = remember { FirebaseAuth.getInstance() }
     val currentUserId = auth.currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
     val context = LocalContext.current
 
@@ -87,26 +78,16 @@ fun TutorialDetailScreen(
     val materialsState by detailViewModel.materials.collectAsState()
     val userNames by detailViewModel.userNames.collectAsState()
     val deleteState = sharedViewModel.deleteState.collectAsState().value
-    val favoriteIds by sharedViewModel.favoriteIds.collectAsState()
 
-    // Enhanced favorite state calculation
-    val isFavorite = remember(favoriteIds, tutorialId) {
-        favoriteIds.contains(tutorialId)
-    }
-
-    // Local UI state management
     val showDeleteDialog = remember { mutableStateOf(false) }
     val commentText = remember { mutableStateOf("") }
     val rating = remember { mutableIntStateOf(0) }
-    val scrollState = rememberScrollState()
 
-    // Load initial data when screen appears
     LaunchedEffect(tutorialId) {
         detailViewModel.loadTutorial(tutorialId)
         detailViewModel.loadComments(tutorialId)
     }
 
-    // Delete operation feedback
     LaunchedEffect(deleteState) {
         when (deleteState) {
             is ApiResponse.Success -> {
@@ -114,110 +95,17 @@ fun TutorialDetailScreen(
                 sharedViewModel.resetDeleteState()
                 navController.popBackStack()
             }
-
             is ApiResponse.Failure -> {
                 Toast.makeText(context, "Error: ${deleteState.errorMessage}", Toast.LENGTH_LONG).show()
                 sharedViewModel.resetDeleteState()
             }
-
             else -> {}
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Detalle del Tutorial",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Volver a la lista de tutoriales" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                actions = {
-                    // Enhanced share button with better UX
-                    IconButton(
-                        onClick = {
-                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    "¡Mira este tutorial de reparación! https://reparalo.app/tutorial/$tutorialId"
-                                )
-                                type = "text/plain"
-                            }
-                            context.startActivity(Intent.createChooser(shareIntent, "Compartir tutorial"))
-                        },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Compartir este tutorial" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Compartir",
-                            tint = PrimaryLight
-                        )
-                    }
+    Scaffold {
+            paddingValues ->
 
-                    // Enhanced favorite button with smooth animation
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = scaleIn(animationSpec = tween(200)),
-                        exit = scaleOut(animationSpec = tween(200))
-                    ) {
-                        IconButton(
-                            onClick = { sharedViewModel.toggleFavorite(tutorialId) },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .semantics {
-                                    contentDescription = if (isFavorite)
-                                        "Quitar de favoritos" else "Agregar a favoritos"
-                                }
-                        ) {
-                            Icon(
-                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                                tint = if (isFavorite) Error else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-
-                    // Enhanced delete button with warning color
-                    IconButton(
-                        onClick = { showDeleteDialog.value = true },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { contentDescription = "Eliminar tutorial" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Eliminar",
-                            tint = Error
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        }
-    ) { paddingValues ->
-
-        // Enhanced main content with improved animations
         AnimatedVisibility(
             visible = tutorialState !is ApiResponse.Idle,
             enter = slideInHorizontally(
@@ -238,7 +126,6 @@ fun TutorialDetailScreen(
                         LoadingIndicator()
                     }
                 }
-
                 is ApiResponse.Failure -> {
                     Box(
                         modifier = Modifier
@@ -307,83 +194,80 @@ fun TutorialDetailScreen(
                         }
                     }
                 }
-
                 is ApiResponse.Success -> {
-                    val comments = (commentsState as? ApiResponse.Success)?.data ?: emptyList()
-
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(scrollState)
-                            .padding(paddingValues)
+                            .padding(paddingValues),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 24.dp)
                     ) {
-                        // Tutorial main content
-                        TutorialDetailContent(
-                            tutorial = state.data,
-                            commentsState = comments,
-                            materialsState = materialsState,
-                            innerPadding = paddingValues,
-                            tutorialId = tutorialId,
-                            userNames = userNames
-                        )
+                        item {
+                            TutorialDetailContent(
+                                tutorial = state.data,
+                                commentsState = (commentsState as? ApiResponse.Success)?.data ?: emptyList(),
+                                materialsState = materialsState,
+                                innerPadding = paddingValues,
+                                tutorialId = tutorialId,
+                                userNames = userNames
+                            )
+                        }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Comments section with visual separation
-                        Card(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
+                        item {
+                            Card(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                             ) {
-                                Text(
-                                    text = "Comentarios y valoraciones",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 16.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = "Comentarios y valoraciones",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(bottom = 16.dp)
+                                    )
 
-                                CommentFormSection(
-                                    commentText = commentText,
-                                    rating = rating,
-                                    onSubmit = {
-                                        detailViewModel.submitComment(
-                                            tutorialId = tutorialId,
-                                            content = commentText.value,
-                                            rating = rating.intValue,
-                                            userId = currentUserId
-                                        )
-                                        commentText.value = ""
-                                        rating.intValue = 0
-                                        Toast.makeText(context, "Comentario enviado correctamente", Toast.LENGTH_SHORT).show()
-                                    }
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                CommentListSection(
-                                    commentsState = commentsState,
-                                    viewModel = detailViewModel,
-                                    tutorialId = tutorialId
-                                )
+                                    CommentFormSection(
+                                        commentText = commentText,
+                                        rating = rating,
+                                        onSubmit = {
+                                            detailViewModel.submitComment(
+                                                tutorialId = tutorialId,
+                                                content = commentText.value,
+                                                rating = rating.intValue,
+                                                userId = currentUserId
+                                            )
+                                            commentText.value = ""
+                                            rating.intValue = 0
+                                            Toast.makeText(context, "Comentario enviado correctamente", Toast.LENGTH_SHORT).show()
+                                        }
+                                    )
+                                }
                             }
                         }
 
-                        // Bottom spacing for better scroll experience
-                        Spacer(modifier = Modifier.height(24.dp))
+                        item {
+                            CommentListSection(
+                                commentsState = commentsState,
+                                userNamesMap = userNames,
+                                onRetry = { detailViewModel.loadComments(tutorialId) }
+                            )
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
                     }
                 }
-
                 ApiResponse.Idle -> {}
             }
         }
 
-        // Delete confirmation dialog
         if (showDeleteDialog.value) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog.value = false },
@@ -447,4 +331,3 @@ fun TutorialDetailScreen(
         }
     }
 }
-
