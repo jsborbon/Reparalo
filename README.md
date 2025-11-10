@@ -60,8 +60,6 @@ git clone https://github.com/jsborbon/Reparalo.git
 
 ## 🖼️ Capturas (`./screenshots/`)
 
-> Coloca tus imágenes dentro de `./screenshots/` con estos nombres para que el README las muestre correctamente.
-
 ### 1) Pantalla de Inicio (modo claro)
 Bienvenida contextual (saludo por momento del día), accesos rápidos a **Tutoriales**, **Materiales**, **Profesionales** y **Foro**, y acceso a notificaciones/perfil.  
 ![Inicio – Claro](./screenshots/Reparalo1.jpg)
