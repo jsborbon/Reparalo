@@ -62,62 +62,61 @@ git clone https://github.com/jsborbon/Reparalo.git
 
 ### 1) Pantalla de Inicio (modo claro)
 Bienvenida contextual (saludo por momento del día), accesos rápidos a **Tutoriales**, **Materiales**, **Profesionales** y **Foro**, y acceso a notificaciones/perfil.  
-![Inicio – Claro](./screenshots/Reparalo1.jpg)
+<p align="center"><img src="./screenshots/Reparalo1.jpg" alt="Inicio – Claro" width="320" /></p>
 
 ---
 
 ### 2) Ajustes (modo claro)
 Preferencias principales: **tema oscuro**, **notificaciones**, **ubicación**, **biometría**, **sincronización**, y restaurar configuración.  
-![Ajustes – Claro](./screenshots/Reparalo2.jpg)
+<p align="center"><img src="./screenshots/Reparalo2.jpg" alt="Ajustes – Claro" width="320" /></p>
 
 ---
 
 ### 3) Ajustes (modo oscuro)
 Mismas opciones con la paleta **Dark**; se muestra confirmación “Tema oscuro activado”.  
-![Ajustes – Oscuro](./screenshots/Reparalo3.jpg)
+<p align="center"><img src="./screenshots/Reparalo3.jpg" alt="Ajustes – Oscuro" width="320" /></p>
 
 ---
 
 ### 4) Materiales
 Buscador + categorías. Listado de materiales con **precio**, **subtotal** y **cantidad** (útil para armar presupuesto rápido).  
-![Materiales](./screenshots/Reparalo4.jpg)
+<p align="center"><img src="./screenshots/Reparalo4.jpg" alt="Materiales" width="320" /></p>
 
 ---
 
 ### 5) Foro (categorías)
 Tabs de categorías (Carpintería, Electricidad, Fontanería…), botón **“Crear nuevo tema”**, y tarjetas con métricas (vistas, likes, comentarios).  
-![Foro – Listado](./screenshots/Reparalo6.jpg)
+<p align="center"><img src="./screenshots/Reparalo6.jpg" alt="Foro – Listado" width="320" /></p>
 
 ---
 
 ### 6) Crear nuevo tema
 Formulario minimal para **título**, **categoría** y **descripción**, con CTA **“Publicar tema”**.  
-![Foro – Nuevo tema](./screenshots/Reparalo7.jpg)
+<p align="center"><img src="./screenshots/Reparalo7.jpg" alt="Foro – Nuevo tema" width="320" /></p>
 
 ---
 
 ### 7) Tutoriales (explorar)
 Buscador por **título/autor/descripcion**, chips de categorías y cards con autor, favoritos, etc.  
-![Tutoriales – Búsqueda](./screenshots/Reparalo8.jpg)
+<p align="center"><img src="./screenshots/Reparalo8.jpg" alt="Tutoriales – Búsqueda" width="320" /></p>
 
 ---
 
 ### 8) Detalle de tutorial
 Título, autor, categoría, duración y nivel. Video embebido, botón **pantalla completa**, **materiales necesarios** y sección de comentarios.  
-![Tutorial – Detalle](./screenshots/Reparalo9.jpg)
+<p align="center"><img src="./screenshots/Reparalo9.jpg" alt="Tutorial – Detalle" width="320" /></p>
 
 ---
 
 ### 9) Inicio (bloques destacados)
 Bloques grandes de acceso rápido, sección **“Tutoriales Destacados”** con badges (rating, duración, dificultad).  
-![Inicio – Destacados](./screenshots/Reparalo10.jpg)
+<p align="center"><img src="./screenshots/Reparalo10.jpg" alt="Inicio – Destacados" width="320" /></p>
 
 ---
 
 ### 10) Inicio (modo oscuro)
 Variante **Dark** del Home con los mismos accesos y secciones en la paleta oscura.  
-![Inicio – Oscuro](./screenshots/Reparalo12.jpg)
-
+<p align="center"><img src="./screenshots/Reparalo12.jpg" alt="Inicio – Oscuro" width="320" /></p>
 
 
 ## Créditos
